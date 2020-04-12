@@ -1,11 +1,10 @@
 package org.topaz
 
-class Topaz{
-	def getWorld() {
-		"Hello, World!"
-	}
+import Cartridge
 
+class Topaz{
 	static main(args) {
-		println new Topaz().world
+	 def cartridge = Cartridge.load("/home/maxx/Documents/alba.pdf")
+  println cartridge.toString()
 	}
 }
