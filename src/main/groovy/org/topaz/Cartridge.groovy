@@ -1,20 +1,24 @@
 import java.io.FileInputStream
+
 class Cartridge{
+ int mRomSize
+ private File mRom
 
- private static final int ROM_SIZE = 0x2000000
+  public Cartridge(File mRom, int mRomSize){
+    this.mRom = mRom
+    this.mRomSize = mRomSize
+  }
 
- static byte[] load(def path){
-  def f = new File(path)
-  def inputStream = new FileInputStream(f)
-   byte[] b = new byte[ROM_SIZE]
+ byte[] load(){
+   def inputStream = new FileInputStream(this.mRom)
+   byte[] b = new byte[this.mRomSize]
 
    try{
-    inputStream.read(b)
-    inputStream.close()
+     inputStream.read(b)
+     inputStream.close()
    }catch(Exception e){
     println "Error reading cartridge: " + e.toString()
    }
   return b
  }
-
 }
