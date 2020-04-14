@@ -1,24 +1,21 @@
-import java.io.FileInputStream
+package org.topaz
 
 class Cartridge{
- int mRomSize
- private File mRom
+		private static final int MAX_ROM_SIZE = 0x2000000
 
-  public Cartridge(File mRom, int mRomSize){
-    this.mRom = mRom
-    this.mRomSize = mRomSize
-  }
+		private File rom
+		int [] memory
 
- byte[] load(){
-   def inputStream = new FileInputStream(this.mRom)
-   byte[] b = new byte[this.mRomSize]
+		public Cartridge(File rom){
+			 memory = new int[rom.bytes.length]
+				this.rom = rom
+				this.load()
+		}
 
-   try{
-     inputStream.read(b)
-     inputStream.close()
-   }catch(Exception e){
-    println "Error reading cartridge: " + e.toString()
-   }
-  return b
- }
+		private void load(){
+		 	this.rom.bytes.eachWithIndex{it, idx->
+				this.memory[idx] = it & 0xFF
+				}
+	 }
 }
+

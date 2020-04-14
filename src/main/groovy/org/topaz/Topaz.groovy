@@ -1,21 +1,23 @@
 package org.topaz
 
-import Cartridge
-import Register
+import org.topaz.Cartridge
+import org.topaz.Register
 
 class Topaz{
   private static final int ROM_SIZE = 0x2000000
 
-	 public static void main(args) {
+  public static void main(args) {
+    def f = new File("/home/maxx/Documents/alba.pdf")
+    def cartridge = new Cartridge(f)
+    println cartridge.cartridgeMemory.length
 
-  def f = new File("/home/maxx/Documents/alba.pdf")
-	 def cartridge = new Cartridge(f, ROM_SIZE)
-  println cartridge.load().length
+    def reg = new Register()
 
-  def reg = new Register()
-
-  reg.setZ(true)
-  println reg.printFlags()
-
+    reg.setZ(true)
+    println reg.printFlags()
 	}
+
+  public Topaz(){
+
+  }
 }
