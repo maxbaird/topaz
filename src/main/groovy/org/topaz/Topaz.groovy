@@ -7,9 +7,9 @@ class Topaz{
   private static final int ROM_SIZE = 0x2000000
 
   public static void main(args) {
-    def f = new File("/home/maxx/Documents/alba.pdf")
+    def f = new File("/home/maxx/Documents/Games/bandicoot.GBA")
     def cartridge = new Cartridge(f)
-    println cartridge.cartridgeMemory.length
+    println cartridge.memory.length
 
     def reg = new Register()
 
@@ -17,7 +17,7 @@ class Topaz{
     println reg.printFlags()
 	}
 
-  public Topaz(){
+ public Topaz(){
 
-  }
+ }
 }

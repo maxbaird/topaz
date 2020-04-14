@@ -1,4 +1,4 @@
-package org.Topaz
+package org.topaz
 
 class Register{
   int A

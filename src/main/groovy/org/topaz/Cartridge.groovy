@@ -7,7 +7,7 @@ class Cartridge{
 		int [] memory
 
 		public Cartridge(File rom){
-			 memory = new int[rom.bytes.length]
+			 memory = new int[MAX_ROM_SIZE]
 				this.rom = rom
 				this.load()
 		}
