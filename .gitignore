@@ -5,3 +5,8 @@
 build
 
 *.swp
+.classpath
+.project
+.groovy/
+.settings/
+bin/
