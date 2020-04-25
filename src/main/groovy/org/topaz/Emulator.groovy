@@ -5,7 +5,6 @@ import org.topaz.cpu.Register
 import org.topaz.cpu.CPU
 
 class Emulator{
-    private static final int ROM_SIZE = 0x2000000
     private static final MAX_CYCLES = 69905
 
     CPU cpu
