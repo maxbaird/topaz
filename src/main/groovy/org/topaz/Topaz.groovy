@@ -1,22 +1,21 @@
 package org.topaz
 
 import org.topaz.Cartridge
-import org.topaz.Register
+import org.topaz.cpu.Register
+import org.topaz.Emulator
 
 class Topaz{
-    private static final int ROM_SIZE = 0x2000000
+    Emulator emulator
 
     public static void main(String []args) {
-        def f = new File("/home/maxx/Documents/Games/bandicoot.GBA")
-        def cartridge = new Cartridge(f)
-        println cartridge.memory.length
-
-        def reg = new Register()
-
-        reg.setZ(true)
-        println reg.printFlags()
+        new Topaz()
+        println 'done...'
     }
 
     public Topaz(){
+        //TODO create GUI and get file
+        def f = new File("/home/maxx/Documents/Games/bandicoot.GBA")
+        def cartridge = new Cartridge(f)
+        emulator = new Emulator(cartridge)
     }
 }

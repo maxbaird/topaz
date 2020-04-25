@@ -1,4 +1,4 @@
-package org.topaz
+package org.topaz.cpu
 
 class Register{
     int A
@@ -18,6 +18,16 @@ class Register{
     private static int FLAG_N = 6
     private static int FLAG_H = 5
     private static int FLAG_C = 4
+    
+    public Register() {
+        this.pc = 0x100
+        this.sp = 0xFFFE
+        
+        this.setAF(0x01B0)
+        this.setBC(0x0013)
+        this.setDE(0x00D8)
+        this.setHL(0x014D)
+    }
 
     private void setFlag(int pos){
         this.F = this.F | (1 << pos)
