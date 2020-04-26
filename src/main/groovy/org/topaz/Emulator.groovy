@@ -3,14 +3,19 @@ package org.topaz
 import org.topaz.Cartridge
 import org.topaz.cpu.Register
 import org.topaz.cpu.CPU
+import org.topaz.cpu.MemoryManager
 
 class Emulator{
     private static final MAX_CYCLES = 69905
 
     CPU cpu
+    MemoryManager memoryManager
+    Cartridge cartridge
 
     public Emulator(Cartridge cartridge){
         this.cpu = new CPU()
+        this.cartridge = cartridge
+        this.memoryManager = new MemoryManager(this.cartridge)
     }
     
     public void Update() {

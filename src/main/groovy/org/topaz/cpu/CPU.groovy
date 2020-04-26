@@ -5,10 +5,8 @@ import org.topaz.cpu.MemoryManager
 
 class CPU{
     Register register
-    MemoryManager memoryManager
     
     public CPU() {
         this.register = new Register()    
-        this.memoryManager = new MemoryManager()
     }
 }

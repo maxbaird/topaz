@@ -1,10 +1,15 @@
 package org.topaz.cpu
 
+import org.topaz.Cartridge
+
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
     private int []rom
+    
+    Cartridge cartridge
 
-    public MemoryManager() {
+    public MemoryManager(Cartridge cartridge) {
+        this.cartridge = cartridge
         this.rom = new int[MEMORY_SIZE]
         this.init()
     }
