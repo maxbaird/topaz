@@ -44,12 +44,17 @@ class MemoryManager{
     }
     
     void writeMemory(int address, int data) {
+        /* Read only memory, no writes allowed */
         if(address < 0x800) {
             return
-        }else if((address >= 0xE000) && (address < 0xFE00)) {
+        }
+        /* Writing to ECHO ram also writes to RAM */ 
+        else if((address >= 0xE000) && (address < 0xFE00)) {
             this.rom[address] = data
             this.writeMemory(address-0x2000, data)
-        }else if((address >= 0xFEA0) && (address < 0xFEFF)) {
+        }
+        /* Unused memory, no writes should happen here */
+        else if((address >= 0xFEA0) && (address < 0xFEFF)) {
             return
         }else {
             this.rom[address] = data
