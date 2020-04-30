@@ -1,17 +1,23 @@
 package org.topaz
 
 class Cartridge{
+    private static final int MAX_ROM_SIZE = 0x2000000
+    private static final int RAM_BANK_SIZE = 0x8000
+    private File rom
+
     boolean isMBC1 = false
     boolean isMBC2 = false
     int currentRomBank = 1
+    
+    int []ramBanks
+    int currentRamBank = 0
 
-    private static final int MAX_ROM_SIZE = 0x2000000
-    private File rom
     int [] memory
 
     public Cartridge(File rom){
         memory = new int[MAX_ROM_SIZE]
         this.rom = rom
+        this.ramBanks = new int[RAM_BANK_SIZE]
         this.load()
         this.setMBC()
     }

@@ -5,7 +5,7 @@ import org.topaz.Cartridge
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
     private int []rom
-    
+
     Cartridge cartridge
 
     public MemoryManager(Cartridge cartridge) {
@@ -47,9 +47,26 @@ class MemoryManager{
         this.rom[0xFF4B] = 0x00
         this.rom[0xFFFF] = 0x00
     }
-    
+
+    int readMemory(final int address) {
+        /* Reading from ROM bank */
+        if((address >= 0x4000) && (address <= 0x7FFF)) {
+            int newAddress = address - 0x4000
+            return this.cartridge.memory[newAddress + (this.cartridge.currentRomBank * 0x4000)]
+        }
+        
+        /* Reading from RAM memory bank */
+        else if((address >= 0xA000) && (address <= 0xBFFF)) {
+            int newAddress = address - 0xA000
+            return this.cartridge.ramBanks[newAddress + (this.cartridge.currentRamBank * 0x2000)]
+            
+        }
+        
+        return this.rom[address]
+    }
+
     void writeMemory(int address, int data) {
-        /* Read only memory, no writes allowed */
+        /* Read only cartridge memory, no writes allowed */
         if(address < 0x800) {
             return
         }
