@@ -55,14 +55,13 @@ class MemoryManager{
             int newAddress = address - 0x4000
             return this.cartridge.memory[newAddress + (this.cartridge.currentRomBank * 0x4000)]
         }
-        
+
         /* Reading from RAM memory bank */
         else if((address >= 0xA000) && (address <= 0xBFFF)) {
             int newAddress = address - 0xA000
             return this.cartridge.ramBanks[newAddress + (this.cartridge.currentRamBank * 0x2000)]
-            
         }
-        
+
         return this.rom[address]
     }
 
@@ -90,16 +89,18 @@ class MemoryManager{
             this.rom[address] = data
         }
     }
-    
+
     void handleBanking(int address, int data) {
         /*
          * If the data to be written occurs between 0x0 to 0x2000, this
          * indicates that RAM banking should be enabled
          */
-        if(this.cartridge.isMBC1 || this.cartridge.isMBC2) {
-            this.doRamBankEnable(address, data)
+        if(address < 0x2000) {
+            if(this.cartridge.isMBC1 || this.cartridge.isMBC2) {
+                this.doRamBankEnable(address, data)
+            }
         }
-        
+
         /*
          * If the data is being written in the range 0x2000 to 0x4000 then
          * writing to this address space sets the lower 5 bits of the current
@@ -107,7 +108,7 @@ class MemoryManager{
          */
         else if((address >= 0x2000) || (address < 0x4000)) {
             if(this.cartridge.isMBC1 || this.cartridge.isMBC2) {
-               this.doChangeLoROMBank(data) 
+                this.doChangeLoROMBank(data)
             }
         }
         /*
@@ -137,24 +138,40 @@ class MemoryManager{
             }
         }
     }
-    
+
     private void doRamBankEnable(int address, int data) {
+        /*
+         * Before writing to any RAM bank the game must first enable RAM bank
+         * writing. This is done by attempting to write to cartridge ROM in the
+         * address range 0x0 to 0x2000. For MBC1 if the lower nibble of the data
+         * being written is 0xA then RAM bank writing is enabled. If the lower
+         * nibble is 0x0 then it is disabled. The same is true for MBC2 except
+         * that bit 4 of the address byte must be 0.
+         */
+        if(this.cartridge.isMBC2) {
+            if(BitUtil.testBit(address, 4)) {
+                return
+            }
+        }
         
+        int lowerNibble = data & 0xF
+        
+        if(lowerNibble == 0xA) {
+            this.cartridge.enableRam = true
+        }else if(lowerNibble == 0x0) {
+            this.cartridge.enableRam = false
+        }
     }
-    
+
     private void doChangeLoROMBank(int data) {
-        
     }
-    
+
     private void doChangeHiROMBank(int data) {
-        
     }
-    
+
     private void doRAMBankChange(data) {
-        
     }
-    
+
     private void doChangeRomRamMode(int data) {
-        
     }
 }
