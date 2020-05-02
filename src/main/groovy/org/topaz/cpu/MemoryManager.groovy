@@ -164,6 +164,40 @@ class MemoryManager{
     }
 
     private void doChangeLoROMBank(int data) {
+        /*
+         * If MBC1 is being used, the current ROM bank can be changed in two
+         * ways. The game can can write to memory address 0x2000 - 0x3FFF where
+         * it only changes the lower 5 bits of the current ROM bank or it can
+         * write to address 0x4000 - 0x5FFF during ROM banking mode where only
+         * bits 5 and 6 are changed. However, if MBC2 is being used, the game
+         * also writes to 0x2000 - 0x3FFF, but only the lower 3 bits are
+         * changed.
+         * 
+         * Regardless, of which MBC is used, if its current value is 0 it must
+         * be set to 1. The reason for this is that ROM bank 0 is static and
+         * always accessible in the range 0x000 - 0x4000 and so ROM bank 0
+         * should never be loaded into this space. If set to 0 it will be
+         * treated as ROM bank 1.
+         */
+        if(this.cartridge.isMBC2) {
+            this.cartridge.currentRomBank = data & 0xF
+            if(this.cartridge.currentRomBank == 0) {
+                this.cartridge.currentRomBank = 1
+            }
+            return
+        }
+        
+        /*
+         * In the case of MBC1, the lower 5 bits of the current ROM bank must be
+         * set to the lower 5 bits of data.
+         */
+        int lower5 = data & 31 /* Get lower 5 bits from data */
+        this.cartridge.currentRomBank &= 224 /* Clear lower 5 bits of current ROM bank */
+        this.cartridge.currentRomBank |= lower5
+        
+        if(this.cartridge.currentRomBank == 0) {
+            this.cartridge.currentRomBank = 1
+        }
     }
 
     private void doChangeHiROMBank(int data) {
