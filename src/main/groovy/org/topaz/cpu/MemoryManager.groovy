@@ -201,11 +201,40 @@ class MemoryManager{
     }
 
     private void doChangeHiROMBank(int data) {
+        /*
+         * This is the second way of changing the current ROM bank in MBC1 mode.
+         * Here, bits 5 and 6 are changed when writing to memory address 0x4000
+         * to 0x6000.
+         */
+        data &= 244 /* Set lower 5 bits to 0 */
+        this.cartridge.currentRomBank |= data
+        
+        if(this.cartridge.currentRomBank == 0) {
+            this.cartridge.currentRomBank = 1
+        }
     }
 
     private void doRAMBankChange(data) {
+        /*
+         * This should only be done in MCB1. 
+         */
+        this.cartridge.currentRamBank = data & 0x3
     }
 
     private void doChangeRomRamMode(int data) {
+        /*
+         * This method is responsible for selecting the current banking mode,
+         * either ROM or RAM. When data is written to memory address 0x4000 to
+         * 0x6000, if the data's LSB is 0 then ROM banking is the selected mode.
+         * Otherwise RAM banking is done. The current RAM bank is set to 0
+         * whenever ROM banking is enabled because only RAM bank 0 is useable in
+         * this mode.
+         */
+        int newData = data & 0x1
+        this.cartridge.isRomBanking = (newData == 0) ? true : false
+        
+        if(this.cartridge.isRomBanking) {
+            this.cartridge.currentRamBank = 0
+        }
     }
 }
