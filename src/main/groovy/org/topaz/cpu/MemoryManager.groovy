@@ -1,6 +1,7 @@
 package org.topaz.cpu
 
 import org.topaz.Cartridge
+import org.topaz.util.BitUtil
 
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
@@ -66,10 +67,17 @@ class MemoryManager{
     }
 
     void writeMemory(int address, int data) {
-        /* Read only cartridge memory, no writes allowed */
-        if(address < 0x800) {
-            return
+        /* Read only cartridge memory, no *normal* writes allowed */
+        if(address < 0x8000) {
+            /*
+             * The only writes allowed here are to change the MBC controllers
+             * writing to memory lower than 0x8000 means attempting to write
+             * into the cartridge ROM. This should only be done to change the
+             * current ROM or RAM bank.
+             */
+            this.handleBanking(address, data)
         }
+
         /* Writing to ECHO ram also writes to RAM */ 
         else if((address >= 0xE000) && (address < 0xFE00)) {
             this.rom[address] = data
@@ -81,5 +89,72 @@ class MemoryManager{
         }else {
             this.rom[address] = data
         }
+    }
+    
+    void handleBanking(int address, int data) {
+        /*
+         * If the data to be written occurs between 0x0 to 0x2000, this
+         * indicates that RAM banking should be enabled
+         */
+        if(this.cartridge.isMBC1 || this.cartridge.isMBC2) {
+            this.doRamBankEnable(address, data)
+        }
+        
+        /*
+         * If the data is being written in the range 0x2000 to 0x4000 then
+         * writing to this address space sets the lower 5 bits of the current
+         * ROM bank.
+         */
+        else if((address >= 0x2000) || (address < 0x4000)) {
+            if(this.cartridge.isMBC1 || this.cartridge.isMBC2) {
+               this.doChangeLoROMBank(data) 
+            }
+        }
+        /*
+         * If the data is being written between 0x4000 and 0x6000 then it's
+         * either a ROM or RAM bank change depending on the currently selected
+         * ROM/RAM mode.
+         */
+        else if((address >= 0x4000) || (address < 0x6000)) {
+            /*
+             * MBC2 has no RAM bank, so only deal with MBC1
+             */
+            if(this.cartridge.isMBC1) {
+                if(this.cartridge.isRomBanking) {
+                    this.doChangeHiROMBank(data)
+                }else {
+                    this.doRAMBankChange(data)
+                }
+            }
+        }
+        /*
+         * This is a 1 bit register that indicates what should happen
+         * when the game writes to the address range 0x4000 to 0x6000 (above)
+         */
+        else if((address >= 0x6000) || (address < 0x8000)) {
+            if(this.cartridge.isMBC1) {
+                this.doChangeRomRamMode(data)
+            }
+        }
+    }
+    
+    private void doRamBankEnable(int address, int data) {
+        
+    }
+    
+    private void doChangeLoROMBank(int data) {
+        
+    }
+    
+    private void doChangeHiROMBank(int data) {
+        
+    }
+    
+    private void doRAMBankChange(data) {
+        
+    }
+    
+    private void doChangeRomRamMode(int data) {
+        
     }
 }

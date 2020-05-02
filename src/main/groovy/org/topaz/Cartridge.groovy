@@ -8,7 +8,9 @@ class Cartridge{
     boolean isMBC1 = false
     boolean isMBC2 = false
     int currentRomBank = 1
-    
+    boolean enableRam = false
+    boolean isRomBanking = true
+
     int []ramBanks
     int currentRamBank = 0
 
