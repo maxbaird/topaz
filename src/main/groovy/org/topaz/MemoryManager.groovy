@@ -1,15 +1,18 @@
 package org.topaz
 
 import org.topaz.util.BitUtil
+import org.topaz.Timer
 
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
-    private int []rom
+    public int []rom
 
     Cartridge cartridge
+    Timer timer
 
-    public MemoryManager(Cartridge cartridge) {
+    public MemoryManager(Cartridge cartridge, Timer timer) {
         this.cartridge = cartridge
+        this.timer = timer
         this.rom = new int[MEMORY_SIZE]
         this.init()
     }
@@ -84,6 +87,26 @@ class MemoryManager{
         /* Unused memory, no writes should happen here */
         else if((address >= 0xFEA0) && (address < 0xFEFF)) {
             return
+        }else if(timer.TMC == address) {
+            /*
+             * When the game is trying to change the timer controller, if the
+             * intended value is different from the current value, the timer
+             * counter must be reset to count at the new frequency.
+             */
+            int currentFrequency = timer.getClockFrequency()
+            this.rom[timer.TMC] = data
+            int newFrequency = timer.getClockFrequency()
+            
+            if(currentFrequency != newFrequency) {
+                timer.setClockFrequency()
+            }
+        }else if(address == 0xFF04) {
+            /*
+             * 0xFF04 is the divider register. It counts up to 255 and is then
+             * reset to 0. Any writes to this address resets it to 0.
+             */
+            this.rom[0xFF04] = 0
+            
         }else {
             this.rom[address] = data
         }
