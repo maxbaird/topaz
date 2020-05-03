@@ -3,7 +3,7 @@ package org.topaz
 import org.topaz.Cartridge
 import org.topaz.cpu.Register
 import org.topaz.cpu.CPU
-import org.topaz.cpu.MemoryManager
+import org.topaz.MemoryManager
 
 class Emulator{
     private static final MAX_CYCLES = 69905

@@ -1,6 +1,5 @@
-package org.topaz.cpu
+package org.topaz
 
-import org.topaz.Cartridge
 import org.topaz.util.BitUtil
 
 class MemoryManager{
@@ -227,7 +226,7 @@ class MemoryManager{
          * either ROM or RAM. When data is written to memory address 0x4000 to
          * 0x6000, if the data's LSB is 0 then ROM banking is the selected mode.
          * Otherwise RAM banking is done. The current RAM bank is set to 0
-         * whenever ROM banking is enabled because only RAM bank 0 is useable in
+         * whenever ROM banking is enabled because only RAM bank 0 is usable in
          * this mode.
          */
         int newData = data & 0x1
