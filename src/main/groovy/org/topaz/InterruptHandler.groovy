@@ -56,8 +56,7 @@ class InterruptHandler{
          * THis method is used in the main emulation loop to handle
          * any interrupts.
          */
-        if(interruptsEnabled) {
-            /* Ensure interrupts are enabled */
+        if(interruptsEnabled) {/* Ensure interrupts are enabled */
 
             /*
              * Get all interrupts requested
