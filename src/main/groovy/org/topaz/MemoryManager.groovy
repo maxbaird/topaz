@@ -171,7 +171,7 @@ class MemoryManager{
          * that bit 4 of the address byte must be 0.
          */
         if(this.cartridge.isMBC2) {
-            if(BitUtil.testBit(address, 4)) {
+            if(BitUtil.isSet(address, 4)) {
                 return
             }
         }

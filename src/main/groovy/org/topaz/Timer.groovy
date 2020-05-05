@@ -2,6 +2,7 @@ package org.topaz
 
 import org.topaz.MemoryManager
 import org.topaz.util.BitUtil
+import org.topaz.InterruptHandler
 
 class Timer{
     /*
@@ -34,6 +35,7 @@ class Timer{
     int dividerCounter = 0
 
     MemoryManager memoryManager
+    InterruptHandler interruptHandler
 
     public void updateTimer(int cycles) {
         incrementDividerRegister(cycles)
@@ -54,7 +56,7 @@ class Timer{
                      * and request an interrupt.
                      */
                     memoryManager.writeMemory(TIMA, memoryManager.readMemory(TMA))
-                    requestInterrupt(2)
+                    interruptHandler.requestInterrupt(InterruptHandler.TIMER_INTERRUPT)
                 }else {
                     /*
                      * Otherwise, simply increment the timer
@@ -71,7 +73,7 @@ class Timer{
          * Bit 2 of this address either starts or stops the timer respectively
          * if it is set or not.
          */
-        return BitUtil.testBit(memoryManager.readMemory(TMC), 2)
+        return BitUtil.isSet(memoryManager.readMemory(TMC), 2)
     }
     
     private void setClockFrequency() {
