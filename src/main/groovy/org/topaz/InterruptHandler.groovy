@@ -90,7 +90,7 @@ class InterruptHandler{
         request = BitUtil.resetBit(request, interruptId)
         memoryManager.writeMemory(IF_REGISTER, request)
         
-        //push(cpu.register.pc) 
+        cpu.register.push(cpu.register.pc) 
         
         switch(interruptId) {
            case V_BLANK_INTERRUPT : cpu.register.pc = ISR.V_BLANK; break

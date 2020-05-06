@@ -11,6 +11,7 @@ class Emulator{
     private static final MAX_CYCLES = 69905
 
     CPU cpu
+    Register register
     MemoryManager memoryManager
     Cartridge cartridge
     Timer timer
@@ -18,13 +19,14 @@ class Emulator{
 
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
+        this.register = new Register()
         this.memoryManager = new MemoryManager(this.cartridge)
-        this.cpu = new CPU(this.memoryManager)
-        this.timer = new Timer(memoryManager: this.memoryManager, cpu: this.cpu)
+        this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register)
+        this.timer = new Timer(memoryManager: this.memoryManager)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
     }
     
-    public void Update() {
+    public void update() {
         int cyclesThisUpdate = 0    
         
         while(cyclesThisUpdate < MAX_CYCLES) {
