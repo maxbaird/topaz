@@ -85,14 +85,26 @@ class InterruptHandler{
     }
 
     void serviceInterrupt(int interruptId) {
+        /*
+         * The protocol for servicing an interrupt is to set the interrupt
+         * enabled switch to false and unset its corresponding bit in the
+         * IF_REGISTER.
+         */
         interruptsEnabled = false
         int request = memoryManager.readMemory(IF_REGISTER)
         request = BitUtil.resetBit(request, interruptId)
         memoryManager.writeMemory(IF_REGISTER, request)
         
-        cpu.register.push(cpu.register.pc) 
+        /*
+         * The current execution address is pushed onto the stack
+         */
+        memoryManager.push(cpu.register.pc) 
         
         switch(interruptId) {
+           /*
+            * Based on the interruptId, the appropriate instruction service
+            * routine is assigned to the program counter.
+            */
            case V_BLANK_INTERRUPT : cpu.register.pc = ISR.V_BLANK; break
            case LCD_INTERRUPT : cpu.register.pc = ISR.LCD; break
            case TIMER_INTERRUPT : cpu.register.pc = ISR.TIMER; break

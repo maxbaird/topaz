@@ -13,8 +13,8 @@ class Timer{
      * the timer is reset to is held at address 0xFF06.
      */
 
-    final int TIMA = 0xFF05 /* Timer Counter */
-    final int TMA = 0xFF06  /* Timer Modulator */
+    static final int TIMA = 0xFF05 /* Timer Counter */
+    static final int TMA = 0xFF06  /* Timer Modulator */
     /* Timer Controller
      * Bit 2    - Timer Stop  (0=Stop, 1=Start)
      * Bits 1-0 - Input Clock Select
@@ -23,7 +23,7 @@ class Timer{
      *            10:  65536 Hz   (~67110 Hz SGB)
      *            11:  16384 Hz   (~16780 Hz SGB)
      */
-    final int TMC = 0xFF07  /* The Timer Controller */
+    static final int TMC = 0xFF07  /* The Timer Controller */
 
     /*
      * The CPU runs at a clock speed of 4194304Hz, therefore, if we
@@ -31,7 +31,7 @@ class Timer{
      * pass between incrementing the register can be calculated.
      */
     final int CLOCKSPEED = 4194304
-    int timerCounter = 1024
+    static int timerCounter = 1024
     int dividerCounter = 0
 
     MemoryManager memoryManager
@@ -48,7 +48,7 @@ class Timer{
                  * If timerCounter <= 0 enough CPU cycles have passed and the
                  * timer should be updated.
                  */
-                setClockFrequency()
+                setClockFrequency(getClockFrequency())
 
                 if(memoryManager.readMemory(TIMA) == 255) {
                     /*
@@ -76,9 +76,7 @@ class Timer{
         return BitUtil.isSet(memoryManager.readMemory(TMC), 2)
     }
     
-    private void setClockFrequency() {
-        int frequency = getClockFrequency()
-        
+    static void setClockFrequency(int frequency) {
         switch(frequency) {
            case 0: timerCounter = 1024; break /* frequency is 4096 */
            case 1: timerCounter = 16; break /* frequency is 262144 */

@@ -1,18 +1,18 @@
 package org.topaz
 
 import org.topaz.util.BitUtil
-import org.topaz.Timer
+import org.topaz.cpu.Register
 
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
     public int []rom
 
     Cartridge cartridge
-    Timer timer
+    Register register
 
-    public MemoryManager(Cartridge cartridge, Timer timer) {
+    public MemoryManager(Cartridge cartridge, Register register) {
         this.cartridge = cartridge
-        this.timer = timer
+        this.register = register
         this.rom = new int[MEMORY_SIZE]
         this.init()
     }
@@ -87,18 +87,18 @@ class MemoryManager{
         /* Unused memory, no writes should happen here */
         else if((address >= 0xFEA0) && (address < 0xFEFF)) {
             return
-        }else if(timer.TMC == address) {
+        }else if(Timer.TMC == address) {
             /*
              * When the game is trying to change the timer controller, if the
              * intended value is different from the current value, the timer
              * counter must be reset to count at the new frequency.
              */
-            int currentFrequency = timer.getClockFrequency()
-            this.rom[timer.TMC] = data
-            int newFrequency = timer.getClockFrequency()
+            int currentFrequency = getClockFrequency()
+            this.rom[Timer.TMC] = data
+            int newFrequency = getClockFrequency()
             
             if(currentFrequency != newFrequency) {
-                timer.setClockFrequency()
+                Timer.setClockFrequency(getClockFrequency())
             }
         }else if(address == 0xFF04) {
             /*
@@ -111,8 +111,40 @@ class MemoryManager{
             this.rom[address] = data
         }
     }
+    
+    void push(int word) {
+        /*
+         * The stack stores bytes, so a word needs to be split into two bytes
+         * and then pushed.
+         */
+        int hi = word >> 8
+        int lo = word & 0xff
+        register.sp--
+        this.writeMemory(register.sp, hi)
+        register.sp--
+        this.writeMemory(register.sp, lo)
+    }
+    
+    int pop() {
+        /*
+         * The stack stores bytes, so a word needs to be split into two bytes
+         * when popping.
+         */
+        int word = this.readMemory(register.sp+1) << 8
+        word |= this.readMemory(register.sp)
+        register.sp = register.sp + 2
+        return word
+    }
 
-    void handleBanking(int address, int data) {
+    private int getClockFrequency() {
+       /*
+        * The clock frequency is combination of bits 1 and 0 of the Timer
+        * controller (TMC at address 0xFF07).
+        */
+        return readMemory(Timer.TMC) & 0x3
+    }
+
+    private void handleBanking(int address, int data) {
         /*
          * If the data to be written occurs between 0x0 to 0x2000, this
          * indicates that RAM banking should be enabled

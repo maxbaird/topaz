@@ -20,10 +20,10 @@ class Emulator{
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
         this.register = new Register()
-        this.memoryManager = new MemoryManager(this.cartridge)
+        this.memoryManager = new MemoryManager(this.cartridge, this.register)
         this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register)
-        this.timer = new Timer(memoryManager: this.memoryManager)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
+        this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
     }
     
     public void update() {
