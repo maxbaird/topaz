@@ -41,6 +41,13 @@ class LCD{
      */
     final int LCD_STATUS = 0xFF41
     
+    def LCD_MODE  = [H_BLANK:0, V_BLANK:1, SPRITE_ATTRIBUTE_SEARCH:2, LCD_DRIVER_TRANSFER:3]
+    
+    final int COINCIDENCE_INTERRUPT_BIT = 6
+    final int OAM_INTERRUPT_BIT = 5 /* Object Attribute Memory (OAM) */
+    final int V_BLANK_INTERRUPT_BIT = 4
+    final int H_BLANK_INTERRUPT_BIT = 3
+    
     final int CYCLES_BETWEEN_SCANLINES = 456
     
     /*
@@ -58,7 +65,7 @@ class LCD{
      * scanLineCounter. If the result is 0 or less, it is time to draw the next
      * scanline.
      */
-    int scanLineCounter = CYCLES_BETWEEN_SCANLINES
+    int scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
     
     MemoryManager memoryManager
     InterruptHandler interruptHandler
@@ -67,12 +74,12 @@ class LCD{
         setLCDStatus()
         
         if(isLCDEnabled()) {
-            scanLineCounter = scanLineCounter - cycles
+            scanLineCyclesCounter = scanLineCyclesCounter - cycles
         }else {
             return
         }
         
-        if(scanLineCounter <= 0) {
+        if(scanLineCyclesCounter <= 0) {
           /* 
            * Move to next scanline. Memory is accessed directly instead of using
            * the writeMemory method of the memory manager. This is because any
@@ -83,7 +90,7 @@ class LCD{
             int currentLine = memoryManager.readMemory(CURRENT_SCANLINE)
             
             /* Reset the scanline counter */
-            scanLineCounter = CYCLES_BETWEEN_SCANLINES
+            scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
             
             if(currentLine == V_BLANK_START) {
               /* Request the appropriate interrupt if in a vertical blank period */
@@ -108,7 +115,7 @@ class LCD{
              * When the LCD is disabled reset scanLineCounter and set the
              * current scanline to 0.
              */
-            scanLineCounter = CYCLES_BETWEEN_SCANLINES
+            scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
             memoryManager.rom[CURRENT_SCANLINE] = 0
             
             /*
@@ -120,6 +127,45 @@ class LCD{
             return
         }
         
+        int currentLine = memoryManager.readMemory(CURRENT_SCANLINE)
+        int currentMode = status & 0x3
+
+        int mode = LCD_MODE.H_BLANK
+        boolean requestInterrupt = false
+        
+        if(currentLine >= V_BLANK_START) {
+            /*
+             * We are currently in the vertical blank (V-Blank) period
+             */
+            mode = LCD_MODE.V_BLANK
+            status = BitUtil.setBit(status, 0)
+            status = BitUtil.resetBit(status, 1)
+            requestInterrupt = BitUtil.isSet(status, V_BLANK_INTERRUPT_BIT)
+        }else {
+            /*
+             * It takes 456 clock cycles to draw each scanline. The clock cycles
+             * are divided among the active modes for drawing i.e., Mode 0, 2 and 3:
+             * 
+             * Mode 2: (Searching for sprite attributes) takes the first 80 cycles
+             * Mode 3: (transfer to LCD driver) takes 172 clock cycles
+             * Mode 0: (H-Blank) takes the remaining cycles
+             */
+            
+            int mode2Cycles = CYCLES_BETWEEN_SCANLINES - 80
+            int mode3Cycles = mode2Cycles - 172
+            
+            if(scanLineCyclesCounter >= mode2Cycles) { /* Mode 2 */
+               mode = LCD_MODE.SPRITE_ATTRIBUTE_SEARCH 
+               status = BitUtil.setBit(status, 1)
+               status = BitUtil.setBit(status, 0)
+               requestInterrupt = BitUtil.isSet(status, OAM_INTERRUPT_BIT)
+
+            }else if(scanLineCyclesCounter >= mode3Cycles) { /* Mode 3 */
+               mode = LCD_MODE.LCD_DRIVER_TRANSFER
+            }else { /* Mode 0 */
+               mode = LCD_MODE.H_BLANK 
+            }
+        }
     }
     
     private boolean isLCDEnabled() {
