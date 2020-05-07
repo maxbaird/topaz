@@ -6,6 +6,7 @@ import org.topaz.cpu.CPU
 import org.topaz.MemoryManager
 import org.topaz.Timer
 import org.topaz.InterruptHandler
+import org.topaz.lcd.LCD
 
 class Emulator{
     private static final MAX_CYCLES = 69905
@@ -16,6 +17,7 @@ class Emulator{
     Cartridge cartridge
     Timer timer
     InterruptHandler interruptHandler
+    LCD lcd
 
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
@@ -24,6 +26,7 @@ class Emulator{
         this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
+        this.lcd = new LCD(memoryManager: this.memoryManager, interruptHandler:this.interruptHandler)
     }
     
     public void update() {
@@ -34,7 +37,7 @@ class Emulator{
             cyclesThisUpdate += cycles
             this.updateTimers(cycles)
             this.updateGraphics(cycles)
-            this.doInterrupts()
+            this.handleInterrupts()
         }
         this.renderScreen()
     }
@@ -48,10 +51,10 @@ class Emulator{
     }
     
     private void updateGraphics(int cycles) {
-        
+       lcd.updateGraphics(cycles) 
     }
     
-    private void doInterrupts() {
+    private void handleInterrupts() {
        interruptHandler.handleInterrupts() 
     }
     

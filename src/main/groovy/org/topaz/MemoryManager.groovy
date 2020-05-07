@@ -2,6 +2,7 @@ package org.topaz
 
 import org.topaz.util.BitUtil
 import org.topaz.cpu.Register
+import org.topaz.lcd.LCD
 
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
@@ -106,7 +107,11 @@ class MemoryManager{
              * reset to 0. Any writes to this address resets it to 0.
              */
             this.rom[0xFF04] = 0
-            
+        }else if(address == LCD.SCANLINE_ADDR) {
+            /*
+             * Reset the current scanline if the game tries to write to it.
+             */
+            this.rom[address] = 0    
         }else {
             this.rom[address] = data
         }
