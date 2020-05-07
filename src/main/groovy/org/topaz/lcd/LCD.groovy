@@ -251,7 +251,11 @@ class LCD{
     }
     
     private boolean isLCDEnabled() {
-        return true
+        /*
+         * Bit 7 of the LCDC_REGISTER is responsible enabling or disabling the
+         * LCD.
+         */
+        return BitUtil.isSet(memoryManager.readMemory(LCDC_REGISTER), 7) 
     }
     
     private void drawScanLine() {
