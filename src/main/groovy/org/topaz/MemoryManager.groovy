@@ -107,7 +107,7 @@ class MemoryManager{
              * reset to 0. Any writes to this address resets it to 0.
              */
             this.rom[0xFF04] = 0
-        }else if(address == LCD.CURRENT_SCANLINE) {
+        }else if(address == LCD.LY_REGISTER) {
             /*
              * Reset the current scanline if the game tries to write to it.
              */

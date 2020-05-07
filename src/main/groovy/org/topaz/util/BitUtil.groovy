@@ -11,7 +11,7 @@ class BitUtil{
         return address
     }
     
-    static int resetBit(int address, int position){
+    static int clearBit(int address, int position){
         int mask = 1 << position
         address &= ~mask
         return address

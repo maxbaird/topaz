@@ -92,7 +92,7 @@ class InterruptHandler{
          */
         interruptsEnabled = false
         int request = memoryManager.readMemory(IF_REGISTER)
-        request = BitUtil.resetBit(request, interruptId)
+        request = BitUtil.clearBit(request, interruptId)
         memoryManager.writeMemory(IF_REGISTER, request)
         
         /*

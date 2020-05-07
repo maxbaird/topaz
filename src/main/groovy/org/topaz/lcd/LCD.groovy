@@ -1,22 +1,41 @@
 package org.topaz.lcd 
+
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
 
 class LCD{
+    
     /*
-     * The current scanline to be drawn to screen is stored at address 0xFF44
+     * This is the LCDC (LCD Control) register. Bit 7 of this register is
+     * checked during the V-Blank to enable or disable the display.
      */
-    static final int CURRENT_SCANLINE = 0xFF44
+    static final int LCDC_REGISTER = 0xFF40
+
+    /*
+     * The current scanline to be drawn to screen is stored at address 0xFF44.
+     * This is known as the LY (LDC Y-coordinate) register and it indicates the
+     * vertical line to which the present data is transferred to the LCD Driver.
+     * It can take any value between 0 to 153.
+     */
+    static final int LY_REGISTER = 0xFF44
+    
+    /*
+     * This is the LYC (LY Compare) register. The gameboy compares the value of the
+     * LY and LYC registers and when both values are identical, the coincidence bit
+     * in the STAT register (LCDC Status Interrupt) becomes set, and (if enabled) an
+     * interrupt is requested.
+     */
+    static final int LYC_REGISTER = 0xFF45
     
     /* 
      * The current LCD status is held at address 0xFF41.The LCD goes through 4
      * modes when drawing scanlines, Bits 1 and 0 represent the current LCD mode
      * as follows:
-     * 00: H-Blank
-     * 01: V-Blank
-     * 10: Searching for sprite attributes
-     * 11: Transfer data to LCD Driver 
+     * 00: During H-Blank
+     * 01: During V-Blank
+     * 10: During Searching for sprite attributes (OAM-RAM)
+     * 11: During Transfer data to LCD Driver 
      * 
      * When the LCD status changes mode between 0b00 to 0b11 (i.e, 0 to 3), an
      * LCD interrupt request can happen. Bits 3,4 and 5 of this register are
@@ -41,12 +60,13 @@ class LCD{
      */
     final int LCD_STATUS = 0xFF41
     
-    def LCD_MODE  = [H_BLANK:0, V_BLANK:1, SPRITE_ATTRIBUTE_SEARCH:2, LCD_DRIVER_TRANSFER:3]
+    def LCD_MODE  = [H_BLANK:0, V_BLANK:1, OAM_SPRITE_ATTRIBUTE_SEARCH:2, LCD_DRIVER_TRANSFER:3]
     
     final int COINCIDENCE_INTERRUPT_BIT = 6
     final int OAM_INTERRUPT_BIT = 5 /* Object Attribute Memory (OAM) */
     final int V_BLANK_INTERRUPT_BIT = 4
     final int H_BLANK_INTERRUPT_BIT = 3
+    final int COINCIDENCE_FLAG_BIT = 2
     
     final int CYCLES_BETWEEN_SCANLINES = 456
     
@@ -86,8 +106,8 @@ class LCD{
            * writes to 0xFF44 (CURRENT_SCANLINE) must reset the current scanline
            * to 0. Which is what the memory manager is programmed to do.
            */
-            memoryManager.rom[CURRENT_SCANLINE]++
-            int currentLine = memoryManager.readMemory(CURRENT_SCANLINE)
+            memoryManager.rom[LY_REGISTER]++
+            int currentLine = memoryManager.readMemory(LY_REGISTER)
             
             /* Reset the scanline counter */
             scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
@@ -100,7 +120,7 @@ class LCD{
                  * If we are beyond the vertical blank period, the current
                  * scanline must then be reset.
                  */
-                memoryManager.rom[CURRENT_SCANLINE] = 0
+                memoryManager.rom[LY_REGISTER] = 0
             }else if(currentLine < V_BLANK_START) {
                drawScanLine() 
             }
@@ -116,7 +136,7 @@ class LCD{
              * current scanline to 0.
              */
             scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
-            memoryManager.rom[CURRENT_SCANLINE] = 0
+            memoryManager.rom[LY_REGISTER] = 0
             
             /*
              * Also set the LCD mode to 1
@@ -127,19 +147,21 @@ class LCD{
             return
         }
         
-        int currentLine = memoryManager.readMemory(CURRENT_SCANLINE)
+        int currentScanLine = memoryManager.readMemory(LY_REGISTER)
         int currentMode = status & 0x3
 
         int mode = LCD_MODE.H_BLANK
         boolean requestInterrupt = false
         
-        if(currentLine >= V_BLANK_START) {
+        if(currentScanLine >= V_BLANK_START) {
             /*
-             * We are currently in the vertical blank (V-Blank) period
+             * We are currently in the vertical blank (V-Blank) period.
+             * So bits 0 and 1 are set to:
+             * 01 - for V-Blank
              */
             mode = LCD_MODE.V_BLANK
             status = BitUtil.setBit(status, 0)
-            status = BitUtil.resetBit(status, 1)
+            status = BitUtil.clearBit(status, 1)
             requestInterrupt = BitUtil.isSet(status, V_BLANK_INTERRUPT_BIT)
         }else {
             /*
@@ -155,16 +177,76 @@ class LCD{
             int mode3Cycles = mode2Cycles - 172
             
             if(scanLineCyclesCounter >= mode2Cycles) { /* Mode 2 */
-               mode = LCD_MODE.SPRITE_ATTRIBUTE_SEARCH 
+               mode = LCD_MODE.OAM_SPRITE_ATTRIBUTE_SEARCH 
+               
+               /*
+                * Currently in Mode 2 (Sprite search) and so bits
+                * 0 and 1 are set to:
+                * 10 - for sprite attributes
+                */
                status = BitUtil.setBit(status, 1)
-               status = BitUtil.setBit(status, 0)
+               status = BitUtil.clearBit(status, 0)
                requestInterrupt = BitUtil.isSet(status, OAM_INTERRUPT_BIT)
 
             }else if(scanLineCyclesCounter >= mode3Cycles) { /* Mode 3 */
                mode = LCD_MODE.LCD_DRIVER_TRANSFER
+
+               /*
+                * Currently in Mode 3 and so bits
+                * 0 and 1 are set to:
+                * 11 - for the transfer of data to LCD driver
+                */
+               status = BitUtil.setBit(status, 1)
+               status = BitUtil.setBit(status, 0)
             }else { /* Mode 0 */
                mode = LCD_MODE.H_BLANK 
+               
+               /*
+                * Currently in Mode 0 and bits 0 and 1 are set to:
+                * 00 - for H-Blank
+                */
+               status = BitUtil.clearBit(status, 1)
+               status = BitUtil.clearBit(status, 0)
+               requestInterrupt = BitUtil.isSet(status, H_BLANK_INTERRUPT_BIT)
             }
+            
+            /*
+             * The current mode of the LCD (currentMode) may not match the mode 
+             * that is set based on the CPU cycles. If this is the case, then a
+             * mode change has occurred and an interrupt has likely been set.
+             * The interrupt must therefore be serviced.
+             */
+            
+            if(requestInterrupt && (mode != currentMode)) {
+                interruptHandler.requestInterrupt(InterruptHandler.LCD_INTERRUPT)
+            }
+            
+            int LY = memoryManager.readMemory(LY_REGISTER)
+            int LYC = memoryManager.readMemory(LYC_REGISTER)
+
+            if(LY == LYC) {
+                /*
+                 * If the values in the LY and LYC register are equal, then bit
+                 * 2 (COINCIDENCE_FLAG_BIT) of the LCD status register is set to
+                 * 1.
+                 */
+                status = BitUtil.setBit(status, COINCIDENCE_FLAG_BIT) 
+               
+                if(BitUtil.isSet(status, COINCIDENCE_INTERRUPT_BIT)) {
+                    /*
+                     * If the COINCIDENCE_INTERRUPT_BIT (bit 6) flag is enabled
+                     * then an LCD interrupt is requested.
+                     */
+                    interruptHandler.requestInterrupt(InterruptHandler.LCD_INTERRUPT) 
+                }
+            }else {
+                /*
+                 * If the LY and LYC registers do not match, the
+                 * COINCIDENCE_FLAG_BIT must be set to 0.
+                 */
+                status = BitUtil.clearBit(status, COINCIDENCE_FLAG_BIT)
+            }
+            memoryManager.writeMemory(LCD_STATUS, status)
         }
     }
     
