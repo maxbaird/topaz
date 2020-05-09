@@ -11,7 +11,6 @@ class MemoryManager{
 
     Cartridge cartridge
     Register register
-    DMA dma
 
     public MemoryManager(Cartridge cartridge, Register register) {
         this.cartridge = cartridge
