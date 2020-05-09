@@ -5,7 +5,6 @@ import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
 
 class LCD{
-    
     /*
      * This is the LCDC (LCD Control) register. Bit 7 of this register is
      * checked during the V-Blank to enable or disable the display.
