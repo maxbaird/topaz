@@ -3,6 +3,7 @@ package org.topaz.gpu
 import org.topaz.gpu.LCD
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
+import org.topaz.util.BitUtil
 
 class GPU{
     static final int CYCLES_BETWEEN_SCANLINES = 456
@@ -31,7 +32,9 @@ class GPU{
     private LCD lcd
     
     public GPU(MemoryManager memoryManager, InterruptHandler interruptHandler) {
-        lcd = new LCD(memoryManager: this.memoryManager, interruptHandler:this.interruptHandler)
+        this.memoryManager = memoryManager
+        this.interruptHandler = interruptHandler
+        lcd = new LCD(memoryManager: memoryManager, interruptHandler: interruptHandler)
     }
 
     public void updateGraphics(int cycles) {
@@ -71,7 +74,23 @@ class GPU{
         }
     }
 
-    public void drawScanLine() {
+    private void drawScanLine() {
+        int control = memoryManager.readMemory(LCD.LCDC_REGISTER)
 
+        if(BitUtil.isSet(control, 0)) {
+            renderTiles()
+        }
+        
+        if(BitUtil.isSet(control, 1)) {
+            renderSprites()
+        }
     }
+    
+   private void renderTiles() {
+       
+   } 
+   
+   private void renderSprites() {
+       
+   }
 }
