@@ -2,7 +2,7 @@ package org.topaz
 
 import org.topaz.MemoryManager
 
-class DMA{
+class DMAHandler{
     /*
      * Writing to this register launches a DMA transfer from ROM or RAM to OAM
      * memory (the sprite attribute table). When the memory manager attempts to

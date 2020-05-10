@@ -3,7 +3,7 @@ package org.topaz
 import org.topaz.util.BitUtil
 import org.topaz.cpu.Register
 import org.topaz.lcd.LCD
-import org.topaz.DMA
+import org.topaz.DMAHandler
 
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
@@ -113,12 +113,12 @@ class MemoryManager{
              * Reset the current scanline if the game tries to write to it.
              */
             this.rom[address] = 0    
-        }else if(address == DMA.DMA_REGISTER) {
+        }else if(address == DMAHandler.DMA_REGISTER) {
             /*
              * When the game writes to this address, we need to perform a DMA
              * transfer.
              */
-            new DMA(memoryManager:this).transfer(data)
+            new DMAHandler(memoryManager:this).transfer(data)
         }else {
             this.rom[address] = data
         }
