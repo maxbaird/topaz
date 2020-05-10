@@ -2,7 +2,7 @@ package org.topaz
 
 import org.topaz.util.BitUtil
 import org.topaz.cpu.Register
-import org.topaz.lcd.LCD
+import org.topaz.gpu.LCD
 import org.topaz.DMAHandler
 
 class MemoryManager{

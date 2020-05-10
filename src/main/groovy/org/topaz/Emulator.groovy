@@ -2,11 +2,11 @@ package org.topaz
 
 import org.topaz.Cartridge
 import org.topaz.cpu.Register
+import org.topaz.gpu.LCD
 import org.topaz.cpu.CPU
 import org.topaz.MemoryManager
 import org.topaz.Timer
 import org.topaz.InterruptHandler
-import org.topaz.lcd.LCD
 
 class Emulator{
     private static final MAX_CYCLES = 69905

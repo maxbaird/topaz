@@ -1,4 +1,4 @@
-package org.topaz.lcd 
+package org.topaz.gpu 
 
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
