@@ -3,6 +3,7 @@ package org.topaz.gpu
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
+import org.topaz.gpu.GPU
 
 class LCD{
     /*
@@ -67,66 +68,10 @@ class LCD{
     final int H_BLANK_INTERRUPT_BIT = 3
     final int COINCIDENCE_FLAG_BIT = 2
     
-    final int CYCLES_BETWEEN_SCANLINES = 456
-    
-    /*
-     * The screen resolution is 160x144, however, the Gameboy actually draws 153
-     * scanlines instead of 144. The extra 8 scanlines are invisible and
-     * constitute the vertical blank period (i.e., between the 144th and 153rd
-     * scanline).
-     */
-    final int V_BLANK_START = 144
-    final int V_BLANK_END = 153
-    /*
-     * It takes 456 CPU cycles to draw each scanline. In the main emulator loop
-     * the graphics is updated after the execution of each opcode and the total
-     * number of CPU cycles executed thus far is subtracted from
-     * scanLineCounter. If the result is 0 or less, it is time to draw the next
-     * scanline.
-     */
-    int scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
-    
     MemoryManager memoryManager
     InterruptHandler interruptHandler
     
-    void updateGraphics(int cycles) {
-        setLCDStatus()
-        
-        if(isLCDEnabled()) {
-            scanLineCyclesCounter = scanLineCyclesCounter - cycles
-        }else {
-            return
-        }
-        
-        if(scanLineCyclesCounter <= 0) {
-          /* 
-           * Move to next scanline. Memory is accessed directly instead of using
-           * the writeMemory method of the memory manager. This is because any
-           * writes to 0xFF44 (CURRENT_SCANLINE) must reset the current scanline
-           * to 0. Which is what the memory manager is programmed to do.
-           */
-            memoryManager.rom[LY_REGISTER]++
-            int currentLine = memoryManager.readMemory(LY_REGISTER)
-            
-            /* Reset the scanline counter */
-            scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
-            
-            if(currentLine == V_BLANK_START) {
-              /* Request the appropriate interrupt if in a vertical blank period */
-                interruptHandler.requestInterrupt(InterruptHandler.V_BLANK_INTERRUPT) 
-            }else if(currentLine > V_BLANK_END) {
-                /*
-                 * If we are beyond the vertical blank period, the current
-                 * scanline must then be reset.
-                 */
-                memoryManager.rom[LY_REGISTER] = 0
-            }else if(currentLine < V_BLANK_START) {
-               drawScanLine() 
-            }
-        }
-    }
-    
-    private void setLCDStatus() {
+    public void setLCDStatus() {
         int status = memoryManager.readMemory(LCD_STATUS)
         
         if(!isLCDEnabled()) {
@@ -134,7 +79,7 @@ class LCD{
              * When the LCD is disabled reset scanLineCounter and set the
              * current scanline to 0.
              */
-            scanLineCyclesCounter = CYCLES_BETWEEN_SCANLINES
+            GPU.SCAN_LINE_CYCLES_COUNTER = GPU.CYCLES_BETWEEN_SCANLINES
             memoryManager.rom[LY_REGISTER] = 0
             
             /*
@@ -152,7 +97,7 @@ class LCD{
         int mode = LCD_MODE.H_BLANK
         boolean requestInterrupt = false
         
-        if(currentScanLine >= V_BLANK_START) {
+        if(currentScanLine >= GPU.V_BLANK_SCANLINE_START) {
             /*
              * We are currently in the vertical blank (V-Blank) period.
              * So bits 0 and 1 are set to:
@@ -172,10 +117,10 @@ class LCD{
              * Mode 0: (H-Blank) takes the remaining cycles
              */
             
-            int mode2Cycles = CYCLES_BETWEEN_SCANLINES - 80
+            int mode2Cycles = GPU.CYCLES_BETWEEN_SCANLINES - 80
             int mode3Cycles = mode2Cycles - 172
             
-            if(scanLineCyclesCounter >= mode2Cycles) { /* Mode 2 */
+            if(GPU.SCAN_LINE_CYCLES_COUNTER >= mode2Cycles) { /* Mode 2 */
                mode = LCD_MODE.OAM_SPRITE_ATTRIBUTE_SEARCH 
                
                /*
@@ -187,7 +132,7 @@ class LCD{
                status = BitUtil.clearBit(status, 0)
                requestInterrupt = BitUtil.isSet(status, OAM_INTERRUPT_BIT)
 
-            }else if(scanLineCyclesCounter >= mode3Cycles) { /* Mode 3 */
+            }else if(GPU.SCAN_LINE_CYCLES_COUNTER >= mode3Cycles) { /* Mode 3 */
                mode = LCD_MODE.LCD_DRIVER_TRANSFER
 
                /*
@@ -249,15 +194,11 @@ class LCD{
         }
     }
     
-    private boolean isLCDEnabled() {
+    public boolean isLCDEnabled() {
         /*
          * Bit 7 of the LCDC_REGISTER is responsible enabling or disabling the
          * LCD.
          */
         return BitUtil.isSet(memoryManager.readMemory(LCDC_REGISTER), 7) 
-    }
-    
-    private void drawScanLine() {
-        
     }
 }

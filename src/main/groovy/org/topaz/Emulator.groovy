@@ -2,7 +2,7 @@ package org.topaz
 
 import org.topaz.Cartridge
 import org.topaz.cpu.Register
-import org.topaz.gpu.LCD
+import org.topaz.gpu.GPU
 import org.topaz.cpu.CPU
 import org.topaz.MemoryManager
 import org.topaz.Timer
@@ -12,12 +12,12 @@ class Emulator{
     private static final MAX_CYCLES = 69905
 
     CPU cpu
+    GPU gpu
     Register register
     MemoryManager memoryManager
     Cartridge cartridge
     Timer timer
     InterruptHandler interruptHandler
-    LCD lcd
 
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
@@ -26,7 +26,7 @@ class Emulator{
         this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
-        this.lcd = new LCD(memoryManager: this.memoryManager, interruptHandler:this.interruptHandler)
+        this.gpu = new GPU(this.memoryManager, this.interruptHandler)
     }
     
     public void update() {
