@@ -11,6 +11,31 @@ class LCD{
      * checked during the V-Blank to enable or disable the display.
      */
     static final int LCDC_REGISTER = 0xFF40
+    
+    /*
+     * This is a mapping for each bit in the control register. Mostly used by
+     * the GPU when rendering tiles and sprites. The main purpose of this map is
+     * to ease code readability.
+     * 
+     * Bit 7 - LCD Display Enable             (0=Off, 1=On)
+     * Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
+     * Bit 5 - Window Display Enable          (0=Off, 1=On)
+     * Bit 4 - BG & Window Tile Data Select   (0=8800-97FF, 1=8000-8FFF)
+     * Bit 3 - BG Tile Map Display Select     (0=9800-9BFF, 1=9C00-9FFF)
+     * Bit 2 - OBJ (Sprite) Size              (0=8x8, 1=8x16)
+     * Bit 1 - OBJ (Sprite) Display Enable    (0=Off, 1=On)
+     * Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
+     */
+    public static def ControlRegisterBit = [
+        DISPLAY_ENABLE : 7,
+        WINDOW_TILE_MAP_DISPLAY_SELECT : 6,
+        WINDOW_DISPLAY_ENABLE : 5,
+        BG_AND_WINDOW_TILE_DATA_SELECT : 4,
+        BG_TILE_MAP_DISPLAY_SELECT : 3,
+        OBJ_SPRITE_SIZE : 2,
+        OBJ_SPRITE_DISPLAY_ENABLE : 1,
+        BG_DISPLAY : 0
+    ].asUnmodifiable()
 
     /*
      * The current scanline to be drawn to screen is stored at address 0xFF44.
@@ -199,6 +224,6 @@ class LCD{
          * Bit 7 of the LCDC_REGISTER is responsible enabling or disabling the
          * LCD.
          */
-        return BitUtil.isSet(memoryManager.readMemory(LCDC_REGISTER), 7) 
+        return BitUtil.isSet(memoryManager.readMemory(LCDC_REGISTER), ControlRegisterBit.DISPLAY_ENABLE) 
     }
 }
