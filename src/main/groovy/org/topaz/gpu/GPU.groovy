@@ -101,8 +101,8 @@ class GPU{
         * 256x256 pixels. This allows for a scrolling background, but makes
         * knowing a starting point from which to draw necessary.
         */
-       final int SCROLL_Y = 0xFF42
-       final int SCROLL_X = 0xFF43
+       final int SCROLL_Y = memoryManager.readMemory(0xFF42)
+       final int SCROLL_X = memoryManager.readMemory(0xFF43)
        
        /*
         * WINDOW_X and WINDOW_Y specify the start position from which the window
@@ -112,8 +112,8 @@ class GPU{
         * Unlike the background, this window does not scroll. It is useful for
         * things like displaying in game score, lives remaining, etc.
         */
-       final int WINDOW_Y = 0xFF4A
-       final int WINDOW_X = 0xFF4B
+       final int WINDOW_Y = memoryManager.readMemory(0xFF4A)
+       final int WINDOW_X = memoryManager.readMemory(0xFF4B)
        
        /*
         * The scroll and window coordinates respectively let us know where the
@@ -166,6 +166,20 @@ class GPU{
                 * tile.
                 */
                isUnsigned = false
+           }
+           
+           if(usingWindow == false) {
+               if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_TILE_MAP_DISPLAY_SELECT)) {
+                   memoryRegion = 0x9C00
+               }else {
+                   memoryRegion = 0x9800
+               }
+           }else {
+               if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.WINDOW_TILE_MAP_DISPLAY_SELECT)) {
+                   memoryRegion = 0x9C00
+               }else {
+                   memoryRegion = 0x9800
+               }
            }
        }
    } 

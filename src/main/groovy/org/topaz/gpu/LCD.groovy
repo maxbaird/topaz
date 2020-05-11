@@ -18,10 +18,10 @@ class LCD{
      * to ease code readability.
      * 
      * Bit 7 - LCD Display Enable             (0=Off, 1=On)
-     * Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)
+     * Bit 6 - Window Tile Map Display Select (0=9800-9BFF, 1=9C00-9FFF)//Tile indexes for Tile Maps 1 and 2
      * Bit 5 - Window Display Enable          (0=Off, 1=On)
-     * Bit 4 - BG & Window Tile Data Select   (0=8800-97FF, 1=8000-8FFF)
-     * Bit 3 - BG Tile Map Display Select     (0=9800-9BFF, 1=9C00-9FFF)
+     * Bit 4 - BG & Window Tile Data Select   (0=8800-97FF, 1=8000-8FFF)//All tiles
+     * Bit 3 - BG Tile Map Display Select     (0=9800-9BFF, 1=9C00-9FFF)//Tile Indexes for Tile maps 1 and 2
      * Bit 2 - OBJ (Sprite) Size              (0=8x8, 1=8x16)
      * Bit 1 - OBJ (Sprite) Display Enable    (0=Off, 1=On)
      * Bit 0 - BG Display (for CGB see below) (0=Off, 1=On)
@@ -39,7 +39,7 @@ class LCD{
 
     /*
      * The current scanline to be drawn to screen is stored at address 0xFF44.
-     * This is known as the LY (LDC Y-coordinate) register and it indicates the
+     * This is known as the LY (LCD Y-coordinate) register and it indicates the
      * vertical line to which the present data is transferred to the LCD Driver.
      * It can take any value between 0 to 153.
      */
