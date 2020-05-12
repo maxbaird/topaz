@@ -105,12 +105,13 @@ class GPU{
        final int SCROLL_X = memoryManager.readMemory(0xFF43)
        
        /*
-        * WINDOW_X and WINDOW_Y specify the start position from which the window
-        * must be drawn. The window is an alternate background area that is
-        * displayed above the normal background. The value for WINDOW_X must be
-        * reduced by 7 so that the window is drawn in the correct location.
-        * Unlike the background, this window does not scroll. It is useful for
-        * things like displaying in game score, lives remaining, etc.
+        * WINDOW_X and WINDOW_Y specify the start position within the background
+        * from which the window must be drawn. The window is an alternate
+        * background area that is displayed above the normal background. The
+        * value for WINDOW_X must be reduced by 7 so that the window is drawn in
+        * the correct location. Unlike the background, this window does not
+        * scroll. It is useful for things like displaying in game score, lives
+        * remaining, etc.
         */
        final int WINDOW_Y = memoryManager.readMemory(0xFF4A)
        final int WINDOW_X = memoryManager.readMemory(0xFF4B)
@@ -181,6 +182,51 @@ class GPU{
                    memoryRegion = 0x9800
                }
            }
+
+           /*
+            * The yPosition is used to calculate which of the 32 vertical tiles
+            * the current scanline is drawing. Tiles can belong to either the
+            * background or the non-scrolling window drawn above the background.
+            */
+           int yPosition = 0
+           
+           if(usingWindow == false) {
+               /*
+                * If the current scanline is currently drawing the background,
+                * then the yPosition calculated is with respect to the
+                * background's Y location within the 256x256 screen.
+                */
+               yPosition = SCROLL_Y + memoryManager.readMemory(LCD.LY_REGISTER)
+           }else {
+               /*
+                * If the current scanline is currently drawing the window, then
+                * the yPosition calculated is with respect to the window's Y
+                * location within the background.
+                */
+               yPosition = memoryManager.readMemory(LCD.LY_REGISTER) - WINDOW_Y 
+           }
+           
+           final int PIXEL_ROWS_PER_TILE = 8
+           final int PIXELS_RENDERED_PER_TILE = 32
+           
+           /*
+            * The background is free to scroll around to any 160x144 pixels of
+            * the available 256x256 pixels. To programmatically know the unique
+            * row of pixels for rendering a calculation is performed. The
+            * yPosition represents the scanline's absolute position in the
+            * 256x256 grid. To find the correct *row of tiles* the yPosition
+            * falls within, it must be divided by the number of pixel rows that
+            * make up each tile, a value represented by PIXEL_ROWS_PER_TILE.
+            * Although tiles are made up of 8x8 pixels, two pixel rows are
+            * combined (when calculating their colour) to form a single row,
+            * this means that the size of the tile actually rendered is 4x8, a
+            * 32 pixel tile. Therefore, to find the correct row of pixels the
+            * scanline should draw, the result of the previous calculation is
+            * multiplied by the number of pixels that will actually be rendered
+            * (PIXELS_RENDERED_PER_TILE).
+            */
+           
+           int tileRow = (yPosition / PIXEL_ROWS_PER_TILE) * PIXELS_RENDERED_PER_TILE
        }
    } 
    
