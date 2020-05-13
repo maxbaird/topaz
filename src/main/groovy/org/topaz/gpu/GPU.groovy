@@ -120,9 +120,9 @@ class GPU{
         * The scroll and window coordinates respectively let us know where the
         * background and window should be drawn. Tiles are set of small bitmaps
         * held in memory. And both tile maps are constructed by referencing
-        * specific tiles from the set of tiles. The tile set is stored in two
-        * memory regions (0x8800 - 0x97FF and 0x8000 - 0x8FFF) and consists of
-        * tiles used for rendering both the background and the window in the
+        * specific tiles from the set of all tiles. The tile set is stored in
+        * two memory regions (0x8800 - 0x97FF and 0x8000 - 0x8FFF) and consists
+        * of tiles used for rendering both the background and the window in the
         * tile maps. The list of tile indexes for creating the two tile maps are
         * respectively indicated by bits 3 and 6 of the LCD control (LCDC)
         * register. If the bits are set to 0 then the list of tile indexes must
@@ -227,6 +227,32 @@ class GPU{
             */
            
            int tileRow = (yPosition / PIXEL_ROWS_PER_TILE) * PIXELS_RENDERED_PER_TILE
+           
+           final int NUMBER_OF_HORIZONTAL_PIXELS = 160
+           
+           NUMBER_OF_HORIZONTAL_PIXELS.times {pixel->
+               int xPosition = pixel + WINDOW_X
+               
+               /*
+                * Translate the current x position to the window if a window is
+                * being drawn.
+                */
+               if(usingWindow) {
+                  if(pixel >= WINDOW_X) {
+                      xPosition = pixel - WINDOW_X
+                  }
+               }
+               
+               /*
+                * This calculation determines which of the 32 horizontal tiles
+                * on the 256x256 grid of tiles the pixel's xPosition falls
+                * within, i.e., which tile column.
+                */
+               int tileColumn = xPosition / 8
+               int tileId = 0
+               
+               int tileAddress = memoryRegion + tileRow + tileColumn
+           }
        }
    } 
    
