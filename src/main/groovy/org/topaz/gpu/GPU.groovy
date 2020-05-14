@@ -217,26 +217,42 @@ class GPU{
            }
            
            final int PIXEL_ROWS_PER_TILE = 8
-           final int PIXELS_RENDERED_PER_TILE = 32
+           final int TILES_PER_ROW = 32
            
            /*
             * The background is free to scroll around to any 160x144 pixels of
             * the available 256x256 pixels. To programmatically know the unique
-            * row of pixels for rendering a calculation is performed. The
+            * row of pixels for rendering, a calculation is performed. The
             * yPosition represents the scanline's absolute position in the
-            * 256x256 grid. To find the *row of tiles*, of the yPosition, it
-            * must first be divided by the number of pixel rows that make up
-            * each tile, a value represented by PIXEL_ROWS_PER_TILE. Although
-            * tiles are made up of 8x8 pixels, two pixel rows are combined (when
-            * calculating their colour) to form a single row, which means that
-            * the actual size of the tile rendered is 4x8, a 32 pixel tile.
-            * Therefore, to find the correct row of pixels the scanline should
-            * draw, the result of the previous calculation is multiplied by the
-            * number of pixels that will actually be rendered
-            * (PIXELS_RENDERED_PER_TILE).
+            * 256x256 grid. The correct row of tiles that the scanline is within
+            * is found by first dividing the yPosition by the number of pixel
+            * rows per tile. We are only interested in the integer result of
+            * this calculation. The result is then multiplied by the number of
+            * tiles per row. The final result is the starting position of the
+            * row in which the current scanline is within the 32x32 tile grid.
+            * 
+            * As an example:
+            * Assume that the background (of size 160x144 pixels) is at the
+            * upper left position of the 256x256 available pixels. This means
+            * that SCROLL_Y and SCROLL_X will be 0 (the background's offset is 0
+            * from each axis as it is flush against it). Next, assume that the
+            * current scanline is at position 42. The yPosition's calculation is
+            * SCROLL_Y + scanline, since SCROLL_Y is 0 this gives us yPosition =
+            * 0 + 42. To get the correct row index, the yPosition is first
+            * divided by the number of pixel rows per tile (each tile is 8x8
+            * pixels). This gives 42/8 = 5 (remember we are only interested in
+            * the integer part of the result). In the 32x32 grid of tiles, the
+            * value 5 represents the 5th row of tiles. To get the index value of
+            * the starting tile of the 5th row, it is multiplied by the number
+            * of tiles per row (32) thus giving the tile row's starting index
+            * value 5*32 = 160. The value 160 is the value at which the tile row
+            * of the scanline *starts*. Remember that the background can be
+            * offset from that starting position anywhere along the 32x32 tile
+            * grid. The calculation of the xPosition gives the correct tile at
+            * which the background begins.
             */
            
-           int tileRow = (yPosition / PIXEL_ROWS_PER_TILE) * PIXELS_RENDERED_PER_TILE
+           int tileRowStart = ((yPosition / PIXEL_ROWS_PER_TILE) as int) * TILES_PER_ROW
            
            final int NUMBER_OF_HORIZONTAL_PIXELS = 160
            
@@ -259,7 +275,7 @@ class GPU{
                 * on the 256x256 grid of tiles the current pixel's xPosition
                 * falls within, i.e., which tile column.
                 */
-               int tileColumn = xPosition / TILE_PIXEL_WIDTH
+               int tileColumn = (xPosition / TILE_PIXEL_WIDTH) as int
                int tileId = 0
                
                /*
@@ -269,7 +285,7 @@ class GPU{
                 * their sum to the memoryRegion therefore gives the tile's
                 * address.
                 */
-               int tileAddress = memoryRegion + tileRow + tileColumn
+               int tileAddress = memoryRegion + tileRowStart + tileColumn
                
                int tileNumber = memoryManager.readMemory(tileAddress)
                
