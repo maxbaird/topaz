@@ -295,9 +295,22 @@ class GPU{
                
                final int TILE_PIXEL_WIDTH = 8
                /*
-                * This calculation determines which of the 32 horizontal tiles
-                * on the 256x256 grid of tiles the current pixel's xPosition
-                * falls within, i.e., which tile column.
+                * This calculation determines which of the 32 tiles along the
+                * x-axis on the 256x256 grid of tiles the current pixel's
+                * xPosition falls within, i.e., which tile column.
+                * 
+                * For example:
+                * For simplicity, assume that the background aligned to the
+                * upper left of the 256x256 pixels such that SCROLL_X and
+                * SCROLL_Y are both 0. Pixel 0 of the scanline would be 0/8 = 0.
+                * This means that the pixel falls in the first line of the tile
+                * (again, we are only interested in the integer result). Pixels
+                * 0 to 7 would give a result of zero. However, when we're at
+                * pixel 8 of the scanline the values become 8/8 = 1, thus
+                * indicating that the pixel is in the second tile of the column.
+                * Again this continues for pixels 8 to 15. And in much the same
+                * way, pixels 16 to 23 will give a result of 2, etc.
+                *
                 */
                int tileColumn = (xPosition / TILE_PIXEL_WIDTH) as int
                int tileId = 0
@@ -308,6 +321,8 @@ class GPU{
                 * selected memoryRegion that holds the list of all tiles. Adding
                 * their sum to the memoryRegion therefore gives the tile's
                 * address.
+                * 
+                * 
                 */
                int tileAddress = memoryRegion + tileRowStart + tileColumn
                
