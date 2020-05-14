@@ -116,6 +116,30 @@ class GPU{
        final int WINDOW_Y = memoryManager.readMemory(0xFF4A)
        final int WINDOW_X = memoryManager.readMemory(0xFF4B)
        
+//     +------------------------------------------------------>256px
+//     |                                ^
+//     |                                |
+//     |                                |
+//     |                             SCROLL_Y
+//     |                                |
+//     |                                |
+//     |                                V      160px
+//     |                +---------------------------------+
+//     |          144px | background          ^           |
+//     |                |                     |           |
+//     |                |                   WIN_Y         |
+//     |                |                     |           |
+//     |<---SCROLL_X--->|                     V           |
+//     |                |             +---------------+   |
+//     |                |             |               |   |
+//     |                | <--WIN_X--> |     window    |   |
+//     |                |             +---------------+   |
+//     |                +---------------------------------+
+//     |
+//     |
+//     V
+//    256px
+       
        /*
         * The scroll and window coordinates respectively let us know where the
         * background and window should be drawn. Tiles are set of small bitmaps
@@ -257,7 +281,7 @@ class GPU{
            final int NUMBER_OF_HORIZONTAL_PIXELS = 160
            
            NUMBER_OF_HORIZONTAL_PIXELS.times {pixel->
-               int xPosition = pixel + WINDOW_X
+               int xPosition = pixel + SCROLL_X
                
                /*
                 * Translate the current x position to the window if a window is
