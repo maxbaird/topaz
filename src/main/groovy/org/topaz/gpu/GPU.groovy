@@ -4,6 +4,7 @@ import org.topaz.gpu.LCD
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
+import java.lang.Math
 
 class GPU{
     static final int CYCLES_BETWEEN_SCANLINES = 456
@@ -30,6 +31,13 @@ class GPU{
     static final int V_BLANK_SCANLINE_END = 153
 
     private LCD lcd
+    
+    enum Colour{
+        WHITE,
+        LIGHT_GRAY,
+        DARK_GRAY,
+        BLACK
+    }
     
     public GPU(MemoryManager memoryManager, InterruptHandler interruptHandler) {
         this.memoryManager = memoryManager
@@ -294,6 +302,7 @@ class GPU{
                }
                
                final int TILE_PIXEL_WIDTH = 8
+               final int TILE_PIXEL_HEIGHT = 8
                /*
                 * This calculation determines which of the 32 tiles along the
                 * x-axis on the 256x256 grid of tiles the current pixel's
@@ -321,8 +330,6 @@ class GPU{
                 * selected memoryRegion that holds the list of all tiles. Adding
                 * their sum to the memoryRegion therefore gives the tile's
                 * address.
-                * 
-                * 
                 */
                int tileAddress = memoryRegion + tileRowStart + tileColumn
                
@@ -330,7 +337,7 @@ class GPU{
                
                int tileLocation = tileData
                
-               final int SIZE_OF_TILE_IN_MEMORY = 16
+               final int SIZE_OF_TILE_IN_MEMORY = TILE_PIXEL_HEIGHT + TILE_PIXEL_WIDTH
                if(isUnsigned) {
                   /*
                    * If the tile memory data was read from the region 0x8000 -
@@ -346,9 +353,99 @@ class GPU{
                    final int OFFSET = 128
                    tileLocation = tileLocation + ((tileNumber + OFFSET) * SIZE_OF_TILE_IN_MEMORY)
                }
+               
+               /*
+                * This calculation determines the row of pixels of the current
+                * tile that the scanline is on.
+                */
+               int tilePixelRow = yPosition % TILE_PIXEL_HEIGHT
+               
+               /*
+                * Each row of pixels is made by combining two rows of tile data.
+                */
+               tilePixelRow = tilePixelRow * 2
+               int pixelData1 = memoryManager.readMemory(tileLocation + tilePixelRow)
+               int pixelData2 = memoryManager.readMemory(tileLocation + tilePixelRow + 1)
+               
+               int colourBit = xPosition % TILE_PIXEL_WIDTH
+
+               /*
+                * Get the xPosition of the bit with respect to the tile.
+                * However, the bit's index position is not the same as the bit's
+                * significance. So, for the 8 bits making up a tile row, index
+                * position 0 of the bit is really bit position 7. Index position
+                * 1 is bit position 6. And so the correct conversion is made by
+                * first subtracting 7 and take the absolute value.
+                */
+               colourBit = Math.abs((colourBit - 7)) 
+               
+               /*
+                * Two rows of bits are combined to form a single row of pixels.
+                * The combination of the rows allows for pixel colours to be
+                * generated. The combined bits result in a value that maps to
+                * one of four possible colours.
+                */
+               int colourNumber = BitUtil.getValue(pixelData2, colourBit)
+               colourNumber = colourNumber << 1
+               colourNumber = colourNumber | BitUtil.getValue(pixelData1, colourBit)
+               
+               /*
+                * The BG (Background) palette data register assigns gray shades
+                * to the colour numbers of the BG and window tiles.
+                * 
+                * Bit 7-6 - Shade for Colour Number 3
+                * Bit 5-4 - Shade for Colour Number 2
+                * Bit 3-2 - Shade for Colour Number 1
+                * Bit 1-0 - Shade for Colour Number 0
+                * 
+                * The four possible shades of gray are:
+                * 0 White
+                * 1 Light gray
+                * 2 Dark Gray
+                * 3 Black
+                */
+               Colour colour = getColour(colourNumber)
+               int red = 0
+               int green = 0
+               int blue = 0
+               
+               switch(colour) {
+                  case Colour.WHITE : red = 255; green = 255; blue = 255; break;
+                  case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
+                  case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
+               }
            }
        }
    } 
+   
+   private Colour getColour(int colourNumber){
+       final int BG_PALETTE_DATA = 0xFF47
+       Colour colour = Colour.WHITE
+
+       int palette = memoryManager.readMemory(BG_PALETTE_DATA)
+       int hi = 0
+       int lo = 0
+       
+       switch(colourNumber){
+           case 0: hi = 1; lo = 0; break;
+           case 1: hi = 3; lo = 2; break;
+           case 2: hi = 5; lo = 4; break;
+           case 3: hi = 7; lo = 6; break;
+       }
+       
+       int c = 0
+       c = BitUtil.getValue(palette, hi) << 1
+       c = c | BitUtil.getValue(palette, lo)
+       
+       switch(c){
+           case 0: colour = Colour.WHITE; break;
+           case 1: colour = Colour.LIGHT_GRAY; break;
+           case 2: colour = Colour.DARK_GRAY; break;
+           case 3: colour = Colour.BLACK; break;
+       }
+       
+       return colour
+   }
    
    private void renderSprites() {
        

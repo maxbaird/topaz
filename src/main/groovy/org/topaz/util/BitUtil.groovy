@@ -16,4 +16,9 @@ class BitUtil{
         address &= ~mask
         return address
     }
+    
+    static int getValue(int data, int position){
+        int mask = 1 << position
+        return (data & mask) ? 1 : 0
+    }
 }
