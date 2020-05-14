@@ -414,6 +414,12 @@ class GPU{
                   case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
                   case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
                }
+               
+               int currentScanline = memoryManager.readMemory(LCD.LY_REGISTER)    
+               
+               if(currentScanline < 0 || currentScanline > 143 || pixel < 0 || pixel > 159) {
+                   return /* really just a continue statement */
+               }
            }
        }
    } 
