@@ -127,7 +127,8 @@ class GPU{
         * respectively indicated by bits 3 and 6 of the LCD control (LCDC)
         * register. If the bits are set to 0 then the list of tile indexes must
         * be read from memory region 0x9800 - 0x9BFF, otherwise, the list at
-        * region 0x9C00 - 0x9FFF must be used.
+        * region 0x9C00 - 0x9FFF must be used. Each byte in the list is a tile
+        * identification number of what needs to be drawn.
         */
        
        int tileData = 0
@@ -170,12 +171,21 @@ class GPU{
            }
            
            if(usingWindow == false) {
+               /*
+                * If the current scanline is not being drawn in the window, get
+                * the correct memory region to load the background tile indexes
+                * from.
+                */
                if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_TILE_MAP_DISPLAY_SELECT)) {
                    memoryRegion = 0x9C00
                }else {
                    memoryRegion = 0x9800
                }
            }else {
+               /*
+                * Otherwise, load the window's list of of tile indexes from the
+                * specified memory region.
+                */
                if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.WINDOW_TILE_MAP_DISPLAY_SELECT)) {
                    memoryRegion = 0x9C00
                }else {
@@ -214,15 +224,15 @@ class GPU{
             * the available 256x256 pixels. To programmatically know the unique
             * row of pixels for rendering a calculation is performed. The
             * yPosition represents the scanline's absolute position in the
-            * 256x256 grid. To find the correct *row of tiles* the yPosition
-            * falls within, it must be divided by the number of pixel rows that
-            * make up each tile, a value represented by PIXEL_ROWS_PER_TILE.
-            * Although tiles are made up of 8x8 pixels, two pixel rows are
-            * combined (when calculating their colour) to form a single row,
-            * this means that the size of the tile actually rendered is 4x8, a
-            * 32 pixel tile. Therefore, to find the correct row of pixels the
-            * scanline should draw, the result of the previous calculation is
-            * multiplied by the number of pixels that will actually be rendered
+            * 256x256 grid. To find the *row of tiles*, of the yPosition, it
+            * must first be divided by the number of pixel rows that make up
+            * each tile, a value represented by PIXEL_ROWS_PER_TILE. Although
+            * tiles are made up of 8x8 pixels, two pixel rows are combined (when
+            * calculating their colour) to form a single row, which means that
+            * the actual size of the tile rendered is 4x8, a 32 pixel tile.
+            * Therefore, to find the correct row of pixels the scanline should
+            * draw, the result of the previous calculation is multiplied by the
+            * number of pixels that will actually be rendered
             * (PIXELS_RENDERED_PER_TILE).
             */
            
@@ -243,15 +253,44 @@ class GPU{
                   }
                }
                
+               final int TILE_PIXEL_WIDTH = 8
                /*
                 * This calculation determines which of the 32 horizontal tiles
-                * on the 256x256 grid of tiles the pixel's xPosition falls
-                * within, i.e., which tile column.
+                * on the 256x256 grid of tiles the current pixel's xPosition
+                * falls within, i.e., which tile column.
                 */
-               int tileColumn = xPosition / 8
+               int tileColumn = xPosition / TILE_PIXEL_WIDTH
                int tileId = 0
                
+               /*
+                * The address of the tile to read from memory is calculated as
+                * follows: tileRow + tileColumn represent the offset into the
+                * selected memoryRegion that holds the list of all tiles. Adding
+                * their sum to the memoryRegion therefore gives the tile's
+                * address.
+                */
                int tileAddress = memoryRegion + tileRow + tileColumn
+               
+               int tileNumber = memoryManager.readMemory(tileAddress)
+               
+               int tileLocation = tileData
+               
+               final int SIZE_OF_TILE_IN_MEMORY = 16
+               if(isUnsigned) {
+                  /*
+                   * If the tile memory data was read from the region 0x8000 -
+                   * 0x8FFF then the tileNumber read from the tileAddress is an
+                   * unsigned byte and the identifier ranges from 0 to 255.
+                   */
+                   tileLocation = tileLocation + (tileNumber * SIZE_OF_TILE_IN_MEMORY)
+               }else {
+                   /*
+                    * If the memory region was 0x8800 - 0x97FF, then the
+                    * identifier is signed and ranges from -127 to 127.
+                    */
+                   final int OFFSET = 128
+                   tileLocation = tileLocation + ((tileNumber + OFFSET) * SIZE_OF_TILE_IN_MEMORY)
+               }
            }
        }
    } 

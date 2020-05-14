@@ -51,7 +51,7 @@ class Emulator{
     }
     
     private void updateGraphics(int cycles) {
-       lcd.updateGraphics(cycles) 
+       gpu.updateGraphics(cycles) 
     }
     
     private void handleInterrupts() {
