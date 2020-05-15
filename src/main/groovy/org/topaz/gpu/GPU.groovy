@@ -286,9 +286,7 @@ class GPU{
            
            int tileRowStart = ((yPosition / PIXEL_ROWS_PER_TILE) as int) * TILES_PER_ROW
            
-           final int NUMBER_OF_HORIZONTAL_PIXELS = 160
-           
-           NUMBER_OF_HORIZONTAL_PIXELS.times {pixel->
+           LCD.WIDTH.times {pixel->
                int xPosition = pixel + SCROLL_X
                
                /*
@@ -389,21 +387,6 @@ class GPU{
                colourNumber = colourNumber << 1
                colourNumber = colourNumber | BitUtil.getValue(pixelData1, colourBit)
                
-               /*
-                * The BG (Background) palette data register assigns gray shades
-                * to the colour numbers of the BG and window tiles.
-                * 
-                * Bit 7-6 - Shade for Colour Number 3
-                * Bit 5-4 - Shade for Colour Number 2
-                * Bit 3-2 - Shade for Colour Number 1
-                * Bit 1-0 - Shade for Colour Number 0
-                * 
-                * The four possible shades of gray are:
-                * 0 White
-                * 1 Light gray
-                * 2 Dark Gray
-                * 3 Black
-                */
                Colour colour = getColour(colourNumber)
                int red = 0
                int green = 0
@@ -417,14 +400,37 @@ class GPU{
                
                int currentScanline = memoryManager.readMemory(LCD.LY_REGISTER)    
                
-               if(currentScanline < 0 || currentScanline > 143 || pixel < 0 || pixel > 159) {
+               if(currentScanline < 0 || currentScanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
+                   /*
+                    * Skip the current iteration if scanline or pixel are not
+                    * within the screen's bounds.
+                    */
                    return /* really just a continue statement */
                }
            }
        }
    } 
    
+   private void renderSprites() {
+       
+       
+   }
    private Colour getColour(int colourNumber){
+       /*
+        * The BG (Background) palette data register assigns gray shades
+        * to the colour numbers of the BG and window tiles.
+        * 
+        * Bit 7-6 - Shade for Colour Number 3
+        * Bit 5-4 - Shade for Colour Number 2
+        * Bit 3-2 - Shade for Colour Number 1
+        * Bit 1-0 - Shade for Colour Number 0
+        * 
+        * The four possible shades of gray are:
+        * 0 White
+        * 1 Light gray
+        * 2 Dark Gray
+        * 3 Black
+        */
        final int BG_PALETTE_DATA = 0xFF47
        Colour colour = Colour.WHITE
 
@@ -434,7 +440,7 @@ class GPU{
        
        switch(colourNumber){
            case 0: hi = 1; lo = 0; break;
-           case 1: hi = 3; lo = 2; break;
+           case 1: hi = 3; lo = 2; break; 
            case 2: hi = 5; lo = 4; break;
            case 3: hi = 7; lo = 6; break;
        }
@@ -451,9 +457,5 @@ class GPU{
        }
        
        return colour
-   }
-   
-   private void renderSprites() {
-       
    }
 }

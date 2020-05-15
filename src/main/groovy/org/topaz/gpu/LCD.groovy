@@ -53,6 +53,9 @@ class LCD{
      */
     static final int LYC_REGISTER = 0xFF45
     
+    static final int HEIGHT = 144
+    static final int WIDTH = 160
+    
     /* 
      * The current LCD status is held at address 0xFF41.The LCD goes through 4
      * modes when drawing scanlines, Bits 1 and 0 represent the current LCD mode
