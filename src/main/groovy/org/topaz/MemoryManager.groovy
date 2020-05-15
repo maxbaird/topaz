@@ -4,17 +4,20 @@ import org.topaz.util.BitUtil
 import org.topaz.cpu.Register
 import org.topaz.gpu.LCD
 import org.topaz.DMAHandler
+import org.topaz.Joypad
 
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
-    public int []rom
+    public static int []rom
 
     Cartridge cartridge
     Register register
+    Joypad joypad
 
-    public MemoryManager(Cartridge cartridge, Register register) {
+    public MemoryManager(Cartridge cartridge, Register register, Joypad joypad) {
         this.cartridge = cartridge
         this.register = register
+        this.joypad = joypad
         this.rom = new int[MEMORY_SIZE]
         this.init()
     }
@@ -64,6 +67,8 @@ class MemoryManager{
         else if((address >= 0xA000) && (address <= 0xBFFF)) {
             int newAddress = address - 0xA000
             return this.cartridge.ramBanks[newAddress + (this.cartridge.currentRamBank * 0x2000)]
+        }else if(address == Joypad.REGISTER) {
+            return joypad.getJoypadState()
         }
 
         return this.rom[address]

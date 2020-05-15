@@ -7,6 +7,7 @@ import org.topaz.cpu.CPU
 import org.topaz.MemoryManager
 import org.topaz.Timer
 import org.topaz.InterruptHandler
+import org.topaz.Joypad
 
 class Emulator{
     private static final MAX_CYCLES = 69905
@@ -18,11 +19,13 @@ class Emulator{
     Cartridge cartridge
     Timer timer
     InterruptHandler interruptHandler
+    Joypad joypad
 
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
         this.register = new Register()
-        this.memoryManager = new MemoryManager(this.cartridge, this.register)
+        this.joypad = new Joypad()
+        this.memoryManager = new MemoryManager(this.cartridge, this.register, this.joypad)
         this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
