@@ -29,6 +29,17 @@ class GPU{
      */
     static final int V_BLANK_SCANLINE_START = 144
     static final int V_BLANK_SCANLINE_END = 153
+    
+    private final int TILE_PIXEL_WIDTH = 8
+    private final int TILE_PIXEL_HEIGHT = 8
+    private final int SIZE_OF_TILE_IN_MEMORY = TILE_PIXEL_HEIGHT + TILE_PIXEL_WIDTH
+    
+    /*
+     * The tile data begins at either of these locations. The sprite tiles always 
+     * begin at location 1.
+     */
+    private final int TILE_DATA_LOCATION_1 = 0x8000
+    private final int TILE_DATA_LOCATION_2 = 0x8800
 
     private LCD lcd
     
@@ -186,10 +197,9 @@ class GPU{
             * 0x8000 - 0x8FFF is used.
             */
            if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_AND_WINDOW_TILE_DATA_SELECT)) {
-               tileData = 0x8000
+               tileData = TILE_DATA_LOCATION_1
            }else {
-               tileData = 0x8800
-               
+               tileData = TILE_DATA_LOCATION_2 
                /*
                 * While the Gameboy seems to largely use unsigned bytes, there
                 * is a quirk when it comes to tiles. As it turns out, if the
@@ -299,8 +309,6 @@ class GPU{
                   }
                }
                
-               final int TILE_PIXEL_WIDTH = 8
-               final int TILE_PIXEL_HEIGHT = 8
                /*
                 * This calculation determines which of the 32 tiles along the
                 * x-axis on the 256x256 grid of tiles the current pixel's
@@ -335,7 +343,6 @@ class GPU{
                
                int tileLocation = tileData
                
-               final int SIZE_OF_TILE_IN_MEMORY = TILE_PIXEL_HEIGHT + TILE_PIXEL_WIDTH
                if(isUnsigned) {
                   /*
                    * If the tile memory data was read from the region 0x8000 -
@@ -387,7 +394,24 @@ class GPU{
                colourNumber = colourNumber << 1
                colourNumber = colourNumber | BitUtil.getValue(pixelData1, colourBit)
                
-               Colour colour = getColour(colourNumber)
+               /*
+                * The BG (Background) palette data register assigns gray shades
+                * to the colour numbers of the BG and window tiles.
+                * 
+                * Bit 7-6 - Shade for Colour Number 3
+                * Bit 5-4 - Shade for Colour Number 2
+                * Bit 3-2 - Shade for Colour Number 1
+                * Bit 1-0 - Shade for Colour Number 0
+                * 
+                * The four possible shades of gray are:
+                * 0 White
+                * 1 Light gray
+                * 2 Dark Gray
+                * 3 Black
+                */
+               final int BG_PALETTE_DATA = 0xFF47
+
+               Colour colour = getColour(colourNumber, BG_PALETTE_DATA)
                int red = 0
                int green = 0
                int blue = 0
@@ -413,17 +437,6 @@ class GPU{
    
    private void renderSprites() {
        /*
-        * There are 40 sprite tiles located in memory region 0x8000 - 0x8FFF.
-        */
-       final int SPRITE_TILE_AMT = 40 
-       
-       /*
-        * A sprite can be either 8x8 or 8x16 pixels, this is determined by the
-        * sprite's attributes.
-        */
-       boolean use8x16 = false
-       
-       /*
         * Sprite attributes are found in the sprite attribute table located at
         * 0xFE00 - 0xFE9F. Each sprite uses 4 bytes of this memory region for
         * its associated attributes. The attributes are as follows:o
@@ -446,29 +459,167 @@ class GPU{
         * and window is white, it is rendered above.
         * 
         * Bit 6: Y-Flip
+        * If this bit is set then the sprite is mirrored vertically, this is
+        * useful for turning sprites upside down.
+        * 
+        * Bit 5: X-Flip
+        * If this bit is set then the sprite is mirrored horizontally, useful
+        * for changing the direction of sprites.
+        * 
+        * Bit 4: Palette Number
+        * Sprites get their monochrome palette from either 0xFF48 or 0xFF49. If
+        * this bit is set then the palette is from the former, otherwise, the
+        * latter.
+        * 
+        * The other bits are unused.
         */
-       
-   }
-   private Colour getColour(int colourNumber){
+
        /*
-        * The BG (Background) palette data register assigns gray shades
-        * to the colour numbers of the BG and window tiles.
-        * 
-        * Bit 7-6 - Shade for Colour Number 3
-        * Bit 5-4 - Shade for Colour Number 2
-        * Bit 3-2 - Shade for Colour Number 1
-        * Bit 1-0 - Shade for Colour Number 0
-        * 
-        * The four possible shades of gray are:
-        * 0 White
-        * 1 Light gray
-        * 2 Dark Gray
-        * 3 Black
+        * There are 40 sprite tiles located in memory region 0x8000 - 0x8FFF.
         */
-       final int BG_PALETTE_DATA = 0xFF47
+       final int SPRITE_TILE_AMT = 40 
+       
+       /*
+        * A sprite can be either 8x8 or 8x16 pixels, this is determined by the
+        * sprite's attributes.
+        */
+       boolean use8x16 = false
+       
+       def spriteAttributeBit = [
+           BACKGROUND_PRIORITY : 7,
+           Y_FLIP : 6,
+           X_FLIP : 5,
+           PALETTE_NUMBER : 4
+       ].asUnmodifiable()
+       
+       if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.OBJ_SPRITE_SIZE)) {
+           use8x16 = true
+       }
+       
+       final int SPRITE_SIZE = 4
+       final int SPRITE_ATTRIBUTE_TABLE = 0xFE00
+
+       SPRITE_TILE_AMT.times { sprite->
+          /*
+           * Sprite takes 4 bytes in the sprite attribute table. So calculate
+           * it's base address and read its associated bytes offset from the
+           * calculated address.
+           */
+          int spriteIndex = sprite * SPRITE_SIZE
+          int yPosition = memoryManager.readMemory(SPRITE_ATTRIBUTE_TABLE + spriteIndex) - 16
+          int xPosition = memoryManager.readMemory(SPRITE_ATTRIBUTE_TABLE + spriteIndex + 1) - 8
+          int tileLocation = memoryManager.readMemory(SPRITE_ATTRIBUTE_TABLE + spriteIndex + 2)
+          int attributes = memoryManager.readMemory(SPRITE_ATTRIBUTE_TABLE + spriteIndex + 3)
+          
+          boolean yFlip = BitUtil.isSet(attributes, spriteAttributeBit.Y_FLIP)
+          boolean xFlip = BitUtil.isSet(attributes, spriteAttributeBit.X_FLIP)
+          
+          int scanline = memoryManager.readMemory(LCD.LY_REGISTER)
+          
+          int ySize = 8
+          
+          if(use8x16) {
+              ySize = 16
+          }
+          
+          /*
+           * Determine if this sprite intercepts with the scanline
+           */
+          if((scanline >= yPosition) && (scanline < (yPosition+ySize))) {
+              int line = scanline - yPosition
+              
+              if(yFlip) {
+                  /*
+                   * Read the sprite in backwards
+                   */
+                  line = Math.abs(line - ySize)
+              }
+              
+              /*
+               * Two rows of bits combine to form a single line of pixels on the
+               * screen. The line represents the row of bits on the tile. For
+               * example, if the current line is 0, then line 0 and 1 are
+               * combined to form the row of pixels. If the current line is 1,
+               * then line's 2 and 3 are combined, etc.
+               */
+              line = line * 2
+              
+              int tileDataAddress = (TILE_DATA_LOCATION_1 + (tileLocation * SIZE_OF_TILE_IN_MEMORY)) + line
+              /* Read the current row of tile bits */
+              int tileData1 = memoryManager.readMemory(tileDataAddress) 
+              /* Read the next row of tile bits */
+              int tileData2 = memoryManager.readMemory(tileDataAddress + 1) 
+              
+              /*
+               * Now combine the two rows of bits to form a single line of
+               * pixels. The tileData is processed from right to left as this
+               * naturally aligns with the pixels. Since pixel 0 is bit 7 of the
+               * colour data, pixel 1 is bit 6, etc.
+               */
+              
+              7.times {tilePixel -> 
+                 int colourBit = tilePixel 
+                 
+                 /*
+                  * Read sprite backwards if flipped along the x-axis
+                  */
+                 if(xFlip) {
+                     colourBit = Math.abs(colourBit - 7)
+                 }
+                 
+                 /* The rest of code is roughly the same as what happens for the tiles */
+                 int colourNumber = BitUtil.getValue(tileData2, colourBit)
+                 colourNumber = colourNumber << 1
+                 colourNumber = colourNumber | BitUtil.getValue(tileData1, colourBit)
+                 
+                 /*
+                  * Sprites can use either of these two palettes based on the
+                  * bit value for their palette number attribute.
+                  */
+                 final int SPRITE_PALETTE_0 = 0xFF48 
+                 final int SPRITE_PALETTE_1 = 0xFF49 
+                 
+                 int colourAddress = 0
+
+                 if(BitUtil.isSet(attributes, spriteAttributeBit.PALETTE_NUMBER)) {
+                     colourAddress = SPRITE_PALETTE_1
+                 }else {
+                     colourAddress = SPRITE_PALETTE_0
+                 }
+                 
+                 Colour colour = this.getColour(colourNumber, colourAddress)
+                 
+                 /*
+                  * White is transparent for sprites
+                  */
+                 if(colour == Colour.WHITE) {
+                     return /* skip this iteration */
+                 }
+                 
+                 int red = 0
+                 int green = 0
+                 int blue = 0
+                 
+                 switch(colour) {
+                    case Colour.WHITE : red = 255; green = 255; blue = 255; break;
+                    case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
+                    case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
+                 }
+                 
+                 /*
+                  * 
+                  */
+                 int xPix = 0 - tilePixel
+                 xPix = xPix + 7
+              }
+          }
+       }
+   }
+
+   private Colour getColour(int colourNumber, int address){
        Colour colour = Colour.WHITE
 
-       int palette = memoryManager.readMemory(BG_PALETTE_DATA)
+       int palette = memoryManager.readMemory(address)
        int hi = 0
        int lo = 0
        
