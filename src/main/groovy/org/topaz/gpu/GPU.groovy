@@ -412,7 +412,41 @@ class GPU{
    } 
    
    private void renderSprites() {
+       /*
+        * There are 40 sprite tiles located in memory region 0x8000 - 0x8FFF.
+        */
+       final int SPRITE_TILE_AMT = 40 
        
+       /*
+        * A sprite can be either 8x8 or 8x16 pixels, this is determined by the
+        * sprite's attributes.
+        */
+       boolean use8x16 = false
+       
+       /*
+        * Sprite attributes are found in the sprite attribute table located at
+        * 0xFE00 - 0xFE9F. Each sprite uses 4 bytes of this memory region for
+        * its associated attributes. The attributes are as follows:o
+        * 
+        * 0: Sprite Y Position: Position of the sprite on the Y axis of the
+        * viewing display minus 16
+        * 
+        * 1: Sprite X Position: Position of the sprite on the X axis of the
+        * viewing display minus 8
+        * 
+        * 2: Pattern number: This is the sprite identifier used for looking up
+        * the sprite data in memory region 0x8000-0x8FFF
+        * 
+        * 3: Bits of this byte are the sprite's attributes, explained below.
+        * 
+        * SPRITE ATTRIBUTES:
+        * Bit 7: Sprite to Background Priority
+        * If this flag is 0 then the sprite is rendered above the background and
+        * window. Otherwise it is hidden behind both. However, if the background
+        * and window is white, it is rendered above.
+        * 
+        * Bit 6: Y-Flip
+        */
        
    }
    private Colour getColour(int colourNumber){
