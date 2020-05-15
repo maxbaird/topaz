@@ -9,9 +9,6 @@ import java.lang.Math
 class GPU{
     static final int CYCLES_BETWEEN_SCANLINES = 456
 
-    MemoryManager memoryManager
-    InterruptHandler interruptHandler
-
     /*
      * It takes 456 CPU cycles to draw each scanline. In the main emulator loop
      * the graphics is updated after the execution of each opcode and the total
@@ -41,7 +38,10 @@ class GPU{
     private final int TILE_DATA_LOCATION_1 = 0x8000
     private final int TILE_DATA_LOCATION_2 = 0x8800
 
+    private MemoryManager memoryManager
+    private InterruptHandler interruptHandler
     private LCD lcd
+    private int screenData
     
     enum Colour{
         WHITE,
@@ -53,6 +53,7 @@ class GPU{
     public GPU(MemoryManager memoryManager, InterruptHandler interruptHandler) {
         this.memoryManager = memoryManager
         this.interruptHandler = interruptHandler
+        this.screenData = new int[LCD.HEIGHT][LCD.WIDTH][3]
         lcd = new LCD(memoryManager: memoryManager, interruptHandler: interruptHandler)
     }
 
@@ -110,7 +111,13 @@ class GPU{
         if(BitUtil.isSet(control, LCD.ControlRegisterBit.OBJ_SPRITE_DISPLAY_ENABLE)) {
             renderSprites()
         }
+        
+        updateDisplay()
     }
+
+   private void updateDisplay() {
+       
+   }
     
    private void renderTiles() {
        /*
@@ -422,15 +429,19 @@ class GPU{
                   case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
                }
                
-               int currentScanline = memoryManager.readMemory(LCD.LY_REGISTER)    
+               int scanline = memoryManager.readMemory(LCD.LY_REGISTER)    
                
-               if(currentScanline < 0 || currentScanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
+               if(scanline < 0 || scanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
                    /*
                     * Skip the current iteration if scanline or pixel are not
                     * within the screen's bounds.
                     */
                    return /* really just a continue statement */
                }
+               
+               screenData[pixel][scanline][0] = red
+               screenData[pixel][scanline][1] = green
+               screenData[pixel][scanline][2] = blue
            }
        }
    } 
@@ -620,6 +631,10 @@ class GPU{
                  if((scanline < 0) || (scanline > (LCD.HEIGHT - 1)) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
                      continue
                  }
+
+                 screenData[pixel][scanline][0] = red
+                 screenData[pixel][scanline][1] = green
+                 screenData[pixel][scanline][2] = blue
               }
           }
        }
