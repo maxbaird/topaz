@@ -557,7 +557,7 @@ class GPU{
                * colour data, pixel 1 is bit 6, etc.
                */
               
-              7.times {tilePixel -> 
+              for(int tilePixel = 7; tilePixel >=0; tilePixel--) {
                  int colourBit = tilePixel 
                  
                  /*
@@ -587,7 +587,7 @@ class GPU{
                      colourAddress = SPRITE_PALETTE_0
                  }
                  
-                 Colour colour = this.getColour(colourNumber, colourAddress)
+                 Colour colour = getColour(colourNumber, colourAddress)
                  
                  /*
                   * White is transparent for sprites
@@ -607,10 +607,19 @@ class GPU{
                  }
                  
                  /*
-                  * 
+                  * Convert the tilePixel into a screen pixel
                   */
-                 int xPix = 0 - tilePixel
-                 xPix = xPix + 7
+                 int pixel = 0 - tilePixel
+                 pixel = pixel + 7
+                 
+                 pixel = xPosition + pixel
+                 
+                 /*
+                  * Final sanity check!
+                  */
+                 if((scanline < 0) || (scanline > (LCD.HEIGHT - 1)) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
+                     continue
+                 }
               }
           }
        }
