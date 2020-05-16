@@ -68,6 +68,15 @@ class MemoryManager{
             int newAddress = address - 0xA000
             return this.cartridge.ramBanks[newAddress + (this.cartridge.currentRamBank * 0x2000)]
         }else if(address == Joypad.KEY_REGISTER) {
+            /*
+             * Reading the joypad is trapped here because this emulator
+             * internally represents the joypad's state differently from its
+             * specification. One byte is used to represent the state of each of
+             * the 8 buttons. Therefore, when reading from this register,
+             * appropriate shifts and bit manipulations must occur so that the
+             * correct value of this address is returned. getJoypadState()
+             * serves this purpose.
+             */
             return joypad.getJoypadState()
         }
 

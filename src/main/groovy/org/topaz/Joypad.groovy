@@ -47,6 +47,16 @@ class Joypad{
         STANDARD_BUTTON:5
     ].asUnmodifiable()
 
+    /*
+     * Although the game expects the status of the 8 buttons to be stored within
+     * bits 0 to 3 of address 0xFF00 (KEY_REGISTER), the Joypad state variable
+     * uses each bit to represent each button as there are 8 bits, one for each
+     * button (it matches neatly). When the game queries the KEY_REGISTER,
+     * getJoypadState() is called to examine the variable joypadState. The bits
+     * in joypadState are manipulated to resemble what the game expects. When a
+     * button is pressed, the corresponding bit in joypadState is set to 0 and
+     * if it is not pressed it is set to 1.
+     */
     private int joypadState
     private InterruptHandler interruptHandler
 
@@ -60,11 +70,51 @@ class Joypad{
          * keypresses as 1.
          */
         keyRegister = keyRegister ^ 0xFF
-        
-        if(BitUtil.isSet(keyRegister, keyRegisterBit.DIRECTIONAL_BUTTON)) {
+
+        /*
+         * Is the game trying to read the standard buttons? Note that the
+         * conditional check is inverted, because for the joypad 0 means the
+         * button has been pressed and 1 means it has not.
+         */
+        if(!BitUtil.isSet(keyRegister, keyRegisterBit.DIRECTIONAL_BUTTON)) {
+            /*
+             * This bit shift is done because the directional button presses
+             * are stored in the top nibble of the joypad's byte.
+             */
             int joypad = joypadState >> 4
-            joypad
+            
+            /*
+             * The logic that follows essentially sets bits 0 - 4 of keyRegister
+             * to the upper nibble of joypadState.
+             */
+            
+            /*
+             * Next the upper nibble of the joypad is turned on. This preserves
+             * the original value of the keyRegister before returning.
+             */
+            joypad = joypad | 0xF0
+            
+            /*
+             * The upper nibble of the joypadState were stored in the lower
+             * nibble of joypad and the upper nibble of joypad was set to 1111.
+             * So when this logical AND is performed, the upper nibble of the
+             * key register is preserved, and the lower nibble is set in
+             * accordance to the lower nibble of joypad (which is really the
+             * upper nibble of joypadState).
+             */
+            keyRegister = keyRegister & joypad
+        }else if(!BitUtil.isSet(keyRegister, keyRegisterBit.STANDARD_BUTTON)) {
+            /*
+             * The standard buttons are stored in the lower nibble of
+             * joypadState. This logic sets bits 0 - 4 of keyRegister to the
+             * same values as the lower nibble of joypadState.
+             */
+            int joypad = joypadState & 0xF
+            joypad = joypad | 0xF0
+            keyRegister = keyRegister & joypad
         }
+        
+        return keyRegister
     }
 
     public void keyPressed(int key) {
@@ -120,6 +170,9 @@ class Joypad{
     }
     
     public void keyReleased(int key) {
+        /*
+         * Simply set the corresponding bit in joypadState.
+         */
         joypadState = BitUtil.setBit(joypadState, key)
     }
 }
