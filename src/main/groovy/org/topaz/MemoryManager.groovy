@@ -67,7 +67,7 @@ class MemoryManager{
         else if((address >= 0xA000) && (address <= 0xBFFF)) {
             int newAddress = address - 0xA000
             return this.cartridge.ramBanks[newAddress + (this.cartridge.currentRamBank * 0x2000)]
-        }else if(address == Joypad.REGISTER) {
+        }else if(address == Joypad.KEY_REGISTER) {
             return joypad.getJoypadState()
         }
 

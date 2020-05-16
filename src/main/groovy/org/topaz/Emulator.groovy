@@ -31,6 +31,7 @@ class Emulator{
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
         //TODO Pass an instance of the screen for the GPU to update
         this.gpu = new GPU(this.memoryManager, this.interruptHandler)
+        joypad.interruptHandler = interruptHandler
     }
     
     public void update() {
