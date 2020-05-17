@@ -48,7 +48,7 @@ class Emulator{
     }
     
     private int executeNextOpCode() {
-        return 1
+        return cpu.executeNextOpcode()
     }
     
     private void updateTimers(int cycles) {
