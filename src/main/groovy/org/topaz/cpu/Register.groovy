@@ -14,10 +14,10 @@ class Register{
     int sp
 
     /* flag bits */
-    private static int FLAG_Z = 7
-    private static int FLAG_N = 6
-    private static int FLAG_H = 5
-    private static int FLAG_C = 4
+    private static final int FLAG_Z = 7
+    private static final int FLAG_N = 6
+    private static final int FLAG_H = 5
+    private static final int FLAG_C = 4
     
     public Register() {
         this.pc = 0x100

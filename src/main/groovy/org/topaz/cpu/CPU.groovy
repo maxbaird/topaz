@@ -53,6 +53,10 @@ class CPU{
             register.A = cpu8BitAdd(register.A, register.B, false, false) 
             return 4
             
+            case 0x90
+            register.A = cpu8BitSub(register.A, register.B, false, false)
+            return 4
+            
             case 0xCB:
             try {
                 return executeExtendedOpcode()
@@ -125,4 +129,47 @@ class CPU{
 
        return reg
     } 
+    
+    private int cpu8BitSub(int reg, int value, boolean useImmediate, boolean subCarry) {
+       int initialValue = reg
+       int runningDifference = 0 
+       
+       if(useImmediate) {
+           int n = memoryManager.readMemory(register.pc)
+           register.pc++
+           runningDifference = n
+       }else {
+           runningDifference = value
+       }
+       
+       if(subCarry) {
+           if(register.isC()) {
+               runningDifference++
+           }
+       }
+       
+       reg = reg - runningDifference
+       
+       /* now set flags */
+       register.F = 0
+       
+       if(reg == 0) {
+          register.setZ(true) 
+       }
+       
+       register.setN(true)
+       
+       if(initialValue < runningDifference) {
+           register.setC(true)
+       }
+       
+       int halfCarry = initialValue & 0xF
+       halfCarry = halfCarry - (runningDifference & 0xF)
+       
+       if(halfCarry < 0) {
+           register.setH(true)
+       }
+       
+       return reg
+    }
 }
