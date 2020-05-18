@@ -82,6 +82,19 @@ class MemoryManager{
 
         return this.rom[address]
     }
+    
+    int readWord() {
+        /*
+         * The read memory function returns a byte by default, this is a
+         * convince method for when an entire word must be read. Such as when
+         * the CPU needs to execute a call instruction.
+         */
+        int word = readMemory(register.pc+1)
+        word = word << 8 // shift first byte into upper byte of word
+        word = word | readMemory(register.pc) //read the second word into the lower byte
+        
+        return word
+    }
 
     void writeMemory(int address, int data) {
         /* Read only cartridge memory, no *normal* writes allowed */

@@ -65,6 +65,14 @@ class CPU{
             cpuJumpImmediate(true, register.FLAG_Z, false)
             return 8
             
+            case 0xCC:
+            cpuCall(true, register.FLAG_Z, true)
+            return 12
+
+            case 0xD0:
+            cpuReturn(true, register.FLAG_C, false)
+            return 8
+            
             case 0xCB:
             try {
                 return executeExtendedOpcode()
@@ -219,5 +227,35 @@ class CPU{
            register.pc = register.pc + n
        }
        register.pc++
+    }
+    
+    private void cpuCall(boolean useCondition, int flag, boolean condition) {
+       int word = memoryManager.readWord() 
+       /*
+        * Advance 2 positions ahead because two bytes were just read.
+        */
+       register.pc = register.pc + 2
+       
+       if(!useCondition) {
+           memoryManager.push(register.pc)
+           register.pc = word
+           return
+       }
+       
+       if(register.isSet(flag) == condition) {
+          memoryManager.push(register.pc) 
+          register.pc = word
+       }
+    }
+    
+    private void cpuReturn(boolean useCondition, int flag, boolean condition) {
+       if(!useCondition) {
+           register.pc = memoryManager.pop()
+           return
+       }
+       
+       if(register.isSet(flag) == condition) {
+           register.pc = memoryManager.pop()
+       } 
     }
 }
