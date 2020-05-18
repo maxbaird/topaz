@@ -258,4 +258,43 @@ class CPU{
            register.pc = memoryManager.pop()
        } 
     }
+    
+    private int cpuRRC(int reg) {
+       boolean isLSBSet = BitUtil.isSet(reg, 0)  
+       
+       register.clearAllFlags()
+       
+       reg = reg >> 1
+       
+       if(isLSBSet) {
+           register.setC()
+           reg = BitUtil.setBit(reg, 7)
+       }
+       
+       if(reg == 0) {
+           register.setZ()
+       }
+       
+       return reg
+    }
+    
+    private void cpuTestBit(int reg, int bit) {
+       /*
+        * This tests the bit of a byte and sets the following flags: 
+        * 
+        * FLAG_Z : set to 1 if the bit is 0
+        * FLAG_N : Set to 0
+        * FLAG_C : Unchanged
+        * FLAG_H : Set to 1
+        */
+       
+       if(BitUtil.isSet(reg, bit)) {
+           register.clearZ()
+       }else {
+           register.setZ()
+       }
+       
+       register.clearN()
+       register.setH()
+    }
 }
