@@ -53,8 +53,12 @@ class CPU{
             register.A = cpu8BitAdd(register.A, register.B, false, false) 
             return 4
             
-            case 0x90
+            case 0x90:
             register.A = cpu8BitSub(register.A, register.B, false, false)
+            return 4
+            
+            case 0xAF:
+            register.A = cpu8BitXOR(register.A, register.A, false)
             return 4
             
             case 0xCB:
@@ -110,21 +114,21 @@ class CPU{
        reg = reg + runningSum
        
        /* Set flags */
-       register.F = 0
+       register.clearAllFlags()
        
        if(reg == 0) {
-           register.setZ(true)
+           register.setZ()
        }
        
        int halfCarry = initialValue & 0xF
        halfCarry = halfCarry + (runningSum & 0xF)
        
        if(halfCarry > 0xF) {
-           register.setH(true)
+           register.setH()
        }
        
        if((initialValue + runningSum) > 0xFF) {
-           register.setC(true)
+           register.setC()
        }
 
        return reg
@@ -151,25 +155,47 @@ class CPU{
        reg = reg - runningDifference
        
        /* now set flags */
-       register.F = 0
+       register.clearAllFlags()
        
        if(reg == 0) {
-          register.setZ(true) 
+          register.setZ() 
        }
        
-       register.setN(true)
+       register.setN()
        
        if(initialValue < runningDifference) {
-           register.setC(true)
+           register.setC()
        }
        
        int halfCarry = initialValue & 0xF
        halfCarry = halfCarry - (runningDifference & 0xF)
        
        if(halfCarry < 0) {
-           register.setH(true)
+           register.setH()
        }
        
+       return reg
+    }
+    
+    private int cpu8BitXOR(int reg, int value, boolean useImmediate) {
+       int xor = 0
+       
+       if(useImmediate) {
+          int n = memoryManager.readMemory(register.pc) 
+          register.pc++
+          xor = n
+       }else {
+           xor = value
+       }
+       
+       reg = reg ^ xor
+       
+       register.clearAllFlags()
+       
+       if(reg == 0) {
+           register.setZ()
+       }
+
        return reg
     }
 }

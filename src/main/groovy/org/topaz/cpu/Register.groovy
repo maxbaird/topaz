@@ -99,20 +99,40 @@ class Register{
         return isSet(FLAG_C)
     }
 
-    void setZ(boolean z){
-        z ? setFlag(FLAG_Z) : clearFlag(FLAG_Z)
+    void setZ(){
+        setFlag(FLAG_Z)
+    }
+    
+    void clearZ() {
+        clearFlag(FLAG_Z)
     }
 
-    void setN(boolean n){
-        n ? setFlag(FLAG_N) : clearFlag(FLAG_N)
+    void setN(){
+        setFlag(FLAG_N)
+    }
+    
+    void clearN() {
+        clearFlag(FLAG_N)
     }
 
-    void setH(boolean h){
-        h ? setFlag(FLAG_H) : clearFlag(FLAG_H)
+    void setH(){
+        setFlag(FLAG_H)
+    }
+    
+    void clearH() {
+        clearFlag(FLAG_H)    
     }
 
-    void setC(boolean c){
-        c ? setFlag(FLAG_C) : clearFlag(FLAG_C)
+    void setC(){
+        setFlag(FLAG_C) 
+    }
+    
+    void clearC() {
+        clearFlag(FLAG_C)
+    }
+    
+    void clearAllFlags() {
+        f = 0
     }
 
     def printFlags(){
