@@ -15,7 +15,7 @@ class CPU{
         register.pc++
 
         try {
-            cycles = executeOpcode()
+            cycles = executeOpcode(opcode)
         }catch(Exception e) {
             println e.message
             System.exit(1)
@@ -25,6 +25,9 @@ class CPU{
     
     private int executeOpcode(opcode) {
         switch(opcode){
+            case 0x00:
+            return 4
+            
             case 0x06:
             register.B = cpu8BitLoad()
             return 8
@@ -81,7 +84,8 @@ class CPU{
             }
 
             default:
-                throw new Exception("Unrecognized opcode: " + opcode)
+                def hexCode = java.lang.String.format("0x%08x", opcode)
+                throw new Exception("Unrecognized opcode: " + hexCode)
         }
     }
     

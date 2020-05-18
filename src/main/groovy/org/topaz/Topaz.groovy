@@ -20,5 +20,6 @@ class Topaz{
         emulator = new Emulator(cartridge)
         println cartridge.isMBC1
         println cartridge.isMBC2
+        emulator.update()
     }
 }

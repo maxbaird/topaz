@@ -41,7 +41,7 @@ class GPU{
     private MemoryManager memoryManager
     private InterruptHandler interruptHandler
     private LCD lcd
-    private int screenData
+    private int[][][] screenData
 
     enum Colour{
         WHITE,
