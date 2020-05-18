@@ -61,6 +61,10 @@ class CPU{
             register.A = cpu8BitXOR(register.A, register.A, false)
             return 4
             
+            case 0x20:
+            cpuJumpImmediate(true, register.FLAG_Z, false)
+            return 8
+            
             case 0xCB:
             try {
                 return executeExtendedOpcode()
@@ -178,6 +182,7 @@ class CPU{
     }
     
     private int cpu8BitXOR(int reg, int value, boolean useImmediate) {
+
        int xor = 0
        
        if(useImmediate) {
@@ -197,5 +202,22 @@ class CPU{
        }
 
        return reg
+    }
+    
+    public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
+       int n = memoryManager.readMemory(register.pc) 
+       
+       if(!useCondition) {
+           /*
+            * Jump unconditionally
+            */
+           register.pc = register.pc + n
+       }else if(register.isSet(flag) == condition) {
+           /*
+            * Only jump if the condition is met
+            */
+           register.pc = register.pc + n
+       }
+       register.pc++
     }
 }

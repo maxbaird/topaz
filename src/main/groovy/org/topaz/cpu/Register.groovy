@@ -14,10 +14,10 @@ class Register{
     int sp
 
     /* flag bits */
-    private static final int FLAG_Z = 7
-    private static final int FLAG_N = 6
-    private static final int FLAG_H = 5
-    private static final int FLAG_C = 4
+    static final int FLAG_Z = 7
+    static final int FLAG_N = 6
+    static final int FLAG_H = 5
+    static final int FLAG_C = 4
     
     public Register() {
         this.pc = 0x100
@@ -37,7 +37,7 @@ class Register{
         this.F = ~(1 << pos) & this.F & 0xFF
     }
 
-    private boolean isSet(int pos){
+    boolean isSet(int pos){
         return this.F & (1 << pos)
     }
 
