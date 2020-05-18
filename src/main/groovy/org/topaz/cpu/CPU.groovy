@@ -3,6 +3,7 @@ package org.topaz.cpu
 import org.topaz.cpu.Register
 import org.topaz.InterruptHandler
 import org.topaz.MemoryManager
+import org.topaz.util.BitUtil
 
 class CPU{
     Register register
@@ -47,9 +48,34 @@ class CPU{
             case 0x2E:
             register.L = cpu8BitLoad()
             return 8
+            
+            case 0x80:
+            register.A = cpu8BitAdd(register.A, register.B, false, false) 
+            return 4
+            
+            case 0xCB:
+            try {
+                return executeExtendedOpcode()
+            }catch(Exception e) {
+                throw e
+            }
 
             default:
                 throw new Exception("Unrecognized opcode: " + opcode)
+        }
+    }
+    
+    private int executeExtendedOpcode() {
+        /*
+         * When the opcode 0xCB is encountered the next immediate byte needs to
+         * be decoded and treated as an opcode.
+         */
+        int opcode = memoryManager.readMemory(register.pc)
+        register.pc++
+        
+        switch(opcode) {
+           default:
+           throw new Exception("Unrecognized extended opcode: " + opcode) 
         }
     }
     
@@ -58,4 +84,45 @@ class CPU{
         register.pc++
         return n
     }
+    
+    private int cpu8BitAdd(int reg, int value, boolean addImmediate, boolean addCarry) {
+       int initialValue = register
+       int runningSum = 0
+       
+       if(addImmediate) {
+          int n = memoryManager.readMemory(register.pc)
+          register.pc++
+          runningSum = n
+       } else {
+           runningSum = value
+       }
+       
+       if(addCarry) {
+          if(register.isC()) {
+              runningSum++
+          }
+       }
+       
+       reg = reg + runningSum
+       
+       /* Set flags */
+       register.F = 0
+       
+       if(reg == 0) {
+           register.setZ(true)
+       }
+       
+       int halfCarry = initialValue & 0xF
+       halfCarry = halfCarry + (runningSum & 0xF)
+       
+       if(halfCarry > 0xF) {
+           register.setH(true)
+       }
+       
+       if((initialValue + runningSum) > 0xFF) {
+           register.setC(true)
+       }
+
+       return reg
+    } 
 }
