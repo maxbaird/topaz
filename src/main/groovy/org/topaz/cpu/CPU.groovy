@@ -84,7 +84,7 @@ class CPU{
             }
 
             default:
-                def hexCode = java.lang.String.format("0x%08x", opcode)
+                def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized opcode: " + hexCode)
         }
     }
@@ -99,7 +99,8 @@ class CPU{
         
         switch(opcode) {
            default:
-           throw new Exception("Unrecognized extended opcode: " + opcode) 
+           def hexCode = java.lang.String.format("0x%2X", opcode)
+           throw new Exception("Unrecognized extended opcode: " + hexCode) 
         }
     }
     
