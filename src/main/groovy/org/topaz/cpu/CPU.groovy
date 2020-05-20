@@ -202,6 +202,18 @@ class CPU{
             case 0x6E:
             register.L = cpuROMLoad(register.HL)
             return 8
+            case 0x0A:
+            register.A = cpuROMLoad(register.BC) 
+            return 8
+            case 0x1A:
+            register.A = cpuROMLoad(register.DE) 
+            return 8
+            case 0xFA:
+            register.A = cpuLoadImmediate16BitMemory() 
+            return 16
+            case 0x3E:
+            cpuLoadImmediate8BitMemory(register.A)
+            return 8
             
             /* Write register to memory */
             case 0x70:
@@ -281,6 +293,13 @@ class CPU{
     private int cpu8BitLoad() {
         int n = memoryManager.readMemory(register.pc)
         register.pc++
+        return n
+    }
+    
+    private int cpuLoadImmediate16BitMemory() {
+        int nn = memoryManager.readWord()
+        register.pc += 2 /* Memory is stored in bytes and 1 word (2 bytes) are read */
+        int n = memoryManager.readMemory(nn)
         return n
     }
     
