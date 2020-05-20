@@ -4,6 +4,7 @@ import org.topaz.gpu.LCD
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
+import org.topaz.ui.Display
 import java.lang.Math
 
 class GPU{
@@ -41,6 +42,7 @@ class GPU{
     private MemoryManager memoryManager
     private InterruptHandler interruptHandler
     private LCD lcd
+    private Display display
     private int[][][] screenData
 
     enum Colour{
@@ -50,10 +52,11 @@ class GPU{
         BLACK
     }
 
-    public GPU(MemoryManager memoryManager, InterruptHandler interruptHandler) {
+    public GPU(MemoryManager memoryManager, InterruptHandler interruptHandler, Display display) {
         this.memoryManager = memoryManager
         this.interruptHandler = interruptHandler
-        this.screenData = new int[LCD.HEIGHT][LCD.WIDTH][3]
+        this.display = display
+        this.screenData = new int[LCD.WIDTH][LCD.HEIGHT][3]
         lcd = new LCD(memoryManager: memoryManager, interruptHandler: interruptHandler)
     }
 
@@ -112,10 +115,7 @@ class GPU{
             renderSprites()
         }
 
-        updateDisplay()
-    }
-
-    private void updateDisplay() {
+        display.update(screenData)
     }
 
     private void renderTiles() {

@@ -8,6 +8,7 @@ import org.topaz.MemoryManager
 import org.topaz.Timer
 import org.topaz.InterruptHandler
 import org.topaz.Joypad
+import org.topaz.ui.Display
 
 class Emulator{
     private static final MAX_CYCLES = 69905
@@ -20,6 +21,7 @@ class Emulator{
     Timer timer
     InterruptHandler interruptHandler
     Joypad joypad
+    Display display
 
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
@@ -29,9 +31,10 @@ class Emulator{
         this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
-        //TODO Pass an instance of the screen for the GPU to update
-        this.gpu = new GPU(this.memoryManager, this.interruptHandler)
         joypad.interruptHandler = interruptHandler
+        //TODO Pass an instance of the screen for the GPU to update
+        this.display = new Display()
+        this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
     }
     
     public void update() {
