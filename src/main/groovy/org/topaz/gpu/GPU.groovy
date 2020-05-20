@@ -114,7 +114,9 @@ class GPU{
         if(BitUtil.isSet(control, LCD.ControlRegisterBit.OBJ_SPRITE_DISPLAY_ENABLE)) {
             renderSprites()
         }
+    }
 
+    public updateDisplay() {
         display.update(screenData)
     }
 
