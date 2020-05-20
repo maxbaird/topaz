@@ -23,7 +23,7 @@ class CPU{
         return cycles
     }
     
-    private int executeOpcode(opcode) {
+    private int executeOpcode = { opcode ->
         switch(opcode){
             /* No-op */
             case 0x00:
@@ -180,6 +180,49 @@ class CPU{
             register.L = cpuRegisterLoad(register.L)
             return 4
             
+            /* ROM Loads */
+            case 0x7E:
+            register.A = cpuROMLoad(register.HL)
+            return 8
+            case 0x46:
+            register.B = cpuROMLoad(register.HL)
+            return 8
+            case 0x4E:
+            register.C = cpuROMLoad(register.HL)
+            return 8
+            case 0x56:
+            register.D = cpuROMLoad(register.HL)
+            return 8
+            case 0x5E:
+            register.E = cpuROMLoad(register.HL)
+            return 8
+            case 0x66:
+            register.H = cpuROMLoad(register.HL)
+            return 8
+            case 0x6E:
+            register.L = cpuROMLoad(register.HL)
+            return 8
+            
+            /* Write register to memory */
+            case 0x70:
+            writeByte(register.HL, register.B)
+            return 8
+            case 0x71:
+            writeByte(register.HL, register.C)
+            return 8
+            case 0x72:
+            writeByte(register.HL, register.D)
+            return 8
+            case 0x73:
+            writeByte(register.HL, register.E)
+            return 8
+            case 0x74:
+            writeByte(register.HL, register.H)
+            return 8
+            case 0x75:
+            writeByte(register.HL, register.L)
+            return 8
+            
             case 0x80:
             register.A = cpu8BitAdd(register.A, register.B, false, false) 
             return 4
@@ -238,8 +281,16 @@ class CPU{
         return n
     }
     
-    private int cpuRegisterLoad(int register2) {
+    private def cpuRegisterLoad(int register2) {
        return register2 
+    }
+    
+    private void writeByte(int address, int data) {
+       memoryManager.writeMemory(address, data) 
+    }
+    
+    private int cpuROMLoad(int address) {
+       return memoryManager.readMemory(address) 
     }
     
     private int cpu8BitAdd(int reg, int value, boolean addImmediate, boolean addCarry) {
