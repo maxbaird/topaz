@@ -25,32 +25,160 @@ class CPU{
     
     private int executeOpcode(opcode) {
         switch(opcode){
+            /* No-op */
             case 0x00:
             return 4
             
+            /* 8-Bit Loads */
             case 0x06:
             register.B = cpu8BitLoad()
             return 8
-            
             case 0x0E:
             register.C = cpu8BitLoad()
             return 8
-            
             case 0x16:
             register.D = cpu8BitLoad()
             return 8
-            
             case 0x1E:
             register.E = cpu8BitLoad()
             return 8
-            
             case 0x26:
             register.H = cpu8BitLoad()
             return 8
-            
             case 0x2E:
             register.L = cpu8BitLoad()
             return 8
+            
+            /* Register Loads */
+            case 0x7F:
+            register.A = cpuRegisterLoad(register.A)
+            return 4
+            case 0x78:
+            register.A = cpuRegisterLoad(register.B)
+            return 4
+            case 0x79:
+            register.A = cpuRegisterLoad(register.C)
+            return 4
+            case 0x7A:
+            register.A = cpuRegisterLoad(register.D)
+            return 4
+            case 0x7B:
+            register.A = cpuRegisterLoad(register.E)
+            return 4
+            case 0x7C:
+            register.A = cpuRegisterLoad(register.H)
+            return 4
+            case 0x7D:
+            register.A = cpuRegisterLoad(register.L)
+            return 4
+            case 0x40:
+            register.B = cpuRegisterLoad(register.B)
+            return 4
+            case 0x41:
+            register.B = cpuRegisterLoad(register.C)
+            return 4
+            case 0x42:
+            register.B = cpuRegisterLoad(register.D)
+            return 4
+            case 0x43:
+            register.B = cpuRegisterLoad(register.E)
+            return 4
+            case 0x44:
+            register.B = cpuRegisterLoad(register.H)
+            return 4
+            case 0x45:
+            register.B = cpuRegisterLoad(register.L)
+            return 4
+            case 0x48:
+            register.C = cpuRegisterLoad(register.B)
+            return 4
+            case 0x49:
+            register.C = cpuRegisterLoad(register.C)
+            return 4
+            case 0x4A:
+            register.C = cpuRegisterLoad(register.D)
+            return 4
+            case 0x4B:
+            register.C = cpuRegisterLoad(register.E)
+            return 4
+            case 0x4C:
+            register.C = cpuRegisterLoad(register.H)
+            return 4
+            case 0x4D:
+            register.C = cpuRegisterLoad(register.L)
+            return 4
+            case 0x50:
+            register.D = cpuRegisterLoad(register.B)
+            return 4
+            case 0x51:
+            register.D = cpuRegisterLoad(register.C)
+            return 4
+            case 0x52:
+            register.D = cpuRegisterLoad(register.D)
+            return 4
+            case 0x53:
+            register.D = cpuRegisterLoad(register.E)
+            return 4
+            case 0x54:
+            register.D = cpuRegisterLoad(register.H)
+            return 4
+            case 0x55:
+            register.D = cpuRegisterLoad(register.L)
+            return 4
+            case 0x58:
+            register.E = cpuRegisterLoad(register.B)
+            return 4
+            case 0x59:
+            register.E = cpuRegisterLoad(register.C)
+            return 4
+            case 0x5A:
+            register.E = cpuRegisterLoad(register.D)
+            return 4
+            case 0x5B:
+            register.E = cpuRegisterLoad(register.E)
+            return 4
+            case 0x5C:
+            register.E = cpuRegisterLoad(register.H)
+            return 4
+            case 0x5D:
+            register.E = cpuRegisterLoad(register.L)
+            return 4
+            case 0x60:
+            register.H = cpuRegisterLoad(register.B)
+            return 4
+            case 0x61:
+            register.H = cpuRegisterLoad(register.C)
+            return 4
+            case 0x62:
+            register.H = cpuRegisterLoad(register.D)
+            return 4
+            case 0x63:
+            register.H = cpuRegisterLoad(register.E)
+            return 4
+            case 0x64:
+            register.H = cpuRegisterLoad(register.H)
+            return 4
+            case 0x65:
+            register.H = cpuRegisterLoad(register.L)
+            return 4
+            case 0x68:
+            register.L = cpuRegisterLoad(register.B)
+            return 4
+            case 0x69:
+            register.L = cpuRegisterLoad(register.C)
+            return 4
+            case 0x6A:
+            register.L = cpuRegisterLoad(register.D)
+            return 4
+            case 0x6B:
+            register.L = cpuRegisterLoad(register.E)
+            return 4
+            case 0x6C:
+            register.L = cpuRegisterLoad(register.H)
+            return 4
+            case 0x6D:
+            register.L = cpuRegisterLoad(register.L)
+            return 4
             
             case 0x80:
             register.A = cpu8BitAdd(register.A, register.B, false, false) 
@@ -108,6 +236,10 @@ class CPU{
         int n = memoryManager.readMemory(register.pc)
         register.pc++
         return n
+    }
+    
+    private int cpuRegisterLoad(int register2) {
+       return register2 
     }
     
     private int cpu8BitAdd(int reg, int value, boolean addImmediate, boolean addCarry) {
