@@ -205,23 +205,26 @@ class CPU{
             
             /* Write register to memory */
             case 0x70:
-            writeByte(register.HL, register.B)
+            cpuLoadRegisterToMemory(register.HL, register.B)
             return 8
             case 0x71:
-            writeByte(register.HL, register.C)
+            cpuLoadRegisterToMemory(register.HL, register.C)
             return 8
             case 0x72:
-            writeByte(register.HL, register.D)
+            cpuLoadRegisterToMemory(register.HL, register.D)
             return 8
             case 0x73:
-            writeByte(register.HL, register.E)
+            cpuLoadRegisterToMemory(register.HL, register.E)
             return 8
             case 0x74:
-            writeByte(register.HL, register.H)
+            cpuLoadRegisterToMemory(register.HL, register.H)
             return 8
             case 0x75:
-            writeByte(register.HL, register.L)
+            cpuLoadRegisterToMemory(register.HL, register.L)
             return 8
+            case 0x36:
+            cpuLoadImmediate8BitMemory(register.HL)
+            return 12
             
             case 0x80:
             register.A = cpu8BitAdd(register.A, register.B, false, false) 
@@ -285,7 +288,13 @@ class CPU{
        return register2 
     }
     
-    private void writeByte(int address, int data) {
+    private void cpuLoadImmediate8BitMemory(int destination) {
+        int data = memoryManager.readMemory(register.pc)
+        register.pc++
+        memoryManager.writeMemory(destination, data)
+    }
+    
+    private void cpuLoadRegisterToMemory(int address, int data) {
        memoryManager.writeMemory(address, data) 
     }
     
