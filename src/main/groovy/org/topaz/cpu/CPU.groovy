@@ -271,6 +271,45 @@ class CPU{
             case 0xEA:
             cpuLoadRegisterToImmediateByte(register.A)
             return 16
+
+            /* LD A,(0xFF00 + C) */
+            case 0xF2:
+            register.A = cpuROMLoad(0xFF00 + register.C)
+            return 8
+            
+            /* LD (0xFF00 + C), A */
+            case 0xE2:
+            memoryManager.writeMemory(0xFF00 + register.C, register.A)
+            return 8
+            
+            /* Load from memory into A, decrement/increment memory */
+            case 0x3A:
+            register.A = cpuROMLoad(register.HL)
+            register.HL = cpu16BitDec(register.HL)
+            return 8
+            case 0x2A:
+            register.A = cpuROMLoad(register.HL) 
+            register.HL = cpu16BitInc(register.HL)
+            return 8
+            
+            /* Load from A into memory increment/decrement register */
+            case 0x22:
+            cpuLoadRegisterToMemory(register.HL, register.A)
+            register.HL = cpu16BitInc(register.HL)
+            return 8
+            
+            case 0xE0:
+            int n = memoryManager.readMemory(register.pc)
+            register.pc++
+            int address = 0xFF00 + n
+            memoryManager.writeMemory(address, register.A)
+            return 12
+            
+            case 0xF0:
+            int n = memoryManager.readMemory(register.pc) 
+            register.pc++
+            register.A = memoryManager.readMemory(0xFF00 + n)
+            return 12
             
             ////////////////////////////////////////////////////
             case 0x80:
@@ -360,6 +399,14 @@ class CPU{
     
     private int cpuROMLoad(int address) {
        return memoryManager.readMemory(address) 
+    }
+    
+    private int cpu16BitDec(int reg) {
+        return (reg-1)
+    }
+    
+    private int cpu16BitInc(int reg) {
+        return (reg+1)
     }
     
     private int cpu8BitAdd(int reg, int value, boolean addImmediate, boolean addCarry) {
