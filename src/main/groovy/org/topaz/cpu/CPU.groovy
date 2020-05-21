@@ -211,7 +211,7 @@ class CPU{
             case 0xFA:
             register.A = cpuLoadImmediate16BitMemory() 
             return 16
-            case 0x3E:
+            case 0x7F:
             cpuLoadImmediate8BitMemory(register.A)
             return 8
             
@@ -238,6 +238,41 @@ class CPU{
             cpuLoadImmediate8BitMemory(register.HL)
             return 12
             
+            /* LD n, A : Put value A into n*/
+            case 0x47:
+            register.B = cpuRegisterLoad(register.A)
+            return 4
+            case 0x4F:
+            register.C = cpuRegisterLoad(register.A)
+            return 4
+            case 0x57:
+            register.D = cpuRegisterLoad(register.A)
+            return 4
+            case 0x5F:
+            register.E = cpuRegisterLoad(register.A)
+            return 4
+            case 0x67:
+            register.H = cpuRegisterLoad(register.A)
+            return 4
+            case 0x6F:
+            register.L = cpuRegisterLoad(register.A)
+            return 4
+            
+            /* Load A into memory address */
+            case 0x02:
+            cpuLoadRegisterToMemory(register.BC, register.A)
+            return 8
+            case 0x12:
+            cpuLoadRegisterToMemory(register.DE, register.A)
+            return 8
+            case 0x77:
+            cpuLoadRegisterToMemory(register.HL, register.A)
+            return 8
+            case 0xEA:
+            cpuLoadRegisterToImmediateByte(register.A)
+            return 16
+            
+            ////////////////////////////////////////////////////
             case 0x80:
             register.A = cpu8BitAdd(register.A, register.B, false, false) 
             return 4
@@ -301,6 +336,12 @@ class CPU{
         register.pc += 2 /* Memory is stored in bytes and 1 word (2 bytes) are read */
         int n = memoryManager.readMemory(nn)
         return n
+    }
+    
+    private void cpuLoadRegisterToImmediateByte(int reg) {
+        int nn = memoryManager.readWord()
+        register.pc += 2
+        memoryManager.writeMemory(nn, reg)
     }
     
     private def cpuRegisterLoad(int register2) {
