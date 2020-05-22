@@ -454,6 +454,30 @@ class CPU{
                 return 8
 
             /* 8-bit sub with carry */
+                case 0x9F:
+                register.A = cpu8BitSub(register.A, register.A, false, true) 
+                return 4
+                case 0x98:
+                register.A = cpu8BitSub(register.A, register.B, false, true) 
+                return 4
+                case 0x99:
+                register.A = cpu8BitSub(register.A, register.C, false, true) 
+                return 4
+                case 0x9A:
+                register.A = cpu8BitSub(register.A, register.D, false, true) 
+                return 4
+                case 0x9B:
+                register.A = cpu8BitSub(register.A, register.E, false, true) 
+                return 4
+                case 0x9C:
+                register.A = cpu8BitSub(register.A, register.H, false, true) 
+                return 4
+                case 0x9D:
+                register.A = cpu8BitSub(register.A, register.L, false, true) 
+                return 4
+                case 0x9E:
+                register.A = cpu8BitSub(register.A, memoryManager.readMemory(register.HL), false, true)
+                return 8
 
 
             ////////////////////////////////////////////////////
