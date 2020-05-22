@@ -454,60 +454,88 @@ class CPU{
                 return 8
 
             /* 8-bit sub with carry */
-                case 0x9F:
-                register.A = cpu8BitSub(register.A, register.A, false, true) 
+            case 0x9F:
+                register.A = cpu8BitSub(register.A, register.A, false, true)
                 return 4
-                case 0x98:
-                register.A = cpu8BitSub(register.A, register.B, false, true) 
+            case 0x98:
+                register.A = cpu8BitSub(register.A, register.B, false, true)
                 return 4
-                case 0x99:
-                register.A = cpu8BitSub(register.A, register.C, false, true) 
+            case 0x99:
+                register.A = cpu8BitSub(register.A, register.C, false, true)
                 return 4
-                case 0x9A:
-                register.A = cpu8BitSub(register.A, register.D, false, true) 
+            case 0x9A:
+                register.A = cpu8BitSub(register.A, register.D, false, true)
                 return 4
-                case 0x9B:
-                register.A = cpu8BitSub(register.A, register.E, false, true) 
+            case 0x9B:
+                register.A = cpu8BitSub(register.A, register.E, false, true)
                 return 4
-                case 0x9C:
-                register.A = cpu8BitSub(register.A, register.H, false, true) 
+            case 0x9C:
+                register.A = cpu8BitSub(register.A, register.H, false, true)
                 return 4
-                case 0x9D:
-                register.A = cpu8BitSub(register.A, register.L, false, true) 
+            case 0x9D:
+                register.A = cpu8BitSub(register.A, register.L, false, true)
                 return 4
-                case 0x9E:
+            case 0x9E:
                 register.A = cpu8BitSub(register.A, memoryManager.readMemory(register.HL), false, true)
                 return 8
-                
-                /* Logic AND */
-                case 0xA7:
+
+            /* Logical AND */
+            case 0xA7:
                 register.A = cpu8BitAND(register.A, register.A, false)
                 return 4
-                case 0xA0:
+            case 0xA0:
                 register.A = cpu8BitAND(register.A, register.B, false)
                 return 4
-                case 0xA1:
+            case 0xA1:
                 register.A = cpu8BitAND(register.A, register.C, false)
                 return 4
-                case 0xA2:
+            case 0xA2:
                 register.A = cpu8BitAND(register.A, register.D, false)
                 return 4
-                case 0xA3:
+            case 0xA3:
                 register.A = cpu8BitAND(register.A, register.E, false)
                 return 4
-                case 0xA4:
+            case 0xA4:
                 register.A = cpu8BitAND(register.A, register.H, false)
                 return 4
-                case 0xA5:
+            case 0xA5:
                 register.A = cpu8BitAND(register.A, register.L, false)
                 return 4
-                case 0xA6:
-                register.A = cpu8BitAND(register.A, memoryManager.readMemory(register.HL), false) 
+            case 0xA6:
+                register.A = cpu8BitAND(register.A, memoryManager.readMemory(register.HL), false)
                 return 8
-                case 0xE6:
-                register.A = cpu8BitAND(register.A, 0, true) 
+            case 0xE6:
+                register.A = cpu8BitAND(register.A, 0, true)
                 return 8
 
+            /* Logical OR */
+            case 0xB7:
+                register.A = cpu8BitOR(register.A, register.A, false)
+                return 4
+            case 0xB0:
+                register.A = cpu8BitOR(register.A, register.B, false)
+                return 4
+            case 0xB1:
+                register.A = cpu8BitOR(register.A, register.C, false)
+                return 4
+            case 0xB2:
+                register.A = cpu8BitOR(register.A, register.D, false)
+                return 4
+            case 0xB3:
+                register.A = cpu8BitOR(register.A, register.E, false)
+                return 4
+            case 0xB4:
+                register.A = cpu8BitOR(register.A, register.H, false)
+                return 4
+            case 0xB5:
+                register.A = cpu8BitOR(register.A, register.L, false)
+                return 4
+            case 0xB6:
+                register.A = cpu8BitOR(register.A, memoryManager.readMemory(register.HL), false)
+                return 8
+            case 0xF6:
+                register.A = cpu8BitOR(register.A, 0, true)
+                return 8
 
             ////////////////////////////////////////////////////
             case 0xAF:
@@ -585,25 +613,48 @@ class CPU{
     }
 
     private int cpu8BitAND(int reg, int value, boolean useImmediate) {
-       int n = 0
-       
-       if(useImmediate) {
-           n = memoryManager.readMemory(register.pc)
-           register.pc++
-       }else {
-           n = value
-       }
-       
-       reg = reg & n
-       
-       register.clearN()
-       register.setH()
-       register.clearC()
-       
-       if(reg == 0x0) {
-           register.setZ()
-       }
-       return reg
+        int n = 0
+
+        if(useImmediate) {
+            n = memoryManager.readMemory(register.pc)
+            register.pc++
+        }else {
+            n = value
+        }
+
+        reg = reg & n
+
+        register.clearN()
+        register.setH()
+        register.clearC()
+
+        if(reg == 0x0) {
+            register.setZ()
+        }
+        return reg
+    }
+
+    private int cpu8BitOR(int reg, int value, boolean useImmediate) {
+        int n = 0
+
+        if(useImmediate) {
+            n = memoryManager.readMemory(register.pc)
+            register.pc++
+        }else {
+            n = value
+        }
+
+        reg = reg | n
+
+        register.clearN()
+        register.clearH()
+        register.clearC()
+
+        if(reg == 0) {
+            register.setZ()
+        }
+
+        return reg
     }
 
     private int cpu8BitLoad() {
