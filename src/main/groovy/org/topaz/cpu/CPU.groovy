@@ -478,6 +478,35 @@ class CPU{
                 case 0x9E:
                 register.A = cpu8BitSub(register.A, memoryManager.readMemory(register.HL), false, true)
                 return 8
+                
+                /* Logic AND */
+                case 0xA7:
+                register.A = cpu8BitAND(register.A, register.A, false)
+                return 4
+                case 0xA0:
+                register.A = cpu8BitAND(register.A, register.B, false)
+                return 4
+                case 0xA1:
+                register.A = cpu8BitAND(register.A, register.C, false)
+                return 4
+                case 0xA2:
+                register.A = cpu8BitAND(register.A, register.D, false)
+                return 4
+                case 0xA3:
+                register.A = cpu8BitAND(register.A, register.E, false)
+                return 4
+                case 0xA4:
+                register.A = cpu8BitAND(register.A, register.H, false)
+                return 4
+                case 0xA5:
+                register.A = cpu8BitAND(register.A, register.L, false)
+                return 4
+                case 0xA6:
+                register.A = cpu8BitAND(register.A, memoryManager.readMemory(register.HL), false) 
+                return 8
+                case 0xE6:
+                register.A = cpu8BitAND(register.A, 0, true) 
+                return 8
 
 
             ////////////////////////////////////////////////////
@@ -555,6 +584,27 @@ class CPU{
         }
     }
 
+    private int cpu8BitAND(int reg, int value, boolean useImmediate) {
+       int n = 0
+       
+       if(useImmediate) {
+           n = memoryManager.readMemory(register.pc)
+           register.pc++
+       }else {
+           n = value
+       }
+       
+       reg = reg & n
+       
+       register.clearN()
+       register.setH()
+       register.clearC()
+       
+       if(reg == 0x0) {
+           register.setZ()
+       }
+       return reg
+    }
 
     private int cpu8BitLoad() {
         int n = memoryManager.readMemory(register.pc)
