@@ -394,6 +394,35 @@ class CPU{
             case 0xC6:
                 register.A = cpu8BitAdd(register.A, 0, true, false)
             return 8
+            
+            /* 8-bit Add with Carry */
+            case 0x8F:
+            register.A = cpu8BitAdd(register.A, register.A, false, true) 
+            return 4
+            case 0x88:
+            register.A = cpu8BitAdd(register.A, register.B, false, true) 
+            return 4
+            case 0x89:
+            register.A = cpu8BitAdd(register.A, register.C, false, true) 
+            return 4
+            case 0x8A:
+            register.A = cpu8BitAdd(register.A, register.D, false, true) 
+            return 4
+            case 0x8B:
+            register.A = cpu8BitAdd(register.A, register.E, false, true) 
+            return 4
+            case 0x8C:
+            register.A = cpu8BitAdd(register.A, register.H, false, true) 
+            return 4
+            case 0x8D:
+            register.A = cpu8BitAdd(register.A, register.L, false, true) 
+            return 4
+            case 0x8E:
+            register.A = cpu8BitAdd(register.A, memoryManager.readMemory(register.HL), false, true) 
+            return 8
+            case 0xCE:
+            register.A = cpu8BitAdd(register.A, 0, true, true) 
+            return 8
 
             ////////////////////////////////////////////////////
             case 0x90:
