@@ -537,11 +537,36 @@ class CPU{
                 register.A = cpu8BitOR(register.A, 0, true)
                 return 8
 
-            ////////////////////////////////////////////////////
+            /* Logical XOR */
             case 0xAF:
                 register.A = cpu8BitXOR(register.A, register.A, false)
                 return 4
+            case 0xA8:
+                register.A = cpu8BitXOR(register.A, register.B, false)
+                return 4
+            case 0xA9:
+                register.A = cpu8BitXOR(register.A, register.C, false)
+                return 4
+            case 0xAA:
+                register.A = cpu8BitXOR(register.A, register.D, false)
+                return 4
+            case 0xAB:
+                register.A = cpu8BitXOR(register.A, register.E, false)
+                return 4
+            case 0xAC:
+                register.A = cpu8BitXOR(register.A, register.H, false)
+                return 4
+            case 0xAD:
+                register.A = cpu8BitXOR(register.A, register.L, false)
+                return 4
+            case 0xAE:
+                register.A = cpu8BitXOR(register.A, memoryManager.readMemory(register.HL), false)
+                return 8
+            case 0xEE:
+                register.A = cpu8BitXOR(register.A, 0, true)
+                return 8
 
+            ////////////////////////////////////////////////////
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
                 return 8
@@ -788,17 +813,16 @@ class CPU{
 
     private int cpu8BitXOR(int reg, int value, boolean useImmediate) {
 
-        int xor = 0
+        int n = 0
 
         if(useImmediate) {
-            int n = memoryManager.readMemory(register.pc)
+            n = memoryManager.readMemory(register.pc)
             register.pc++
-            xor = n
         }else {
-            xor = value
+            n = value
         }
 
-        reg = reg ^ xor
+        reg = reg ^ n
 
         register.clearAllFlags()
 
