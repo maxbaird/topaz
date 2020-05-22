@@ -338,7 +338,7 @@ class CPU{
                 memoryManager.writeMemory(nn, register.getSPHigh())
                 return 20
 
-            /* 16Bit push */
+            /* push */
             case 0xF5:
                 memoryManager.push(register.AF)
                 return 16
@@ -352,11 +352,50 @@ class CPU{
                 memoryManager.push(register.HL)
                 return 16
 
-            ////////////////////////////////////////////////////
+            /* pop */
+            case 0xF1:
+                register.AF = memoryManager.pop()
+                return 12
+            case 0xC1:
+                register.BC = memoryManager.pop()
+                return 12
+            case 0xD1:
+                register.DE = memoryManager.pop()
+                return 12
+            case 0xE1:
+                register.HL = memoryManager.pop()
+                return 12
+
+            /* 8-bit Add */
+            case 0x87:
+                register.A = cpu8BitAdd(register.A, register.A, false, false)
+                return 4
             case 0x80:
                 register.A = cpu8BitAdd(register.A, register.B, false, false)
                 return 4
+            case 0x81:
+                register.A = cpu8BitAdd(register.A, register.C, false, false)
+                return 4
+            case 0x82:
+                register.A = cpu8BitAdd(register.A, register.D, false, false)
+                return 4
+            case 0x83:
+                register.A = cpu8BitAdd(register.A, register.E, false, false)
+                return 4
+            case 0x84:
+                register.A = cpu8BitAdd(register.A, register.H, false, false)
+                return 4
+            case 0x85:
+                register.A = cpu8BitAdd(register.A, register.L, false, false)
+                return 4
+            case 0x86:
+                register.A = cpu8BitAdd(register.A, memoryManager.readMemory(register.HL), false, false)
+            return 8
+            case 0xC6:
+                register.A = cpu8BitAdd(register.A, 0, true, false)
+            return 8
 
+            ////////////////////////////////////////////////////
             case 0x90:
                 register.A = cpu8BitSub(register.A, register.B, false, false)
                 return 4
