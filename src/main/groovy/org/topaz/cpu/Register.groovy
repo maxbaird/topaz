@@ -50,6 +50,14 @@ class Register{
         def b2 = s & 0xFF
         return [b1, b2]
     }
+    
+    def getSPLow() {
+       return split(sp)[1]
+    }
+    
+    def getSPHigh() {
+        return split(sp)[0]
+    }
 
     def getAF(){
         return combine(A,F)
