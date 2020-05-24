@@ -114,6 +114,10 @@ class Register{
     void clearZ() {
         clearFlag(FLAG_Z)
     }
+    
+    void setZ(boolean b) {
+        b ? setFlag(FLAG_Z) : clearFlag(FLAG_Z)
+    }
 
     void setN(){
         setFlag(FLAG_N)
@@ -121,6 +125,10 @@ class Register{
     
     void clearN() {
         clearFlag(FLAG_N)
+    }
+
+    void setN(boolean b) {
+        b ? setFlag(FLAG_N) : clearFlag(FLAG_N)
     }
 
     void setH(){
@@ -131,12 +139,20 @@ class Register{
         clearFlag(FLAG_H)    
     }
 
+    void setH(boolean b) {
+        b ? setFlag(FLAG_H) : clearFlag(FLAG_H)
+    }
+
     void setC(){
         setFlag(FLAG_C) 
     }
     
     void clearC() {
         clearFlag(FLAG_C)
+    }
+
+    void setC(boolean b) {
+        b ? setFlag(FLAG_C) : clearFlag(FLAG_C)
     }
     
     void clearAllFlags() {

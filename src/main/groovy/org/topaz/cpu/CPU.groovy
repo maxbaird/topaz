@@ -620,7 +620,34 @@ class CPU{
             case 0x34:
                 cpuIncMemory(register.HL)
                 return 12
+                
+                /* Decrement */
+                case 0x3D:
+                register.A = cpuDec(register.A) 
+                return 4
+                case 0x05:
+                register.B = cpuDec(register.B) 
+                return 4
+                case 0x0D:
+                register.C = cpuDec(register.C) 
+                return 4
+                case 0x15:
+                register.D = cpuDec(register.D) 
+                return 4
+                case 0x1D:
+                register.E = cpuDec(register.E) 
+                return 4
+                case 0x25:
+                register.H = cpuDec(register.H) 
+                return 4
+                case 0x2D:
+                register.L = cpuDec(register.L) 
+                return 4
+                case 0x35:
+                cpuDecMemory(register.HL) 
+                return 12
             ////////////////////////////////////////////////////
+
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
                 return 8
@@ -701,6 +728,26 @@ class CPU{
         register.setZ(n == 0)
         register.setN(false)
         register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F)
+    }
+    
+    private int cpuDec(int n){
+        int initialN = n
+        n--
+        register.setZ(n == 0)
+        register.setN(true)
+        register.setH((initialN & 0x0F) == 0)
+        return n
+    }
+    
+    private void cpuDecMemory(int address) {
+        int n = memoryManager.readMemory(address)
+        int initialN = n
+        n--
+        memoryManager.writeMemory(address, n)
+        
+        register.setZ(n == 0)
+        register.setN(true)
+        register.setH((initialN & 0x0F) == 0)
     }
 
     private void cpu16BitLDHL() {
