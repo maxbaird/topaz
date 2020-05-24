@@ -566,6 +566,35 @@ class CPU{
                 register.A = cpu8BitXOR(register.A, 0, true)
                 return 8
 
+            /* Compares */
+            case 0xBF:
+                cpuCompare(register.A, register.A, false)
+                return 4
+            case 0xB8:
+                cpuCompare(register.A, register.B, false)
+                return 4
+            case 0xB9:
+                cpuCompare(register.A, register.C, false)
+                return 4
+            case 0xBA:
+                cpuCompare(register.A, register.D, false)
+                return 4
+            case 0xBB:
+                cpuCompare(register.A, register.E, false)
+                return 4
+            case 0xBC:
+                cpuCompare(register.A, register.H, false)
+                return 4
+            case 0xBD:
+                cpuCompare(register.A, register.L, false)
+                return 4
+            case 0xBE:
+                cpuCompare(register.A, memoryManager.readMemory(register.HL), false)
+                return 8
+            case 0xFE:
+                cpuCompare(register.A, 0, true)
+                return 8
+
             ////////////////////////////////////////////////////
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
@@ -611,6 +640,22 @@ class CPU{
         int nn = memoryManager.readWord(register.pc)
         register.pc += 2
         return nn
+    }
+
+    private void cpuCompare(int A, int val, boolean useImmediate) {
+        int n = 0
+
+        if(useImmediate) {
+            n = memoryManager.readMemory(register.pc)
+            register.pc++
+        }else {
+            n = val
+        }
+
+        register.setZ(A == n)
+        register.setC(A < n)
+        register.setH((n & 0x0F) > (A & 0x0F))
+        register.setN(true)
     }
 
     private void cpu16BitLDHL() {
