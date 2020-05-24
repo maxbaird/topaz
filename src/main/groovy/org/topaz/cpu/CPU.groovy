@@ -595,6 +595,31 @@ class CPU{
                 cpuCompare(register.A, 0, true)
                 return 8
 
+            /* Increment */
+            case 0x3C:
+                register.A = cpuInc(register.A)
+                return 4
+            case 0x04:
+                register.B = cpuInc(register.B)
+                return 4
+            case 0x0C:
+                register.C = cpuInc(register.C)
+                return 4
+            case 0x14:
+                register.D = cpuInc(register.D)
+                return 4
+            case 0x1C:
+                register.E = cpuInc(register.E)
+                return 4
+            case 0x24:
+                register.H = cpuInc(register.H)
+                return 4
+            case 0x2C:
+                register.L = cpuInc(register.L)
+                return 4
+            case 0x34:
+                cpuIncMemory(register.HL)
+                return 12
             ////////////////////////////////////////////////////
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
@@ -656,6 +681,26 @@ class CPU{
         register.setC(A < n)
         register.setH((n & 0x0F) > (A & 0x0F))
         register.setN(true)
+    }
+
+    private int cpuInc(int n){
+        def initialN = n
+        n++
+        register.setZ(n == 0)
+        register.setN(false)
+        register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F)
+        return n
+    }
+
+    private void cpuIncMemory(int address) {
+        int n = memoryManager.readMemory(address)
+        int initialN = n
+        n++
+        memoryManager.writeMemory(address, n)
+
+        register.setZ(n == 0)
+        register.setN(false)
+        register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F)
     }
 
     private void cpu16BitLDHL() {
