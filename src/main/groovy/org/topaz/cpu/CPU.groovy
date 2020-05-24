@@ -646,6 +646,20 @@ class CPU{
                 case 0x35:
                 cpuDecMemory(register.HL) 
                 return 12
+                
+                /* 16-bit add */
+                case 0x09:
+                register.HL = cpu16BitAdd(register.HL, register.BC) 
+                return 8
+                case 0x19:
+                register.HL = cpu16BitAdd(register.HL, register.DE) 
+                return 8
+                case 0x29:
+                register.HL = cpu16BitAdd(register.HL, register.HL) 
+                return 8
+                case 0x39:
+                register.HL = cpu16BitAdd(register.HL, register.sp) 
+                return 8
             ////////////////////////////////////////////////////
 
             case 0x20:
@@ -902,6 +916,27 @@ class CPU{
             register.setC()
         }
 
+        return reg
+    }
+    
+    private int cpu16BitAdd(int reg, int n) {
+        int initialHL = reg 
+        reg = reg + n
+        
+        register.clearN()
+
+        /*
+         * The half-carry is set if an overflow occurs from bit position 11. If
+         * the initial value of the first 12 bits are greater than the 12 bits
+         * of the result, it means that the result overflowed the bit at
+         * position 11 and is therefore a greater value, i.e, a half-carry
+         * occurred. Otherwise, the value of the first 12 bits will be greater
+         * than the value of the initial 12 bits meaning that no overflow
+         * occurred.
+         */
+        register.setH((initialHL & 0xFFF) > (reg & 0xFFF))
+        register.setC(reg > 0xFFFF)
+         
         return reg
     }
 
