@@ -660,6 +660,11 @@ class CPU{
                 case 0x39:
                 register.HL = cpu16BitAdd(register.HL, register.sp) 
                 return 8
+                
+                /* Add n to stack pointer */
+                case 0xE8:
+                cpu8BitSPAdd() 
+                return 16
             ////////////////////////////////////////////////////
 
             case 0x20:
@@ -981,6 +986,17 @@ class CPU{
         }
 
         return reg
+    }
+    
+    private void cpu8BitSPAdd() {
+        int n = memoryManager.readMemory(register.pc)
+        int result = (register.pc + n) & 0xFFFF
+        register.pc = result
+        
+        register.clearZ()
+        register.clearN()
+        register.setC(((register.pc ^ n ^ result) & 0x100) != 0)
+        register.setH(((register.pc ^ n ^ result) & 0x10) != 0)
     }
 
     private int cpu8BitXOR(int reg, int value, boolean useImmediate) {
