@@ -597,74 +597,102 @@ class CPU{
 
             /* Increment */
             case 0x3C:
-                register.A = cpuInc(register.A)
+                register.A = cpu8BitInc(register.A)
                 return 4
             case 0x04:
-                register.B = cpuInc(register.B)
+                register.B = cpu8BitInc(register.B)
                 return 4
             case 0x0C:
-                register.C = cpuInc(register.C)
+                register.C = cpu8BitInc(register.C)
                 return 4
             case 0x14:
-                register.D = cpuInc(register.D)
+                register.D = cpu8BitInc(register.D)
                 return 4
             case 0x1C:
-                register.E = cpuInc(register.E)
+                register.E = cpu8BitInc(register.E)
                 return 4
             case 0x24:
-                register.H = cpuInc(register.H)
+                register.H = cpu8BitInc(register.H)
                 return 4
             case 0x2C:
-                register.L = cpuInc(register.L)
+                register.L = cpu8BitInc(register.L)
                 return 4
             case 0x34:
                 cpuIncMemory(register.HL)
                 return 12
-                
-                /* Decrement */
-                case 0x3D:
-                register.A = cpuDec(register.A) 
+
+            /* Decrement */
+            case 0x3D:
+                register.A = cpu8BitDec(register.A)
                 return 4
-                case 0x05:
-                register.B = cpuDec(register.B) 
+            case 0x05:
+                register.B = cpu8BitDec(register.B)
                 return 4
-                case 0x0D:
-                register.C = cpuDec(register.C) 
+            case 0x0D:
+                register.C = cpu8BitDec(register.C)
                 return 4
-                case 0x15:
-                register.D = cpuDec(register.D) 
+            case 0x15:
+                register.D = cpu8BitDec(register.D)
                 return 4
-                case 0x1D:
-                register.E = cpuDec(register.E) 
+            case 0x1D:
+                register.E = cpu8BitDec(register.E)
                 return 4
-                case 0x25:
-                register.H = cpuDec(register.H) 
+            case 0x25:
+                register.H = cpu8BitDec(register.H)
                 return 4
-                case 0x2D:
-                register.L = cpuDec(register.L) 
+            case 0x2D:
+                register.L = cpu8BitDec(register.L)
                 return 4
-                case 0x35:
-                cpuDecMemory(register.HL) 
+            case 0x35:
+                cpuDecMemory(register.HL)
                 return 12
-                
-                /* 16-bit add */
-                case 0x09:
-                register.HL = cpu16BitAdd(register.HL, register.BC) 
+
+            /* 16-bit add */
+            case 0x09:
+                register.HL = cpu16BitAdd(register.HL, register.BC)
                 return 8
-                case 0x19:
-                register.HL = cpu16BitAdd(register.HL, register.DE) 
+            case 0x19:
+                register.HL = cpu16BitAdd(register.HL, register.DE)
                 return 8
-                case 0x29:
-                register.HL = cpu16BitAdd(register.HL, register.HL) 
+            case 0x29:
+                register.HL = cpu16BitAdd(register.HL, register.HL)
                 return 8
-                case 0x39:
-                register.HL = cpu16BitAdd(register.HL, register.sp) 
+            case 0x39:
+                register.HL = cpu16BitAdd(register.HL, register.sp)
                 return 8
-                
-                /* Add n to stack pointer */
-                case 0xE8:
-                cpu8BitSPAdd() 
+
+            /* Add n to stack pointer */
+            case 0xE8:
+                cpu8BitSPAdd()
                 return 16
+
+            /* 16 bit inc */ 
+            case 0x03:
+                register.BC = cpu16BitInc(register.BC)
+                return 8
+            case 0x13:
+                register.DE = cpu16BitInc(register.DE)
+                return 8
+            case 0x23:
+                register.HL = cpu16BitInc(register.HL)
+                return 8
+            case 0x33:
+                register.sp = cpu16BitInc(register.sp)
+                return 8
+
+            /* 16 bit DEC */
+            case 0x0B:
+                register.BC = cpu16BitDec(register.BC)
+                return 8
+            case 0x1B:
+                register.DE = cpu16BitDec(register.DE)
+                return 8
+            case 0x2B:
+                register.HL = cpu16BitDec(register.HL)
+                return 8
+            case 0x3B:
+                register.sp = cpu16BitDec(register.sp)
+                return 8
             ////////////////////////////////////////////////////
 
             case 0x20:
@@ -729,7 +757,7 @@ class CPU{
         register.setN(true)
     }
 
-    private int cpuInc(int n){
+    private int cpu8BitInc(int n){
         def initialN = n
         n++
         register.setZ(n == 0)
@@ -748,8 +776,8 @@ class CPU{
         register.setN(false)
         register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F)
     }
-    
-    private int cpuDec(int n){
+
+    private int cpu8BitDec(int n){
         int initialN = n
         n--
         register.setZ(n == 0)
@@ -757,13 +785,13 @@ class CPU{
         register.setH((initialN & 0x0F) == 0)
         return n
     }
-    
+
     private void cpuDecMemory(int address) {
         int n = memoryManager.readMemory(address)
         int initialN = n
         n--
         memoryManager.writeMemory(address, n)
-        
+
         register.setZ(n == 0)
         register.setN(true)
         register.setH((initialN & 0x0F) == 0)
@@ -923,11 +951,11 @@ class CPU{
 
         return reg
     }
-    
+
     private int cpu16BitAdd(int reg, int n) {
-        int initialHL = reg 
+        int initialHL = reg
         reg = reg + n
-        
+
         register.clearN()
 
         /*
@@ -941,7 +969,7 @@ class CPU{
          */
         register.setH((initialHL & 0xFFF) > (reg & 0xFFF))
         register.setC(reg > 0xFFFF)
-         
+
         return reg
     }
 
@@ -987,14 +1015,24 @@ class CPU{
 
         return reg
     }
-    
+
     private void cpu8BitSPAdd() {
         int n = memoryManager.readMemory(register.pc)
         int result = (register.pc + n) & 0xFFFF
         register.pc = result
-        
+
         register.clearZ()
         register.clearN()
+
+        /*
+         * To understand the logic behind setting the carry and half carry flag,
+         * see the following stackoverflow questions.
+         * 
+         * https://stackoverflow.com/questions/62006764/how-is-xor-applied-when-determining-carry
+         * https://stackoverflow.com/questions/20494087/is-it-possible-to-write-a-function-adding-two-integers-without-control-flow-and/20500295#20500295
+         * https://stackoverflow.com/questions/9070937/adding-two-numbers-without-operator-clarification
+         */
+
         register.setC(((register.pc ^ n ^ result) & 0x100) != 0)
         register.setH(((register.pc ^ n ^ result) & 0x10) != 0)
     }
