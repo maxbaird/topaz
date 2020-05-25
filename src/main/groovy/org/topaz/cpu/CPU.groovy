@@ -729,10 +729,40 @@ class CPU{
         register.pc++
 
         switch(opcode) {
+            /* Swaps */
+            case 0x37:
+                register.A = cpuSwapNibbles(register.A)
+                return 8
+            case 0x30:
+                register.B = cpuSwapNibbles(register.B)
+                return 8
+            case 0x31:
+                register.C = cpuSwapNibbles(register.C)
+                return 8
+            case 0x32:
+                register.D = cpuSwapNibbles(register.D)
+                return 8
+            case 0x33:
+                register.E = cpuSwapNibbles(register.E)
+                return 8
+            case 0x34:
+                register.H = cpuSwapNibbles(register.H)
+                return 8
+            case 0x35:
+                register.L = cpuSwapNibbles(register.L)
+                return 8
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
         }
+    }
+
+    private int cpuSwapNibbles(int n){
+        n = (((n & 0xF0) >> 4) | ((n & 0x0F) << 4))
+
+        register.clearAllFlags()
+        register.setZ(n == 0)
+        return n
     }
 
     private int cpu16BitImmediateLoad() {
