@@ -91,6 +91,7 @@ class InterruptHandler{
          * IF_REGISTER.
          */
         interruptsEnabled = false
+        cpu.isHalted = false
         int request = memoryManager.readMemory(IF_REGISTER)
         request = BitUtil.clearBit(request, interruptId)
         memoryManager.writeMemory(IF_REGISTER, request)

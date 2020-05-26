@@ -8,6 +8,8 @@ import org.topaz.util.BitUtil
 class CPU{
     Register register
     MemoryManager memoryManager
+    
+    public boolean isHalted = false
 
     int executeNextOpcode() {
         int cycles = 0
@@ -693,10 +695,27 @@ class CPU{
             case 0x3B:
                 register.sp = cpu16BitDec(register.sp)
                 return 8
-             
-                /* DAA */
-                case 0x27:
-                cpuDAA() 
+
+            /* DAA */
+            case 0x27:
+                cpuDAA()
+                return 4
+
+            /* Miscellaneous */
+            case 0x2F:
+                register.A = ~register.A
+                register.setN()
+                register.setH()
+                return 4
+
+            case 0x37:
+                register.setC()
+                register.clearN()
+                register.clearH()
+                return 4
+                
+                case 0x76:
+                this.isHalted = true
                 return 4
             ////////////////////////////////////////////////////
 
@@ -769,7 +788,7 @@ class CPU{
                 register.A = register.A + 0x60
                 register.setC()
             }
-            
+
             if(register.isH() || ((register.A & 0x0F) > 0x09)) {
                 register.A = register.A + 0x6
             }else {
@@ -781,11 +800,11 @@ class CPU{
                 }
             }
         }
-        
+
         register.setZ(register.A == 0)
         register.clearH()
     }
-    
+
     private int cpuSwapNibbles(int n){
         n = (((n & 0xF0) >> 4) | ((n & 0x0F) << 4))
 
