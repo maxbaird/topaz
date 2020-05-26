@@ -8,8 +8,9 @@ import org.topaz.util.BitUtil
 class CPU{
     Register register
     MemoryManager memoryManager
-    
+
     public boolean isHalted = false
+    public boolean interruptsDisabled = false
 
     int executeNextOpcode() {
         int cycles = 0
@@ -713,11 +714,20 @@ class CPU{
                 register.clearN()
                 register.clearH()
                 return 4
-                
-                case 0x76:
+
+            case 0x76:
                 this.isHalted = true
                 return 4
+
+            case 0x10: //Stop
+                register.pc++
+                return 4
+
+            case 0xF3:
+                this.interruptsDisabled = true
+                return 4
             ////////////////////////////////////////////////////
+
 
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)

@@ -72,11 +72,8 @@ class Emulator{
         int cyclesThisUpdate = 0
 
         while(cyclesThisUpdate < MAX_CYCLES) {
-            int cycles = 4
-            if(!cpu.isHalted) {
-                cycles = this.executeNextOpCode()
-            }
-
+            int cycles = 0
+            cycles = this.executeNextOpCode()
             cyclesThisUpdate += cycles
             this.updateTimers(cycles)
             this.updateGraphics(cycles)
@@ -86,7 +83,17 @@ class Emulator{
     }
 
     private int executeNextOpCode() {
-        return cpu.executeNextOpcode()
+        if(!cpu.isHalted) {
+            return cpu.executeNextOpcode()
+        }else {
+            return 4    
+        }
+        
+        if(cpu.interruptsDisabled) {
+            if(memoryManager.readMemory(register.pc - 1) != 0xF3) {
+                cpu.interruptsDisabled = false
+            }
+        }
     }
 
     private void updateTimers(int cycles) {
