@@ -808,6 +808,7 @@ class CPU{
                 register.L = cpuSwapNibbles(register.L)
                 return 8
 
+            /* Rotate left through carry */ 
             case 0x07:
                 register.A = cpuRLC(register.A)
                 return 8
@@ -829,6 +830,9 @@ class CPU{
             case 0x05:
                 register.L = cpuRLC(register.L)
                 return 8
+            case 0x06:
+                cpuRLCMemory(register.HL)
+                return 16
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -868,6 +872,25 @@ class CPU{
         register.setC(BitUtil.isSet(n, 7))
 
         return reg
+    }
+
+    private void cpuRLCMemory(int address) {
+        int reg = memoryManager.readMemory(address)
+
+        boolean isMSBSet = BitUtil.isSet(reg, 7)
+
+        reg = (reg << 1) & 0xFF
+
+        register.clearN()
+        register.clearH()
+
+        if(isMSBSet) {
+            register.setC()
+            reg = BitUtil.setBit(reg, 0)
+        }
+
+        register.setZ(reg == 0)
+        memoryManager.writeMemory(address, reg)
     }
 
     private int cpuRL(int reg) {
