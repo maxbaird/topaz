@@ -9,8 +9,9 @@ class CPU{
     Register register
     MemoryManager memoryManager
 
-    public boolean isHalted = false
-    public boolean interruptsDisabled = false
+    boolean isHalted = false
+    boolean interruptsDisabled = false
+    boolean interruptsEnabled = false
 
     int executeNextOpcode() {
         int cycles = 0
@@ -725,6 +726,10 @@ class CPU{
 
             case 0xF3:
                 this.interruptsDisabled = true
+                return 4
+                
+                case 0xFB:
+                this.interruptsEnabled = true 
                 return 4
             ////////////////////////////////////////////////////
 

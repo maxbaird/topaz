@@ -86,12 +86,29 @@ class Emulator{
         if(!cpu.isHalted) {
             return cpu.executeNextOpcode()
         }else {
+            /*
+             * 4 is the number of cycles the opcode for halting the CPU takes.
+             */
             return 4    
         }
         
+        /*
+         * Interrupts are only enabled or disabled after the next instruction.
+         * Opcode 0xF3 disables interrupt and opcode 0xFB enables them. So if
+         * the previous instruction was neither the opcode for enabling or
+         * disabling interrupts, the boolean values are reset.
+         */
         if(cpu.interruptsDisabled) {
             if(memoryManager.readMemory(register.pc - 1) != 0xF3) {
                 cpu.interruptsDisabled = false
+                interruptHandler.interruptsEnabled = false
+            }
+        }
+        
+        if(cpu.interruptsEnabled) {
+            if(memoryManager.readMemory(register.pc - 1) != 0xFB) {
+                cpu.interruptsEnabled = false
+                interruptHandler.interruptsEnabled = true
             }
         }
     }
