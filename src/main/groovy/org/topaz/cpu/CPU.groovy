@@ -736,9 +736,17 @@ class CPU{
             case 0x07:
                 register.A = cpuRLC(register.A)
                 return 4
-                
-                case 0x17:
-                register.A = cpuRL(register.A) 
+
+            case 0x17:
+                register.A = cpuRL(register.A)
+                return 4
+
+            case 0x0F:
+                register.A = cpuRRC(register.A)
+                return 4
+
+            case 0x1F:
+                register.A = cpuRR(register.A)
                 return 4
             ////////////////////////////////////////////////////
 
@@ -799,6 +807,28 @@ class CPU{
             case 0x35:
                 register.L = cpuSwapNibbles(register.L)
                 return 8
+
+            case 0x07:
+                register.A = cpuRLC(register.A)
+                return 8
+            case 0x00:
+                register.B = cpuRLC(register.B)
+                return 8
+            case 0x01:
+                register.C = cpuRLC(register.C)
+                return 8
+            case 0x02:
+                register.D = cpuRLC(register.D)
+                return 8
+            case 0x03:
+                register.E = cpuRLC(register.E)
+                return 8
+            case 0x04:
+                register.H = cpuRLC(register.H)
+                return 8
+            case 0x05:
+                register.L = cpuRLC(register.L)
+                return 8
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -836,27 +866,65 @@ class CPU{
         register.clearN()
         register.clearH()
         register.setC(BitUtil.isSet(n, 7))
-        
+
         return reg
     }
-    
+
     private int cpuRL(int reg) {
         boolean carrySet = register.isC()
         boolean isMSBSet = BitUtil.isSet(reg, 7)
-        
+
         reg = (reg << 1) & 0xFF
-        
+
         register.clearH()
         register.clearN()
         register.setC(isMSBSet)
-        
+
         if(carrySet) {
             reg = BitUtil.setBit(reg, 0)
         }
-        
+
         register.setZ(reg == 0)
 
-        return reg 
+        return reg
+    }
+
+    private int cpuRRC(int reg) {
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+
+        register.clearAllFlags()
+
+        reg = reg >> 1
+
+        if(isLSBSet) {
+            register.setC()
+            reg = BitUtil.setBit(reg, 7)
+        }
+
+        if(reg == 0) {
+            register.setZ()
+        }
+
+        return reg
+    }
+
+    private int cpuRR(int reg) {
+        boolean carrySet = register.isC()
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+
+        reg = reg >> 1
+
+        register.clearH()
+        register.clearN()
+        register.setC(isLSBSet)
+
+        if(carrySet) {
+            reg = BitUtil.setBit(reg, 7)
+        }
+
+        register.setZ(reg == 0)
+
+        return reg
     }
 
     private int cpuSwapNibbles(int n){
@@ -1236,25 +1304,6 @@ class CPU{
         if(register.isSet(flag) == condition) {
             register.pc = memoryManager.pop()
         }
-    }
-
-    private int cpuRRC(int reg) {
-        boolean isLSBSet = BitUtil.isSet(reg, 0)
-
-        register.clearAllFlags()
-
-        reg = reg >> 1
-
-        if(isLSBSet) {
-            register.setC()
-            reg = BitUtil.setBit(reg, 7)
-        }
-
-        if(reg == 0) {
-            register.setZ()
-        }
-
-        return reg
     }
 
     private void cpuTestBit(int reg, int bit) {
