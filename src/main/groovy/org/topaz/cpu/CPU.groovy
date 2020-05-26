@@ -727,9 +727,18 @@ class CPU{
             case 0xF3:
                 this.interruptsDisabled = true
                 return 4
+
+            case 0xFB:
+                this.interruptsEnabled = true
+                return 4
+
+            /* Rotates and shifts */
+            case 0x07:
+                register.A = cpuRLC(register.A)
+                return 4
                 
-                case 0xFB:
-                this.interruptsEnabled = true 
+                case 0x17:
+                register.A = cpuRL(register.A) 
                 return 4
             ////////////////////////////////////////////////////
 
@@ -818,6 +827,36 @@ class CPU{
 
         register.setZ(register.A == 0)
         register.clearH()
+    }
+
+    private int cpuRLC(int reg) {
+        int n = reg & 0xFF
+        register.A = (reg << 1 | reg >> 7) & 0xFF
+        register.setZ(reg == 0)
+        register.clearN()
+        register.clearH()
+        register.setC(BitUtil.isSet(n, 7))
+        
+        return reg
+    }
+    
+    private int cpuRL(int reg) {
+        boolean carrySet = register.isC()
+        boolean isMSBSet = BitUtil.isSet(reg, 7)
+        
+        reg = (reg << 1) & 0xFF
+        
+        register.clearH()
+        register.clearN()
+        register.setC(isMSBSet)
+        
+        if(carrySet) {
+            reg = BitUtil.setBit(reg, 0)
+        }
+        
+        register.setZ(reg == 0)
+
+        return reg 
     }
 
     private int cpuSwapNibbles(int n){
