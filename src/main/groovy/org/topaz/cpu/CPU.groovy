@@ -693,6 +693,11 @@ class CPU{
             case 0x3B:
                 register.sp = cpu16BitDec(register.sp)
                 return 8
+             
+                /* DAA */
+                case 0x27:
+                cpuDAA() 
+                return 4
             ////////////////////////////////////////////////////
 
             case 0x20:
@@ -757,6 +762,30 @@ class CPU{
         }
     }
 
+    //STOLEN! :-)
+    private void cpuDAA() {
+        if(!register.isN()) {
+            if(register.isC() || register.A > 0x99) {
+                register.A = register.A + 0x60
+                register.setC()
+            }
+            
+            if(register.isH() || ((register.A & 0x0F) > 0x09)) {
+                register.A = register.A + 0x6
+            }else {
+                if(register.isC()) {
+                    register.A = register.A - 0x60
+                }
+                if(register.isH()) {
+                    register.A = register.A - 0x6
+                }
+            }
+        }
+        
+        register.setZ(register.A == 0)
+        register.clearH()
+    }
+    
     private int cpuSwapNibbles(int n){
         n = (((n & 0xF0) >> 4) | ((n & 0x0F) << 4))
 
