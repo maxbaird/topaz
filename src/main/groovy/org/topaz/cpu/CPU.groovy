@@ -833,6 +833,32 @@ class CPU{
             case 0x06:
                 cpuRLCMemory(register.HL)
                 return 16
+                
+                /* rotate left */
+                case 0x17:
+                register.A = cpuRL(register.A) 
+                return 8
+                case 0x10:
+                register.B = cpuRL(register.B) 
+                return 8
+                case 0x11:
+                register.C = cpuRL(register.C) 
+                return 8
+                case 0x12:
+                register.D = cpuRL(register.D) 
+                return 8
+                case 0x13:
+                register.E = cpuRL(register.E) 
+                return 8
+                case 0x14:
+                register.H = cpuRL(register.H) 
+                return 8
+                case 0x15:
+                register.L = cpuRL(register.A) 
+                return 8
+                case 0x16:
+                cpuRLMemory(register.HL)
+                return 16
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -910,6 +936,26 @@ class CPU{
         register.setZ(reg == 0)
 
         return reg
+    }
+    
+    private void cpuRLMemory(int address) {
+        int reg = memoryManager.readMemory(address)
+        
+        boolean isCarrySet = register.isC()
+        boolean isMSBSet = BitUtil.isSet(reg, 7)
+        
+        reg = reg << 1
+        
+        register.clearH()
+        register.clearN()
+        register.setC(isMSBSet)
+
+        if(isCarrySet) {
+            reg = BitUtil.setBit(reg, 0)
+        }
+        
+        register.setZ(reg == 0)
+        memoryManager.writeMemory(address, reg)
     }
 
     private int cpuRRC(int reg) {
