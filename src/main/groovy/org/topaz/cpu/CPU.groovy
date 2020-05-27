@@ -987,6 +987,72 @@ class CPU{
             case 0x3E:
                 cpuSRLMemory(register.HL)
                 return 16
+
+            /* Test Bit */
+            case 0x40 : cpuTestBit(register.B, 0); return 8
+            case 0x41 : cpuTestBit(register.@C, 0); return 8
+            case 0x42 : cpuTestBit(register.D, 0); return 8
+            case 0x43 : cpuTestBit(register.E, 0); return 8
+            case 0x44 : cpuTestBit(register.@H,0); return 8
+            case 0x45 : cpuTestBit(register.L, 0); return 8
+            case 0x46 : cpuTestBit(memoryManager.readMemory(register.HL), 0); return 16
+            case 0x47 : cpuTestBit(register.A, 0); return 8
+            case 0x48 : cpuTestBit(register.B, 1); return 8
+            case 0x49 : cpuTestBit(register.@C, 1); return 8
+            case 0x4A : cpuTestBit(register.D, 1); return 8
+            case 0x4B : cpuTestBit(register.E, 1); return 8
+            case 0x4C : cpuTestBit(register.@H,1); return 8
+            case 0x4D : cpuTestBit(register.L, 1); return 8
+            case 0x4E : cpuTestBit(memoryManager.readMemory(register.HL), 1); return 16
+            case 0x4F : cpuTestBit(register.A, 1); return 8
+            case 0x50 : cpuTestBit(register.B, 2); return 8
+            case 0x51 : cpuTestBit(register.@C, 2); return 8
+            case 0x52 : cpuTestBit(register.D, 2); return 8
+            case 0x53 : cpuTestBit(register.E, 2); return 8
+            case 0x54 : cpuTestBit(register.@H,2); return 8
+            case 0x55 : cpuTestBit(register.L, 2); return 8
+            case 0x56 : cpuTestBit(memoryManager.readMemory(register.HL), 2); return 16
+            case 0x57 : cpuTestBit(register.A, 2); return 8
+            case 0x58 : cpuTestBit(register.B, 3); return 8
+            case 0x59 : cpuTestBit(register.@C, 3); return 8
+            case 0x5A : cpuTestBit(register.D, 3); return 8
+            case 0x5B : cpuTestBit(register.E, 3); return 8
+            case 0x5C : cpuTestBit(register.@H,3); return 8
+            case 0x5D : cpuTestBit(register.L, 3); return 8
+            case 0x5E : cpuTestBit(memoryManager.readMemory(register.HL), 3); return 16
+            case 0x5F : cpuTestBit(register.A, 3); return 8
+            case 0x60 : cpuTestBit(register.B, 4); return 8
+            case 0x61 : cpuTestBit(register.@C, 4); return 8
+            case 0x62 : cpuTestBit(register.D, 4); return 8
+            case 0x63 : cpuTestBit(register.E, 4); return 8
+            case 0x64 : cpuTestBit(register.@H,4); return 8
+            case 0x65 : cpuTestBit(register.L, 4); return 8
+            case 0x66 : cpuTestBit(memoryManager.readMemory(register.HL), 4); return 16
+            case 0x67 : cpuTestBit(register.A, 4); return 8
+            case 0x68 : cpuTestBit(register.B, 5); return 8
+            case 0x69 : cpuTestBit(register.@C, 5); return 8
+            case 0x6A : cpuTestBit(register.D, 5); return 8
+            case 0x6B : cpuTestBit(register.E, 5); return 8
+            case 0x6C : cpuTestBit(register.@H,5); return 8
+            case 0x6D : cpuTestBit(register.L, 5); return 8
+            case 0x6E : cpuTestBit(memoryManager.readMemory(register.HL), 5); return 16
+            case 0x6F : cpuTestBit(register.A, 5); return 8
+            case 0x70 : cpuTestBit(register.B, 6); return 8
+            case 0x71 : cpuTestBit(register.@C, 6); return 8
+            case 0x72 : cpuTestBit(register.D, 6); return 8
+            case 0x73 : cpuTestBit(register.E, 6); return 8
+            case 0x74 : cpuTestBit(register.@H,6); return 8
+            case 0x75 : cpuTestBit(register.L, 6); return 8
+            case 0x76 : cpuTestBit(memoryManager.readMemory(register.HL), 6); return 16
+            case 0x77 : cpuTestBit(register.A, 6); return 8
+            case 0x78 : cpuTestBit(register.B, 7); return 8
+            case 0x79 : cpuTestBit(register.@C, 7); return 8
+            case 0x7A : cpuTestBit(register.D, 7); return 8
+            case 0x7B : cpuTestBit(register.E, 7); return 8
+            case 0x7C : cpuTestBit(register.@H,7); return 8
+            case 0x7D : cpuTestBit(register.L, 7); return 8
+            case 0x7E : cpuTestBit(memoryManager.readMemory(register.HL), 7); return 16
+            case 0x7F : cpuTestBit(register.A, 7); return 8
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -1015,6 +1081,22 @@ class CPU{
 
         register.setZ(register.A == 0)
         register.clearH()
+    }
+
+    private void cpuTestBit(int reg, int bit) {
+        /*
+         * This tests the bit of a byte and sets the following flags:
+         *
+         * FLAG_Z : set to 1 if the bit is 0
+         * FLAG_N : Set to 0
+         * FLAG_C : Unchanged
+         * FLAG_H : Set to 1
+         */
+
+        register.setZ(BitUtil.isSet(reg, bit))
+
+        register.clearN()
+        register.setH()
     }
 
     private int cpuSRL(int reg) {
@@ -1628,23 +1710,4 @@ class CPU{
         }
     }
 
-    private void cpuTestBit(int reg, int bit) {
-        /*
-         * This tests the bit of a byte and sets the following flags: 
-         * 
-         * FLAG_Z : set to 1 if the bit is 0
-         * FLAG_N : Set to 0
-         * FLAG_C : Unchanged
-         * FLAG_H : Set to 1
-         */
-
-        if(BitUtil.isSet(reg, bit)) {
-            register.clearZ()
-        }else {
-            register.setZ()
-        }
-
-        register.clearN()
-        register.setH()
-    }
 }
