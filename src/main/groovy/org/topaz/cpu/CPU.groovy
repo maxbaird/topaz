@@ -883,8 +883,34 @@ class CPU{
                 register.L = cpuRRC(register.L)
                 return 8
             case 0x0E:
-                cpuRRCMemory(register.HL) 
-            return 16    
+                cpuRRCMemory(register.HL)
+                return 16
+
+            /* rotate right */
+            case 0x1F:
+                register.A = cpuRR(register.A)
+                return 8
+            case 0x18:
+                register.B = cpuRR(register.B)
+                return 8
+            case 0x19:
+                register.C = cpuRR(register.C)
+                return 8
+            case 0x1A:
+                register.D = cpuRR(register.D)
+                return 8
+            case 0x1B:
+                register.E = cpuRR(register.E)
+                return 8
+            case 0x1C:
+                register.H = cpuRR(register.H)
+                return 8
+            case 0x1D:
+                register.L = cpuRR(register.L)
+                return 8
+            case 0x1E:
+                cpuRRMemory(register.HL)
+                return 16
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -1002,22 +1028,22 @@ class CPU{
 
         return reg
     }
-    
+
     private void cpuRRCMemory(int address) {
         int reg = memoryManager.readMemory(address)
-        
+
         boolean isLSBSet = BitUtil.isSet(reg, 0)
-        
+
         reg = (reg >> 1) & 0xFF
-        
+
         register.clearN()
         register.clearH()
-        
+
         if(isLSBSet) {
             register.setC()
             reg = BitUtil.setBit(reg, 7)
         }
-        
+
         register.setZ(reg == 0)
         memoryManager.writeMemory(address, reg)
     }
@@ -1039,6 +1065,26 @@ class CPU{
         register.setZ(reg == 0)
 
         return reg
+    }
+
+    private void cpuRRMemory(int address) {
+        int reg = memoryManager.readMemory(address)
+
+        boolean isCarrySet = register.isC()
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+
+        reg = (reg >> 1) & 0xFF
+
+        register.clearN()
+        register.clearH()
+        register.setC(isLSBSet)
+
+        if(isCarrySet) {
+            reg = BitUtil.setBit(reg, 7)
+        }
+
+        register.setZ(reg == 0)
+        memoryManager.writeMemory(reg, address)
     }
 
     private int cpuSwapNibbles(int n){
