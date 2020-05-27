@@ -38,7 +38,7 @@ class CPU{
                 register.B = cpu8BitLoad()
                 return 8
             case 0x0E:
-                register.C = cpu8BitLoad()
+                register.@C = cpu8BitLoad()
                 return 8
             case 0x16:
                 register.D = cpu8BitLoad()
@@ -47,7 +47,7 @@ class CPU{
                 register.E = cpu8BitLoad()
                 return 8
             case 0x26:
-                register.H = cpu8BitLoad()
+                register.@H = cpu8BitLoad()
                 return 8
             case 0x2E:
                 register.L = cpu8BitLoad()
@@ -94,22 +94,22 @@ class CPU{
                 register.B = cpuRegisterLoad(register.L)
                 return 4
             case 0x48:
-                register.C = cpuRegisterLoad(register.B)
+                register.@C = cpuRegisterLoad(register.B)
                 return 4
             case 0x49:
-                register.C = cpuRegisterLoad(register.C)
+                register.@C = cpuRegisterLoad(register.C)
                 return 4
             case 0x4A:
-                register.C = cpuRegisterLoad(register.D)
+                register.@C = cpuRegisterLoad(register.D)
                 return 4
             case 0x4B:
-                register.C = cpuRegisterLoad(register.E)
+                register.@C = cpuRegisterLoad(register.E)
                 return 4
             case 0x4C:
-                register.C = cpuRegisterLoad(register.H)
+                register.@C = cpuRegisterLoad(register.H)
                 return 4
             case 0x4D:
-                register.C = cpuRegisterLoad(register.L)
+                register.@C = cpuRegisterLoad(register.L)
                 return 4
             case 0x50:
                 register.D = cpuRegisterLoad(register.B)
@@ -148,22 +148,22 @@ class CPU{
                 register.E = cpuRegisterLoad(register.L)
                 return 4
             case 0x60:
-                register.H = cpuRegisterLoad(register.B)
+                register.@H = cpuRegisterLoad(register.B)
                 return 4
             case 0x61:
-                register.H = cpuRegisterLoad(register.C)
+                register.@H = cpuRegisterLoad(register.C)
                 return 4
             case 0x62:
-                register.H = cpuRegisterLoad(register.D)
+                register.@H = cpuRegisterLoad(register.D)
                 return 4
             case 0x63:
-                register.H = cpuRegisterLoad(register.E)
+                register.@H = cpuRegisterLoad(register.E)
                 return 4
             case 0x64:
-                register.H = cpuRegisterLoad(register.H)
+                register.@H = cpuRegisterLoad(register.H)
                 return 4
             case 0x65:
-                register.H = cpuRegisterLoad(register.L)
+                register.@H = cpuRegisterLoad(register.L)
                 return 4
             case 0x68:
                 register.L = cpuRegisterLoad(register.B)
@@ -192,7 +192,7 @@ class CPU{
                 register.B = cpuROMLoad(register.HL)
                 return 8
             case 0x4E:
-                register.C = cpuROMLoad(register.HL)
+                register.@C = cpuROMLoad(register.HL)
                 return 8
             case 0x56:
                 register.D = cpuROMLoad(register.HL)
@@ -201,7 +201,7 @@ class CPU{
                 register.E = cpuROMLoad(register.HL)
                 return 8
             case 0x66:
-                register.H = cpuROMLoad(register.HL)
+                register.@H = cpuROMLoad(register.HL)
                 return 8
             case 0x6E:
                 register.L = cpuROMLoad(register.HL)
@@ -247,7 +247,7 @@ class CPU{
                 register.B = cpuRegisterLoad(register.A)
                 return 4
             case 0x4F:
-                register.C = cpuRegisterLoad(register.A)
+                register.@C = cpuRegisterLoad(register.A)
                 return 4
             case 0x57:
                 register.D = cpuRegisterLoad(register.A)
@@ -256,7 +256,7 @@ class CPU{
                 register.E = cpuRegisterLoad(register.A)
                 return 4
             case 0x67:
-                register.H = cpuRegisterLoad(register.A)
+                register.@H = cpuRegisterLoad(register.A)
                 return 4
             case 0x6F:
                 register.L = cpuRegisterLoad(register.A)
@@ -607,7 +607,7 @@ class CPU{
                 register.B = cpu8BitInc(register.B)
                 return 4
             case 0x0C:
-                register.C = cpu8BitInc(register.C)
+                register.@C = cpu8BitInc(register.C)
                 return 4
             case 0x14:
                 register.D = cpu8BitInc(register.D)
@@ -616,7 +616,7 @@ class CPU{
                 register.E = cpu8BitInc(register.E)
                 return 4
             case 0x24:
-                register.H = cpu8BitInc(register.H)
+                register.@H = cpu8BitInc(register.H)
                 return 4
             case 0x2C:
                 register.L = cpu8BitInc(register.L)
@@ -633,7 +633,7 @@ class CPU{
                 register.B = cpu8BitDec(register.B)
                 return 4
             case 0x0D:
-                register.C = cpu8BitDec(register.C)
+                register.@C = cpu8BitDec(register.C)
                 return 4
             case 0x15:
                 register.D = cpu8BitDec(register.D)
@@ -642,7 +642,7 @@ class CPU{
                 register.E = cpu8BitDec(register.E)
                 return 4
             case 0x25:
-                register.H = cpu8BitDec(register.H)
+                register.@H = cpu8BitDec(register.H)
                 return 4
             case 0x2D:
                 register.L = cpu8BitDec(register.L)
@@ -793,7 +793,7 @@ class CPU{
                 register.B = cpuSwapNibbles(register.B)
                 return 8
             case 0x31:
-                register.C = cpuSwapNibbles(register.C)
+                register.@C = cpuSwapNibbles(register.C)
                 return 8
             case 0x32:
                 register.D = cpuSwapNibbles(register.D)
@@ -802,7 +802,7 @@ class CPU{
                 register.E = cpuSwapNibbles(register.E)
                 return 8
             case 0x34:
-                register.H = cpuSwapNibbles(register.H)
+                register.@H = cpuSwapNibbles(register.H)
                 return 8
             case 0x35:
                 register.L = cpuSwapNibbles(register.L)
@@ -816,7 +816,7 @@ class CPU{
                 register.B = cpuRLC(register.B)
                 return 8
             case 0x01:
-                register.C = cpuRLC(register.C)
+                register.@C = cpuRLC(register.C)
                 return 8
             case 0x02:
                 register.D = cpuRLC(register.D)
@@ -825,7 +825,7 @@ class CPU{
                 register.E = cpuRLC(register.E)
                 return 8
             case 0x04:
-                register.H = cpuRLC(register.H)
+                register.@H = cpuRLC(register.H)
                 return 8
             case 0x05:
                 register.L = cpuRLC(register.L)
@@ -842,7 +842,7 @@ class CPU{
                 register.B = cpuRL(register.B)
                 return 8
             case 0x11:
-                register.C = cpuRL(register.C)
+                register.@C = cpuRL(register.C)
                 return 8
             case 0x12:
                 register.D = cpuRL(register.D)
@@ -851,7 +851,7 @@ class CPU{
                 register.E = cpuRL(register.E)
                 return 8
             case 0x14:
-                register.H = cpuRL(register.H)
+                register.@H = cpuRL(register.H)
                 return 8
             case 0x15:
                 register.L = cpuRL(register.A)
@@ -868,7 +868,7 @@ class CPU{
                 register.B = cpuRRC(register.B)
                 return 8
             case 0x09:
-                register.C = cpuRRC(register.C)
+                register.@C = cpuRRC(register.C)
                 return 8
             case 0x0A:
                 register.D = cpuRRC(register.D)
@@ -877,7 +877,7 @@ class CPU{
                 register.E = cpuRRC(register.E)
                 return 8
             case 0x0C:
-                register.H = cpuRRC(register.H)
+                register.@H = cpuRRC(register.H)
                 return 8
             case 0x0D:
                 register.L = cpuRRC(register.L)
@@ -894,7 +894,7 @@ class CPU{
                 register.B = cpuRR(register.B)
                 return 8
             case 0x19:
-                register.C = cpuRR(register.C)
+                register.@C = cpuRR(register.C)
                 return 8
             case 0x1A:
                 register.D = cpuRR(register.D)
@@ -903,7 +903,7 @@ class CPU{
                 register.E = cpuRR(register.E)
                 return 8
             case 0x1C:
-                register.H = cpuRR(register.H)
+                register.@H = cpuRR(register.H)
                 return 8
             case 0x1D:
                 register.L = cpuRR(register.L)
