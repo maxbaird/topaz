@@ -911,31 +911,57 @@ class CPU{
             case 0x1E:
                 cpuRRMemory(register.HL)
                 return 16
+
+            /* shift left */
+            case 0x27:
+                register.A = cpuSLA(register.A)
+                return 8
+            case 0x20:
+                register.B = cpuSLA(register.B)
+                return 8
+            case 0x21:
+                register.@C = cpuSLA(register.C)
+                return 8
+            case 0x22:
+                register.D = cpuSLA(register.D)
+                return 8
+            case 0x23:
+                register.E = cpuSLA(register.E)
+                return 8
+            case 0x24:
+                register.@H = cpuSLA(register.H)
+                return 8
+            case 0x25:
+                register.L = cpuSLA(register.L)
+                return 8
+            case 0x26:
+                cpuSLAMemory()
+                return 16
                 
-                /* shift left */
-                case 0x27:
-                register.A = cpuSLA(register.A) 
+                /* shift right into carry */
+                case 0x2F:
+                register.A = cpuSRA(register.A) 
                 return 8
-                case 0x20:
-                register.B = cpuSLA(register.B) 
+                case 0x28:
+                register.B = cpuSRA(register.B) 
                 return 8
-                case 0x21:
-                register.@C = cpuSLA(register.C) 
+                case 0x29:
+                register.@C = cpuSRA(register.C) 
                 return 8
-                case 0x22:
-                register.D = cpuSLA(register.D) 
+                case 0x2A:
+                register.D = cpuSRA(register.D) 
                 return 8
-                case 0x23:
-                register.E = cpuSLA(register.E) 
+                case 0x2B:
+                register.E = cpuSRA(register.E) 
                 return 8
-                case 0x24:
-                register.@H = cpuSLA(register.H) 
+                case 0x2C:
+                register.@H = cpuSRA(register.H) 
                 return 8
-                case 0x25:
-                register.L = cpuSLA(register.L) 
+                case 0x2D:
+                register.L = cpuSRA(register.L) 
                 return 8
-                case 0x26:
-                cpuSLAMemory() 
+                case 0x2E:
+                cpuSRAMemory(register.HL) 
                 return 16
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
@@ -967,6 +993,44 @@ class CPU{
         register.clearH()
     }
 
+    private int cpuSRA(int reg) {
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+        boolean isMSBSet = BitUtil.isSet(reg, 7)
+
+        reg = (reg >> 1) & 0xFF
+
+        if(isMSBSet) {
+            reg = BitUtil.setBit(reg, 7)
+        }
+
+        register.clearN()
+        register.clearH()
+        register.setC(isLSBSet)
+        register.setZ(reg == 0)
+
+        return reg
+    }
+
+    private void cpuSRAMemory(int address) {
+        int reg = memoryManager.readMemory(address)
+
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+        boolean isMSBSet = BitUtil.isSet(reg, 7)
+
+        reg = (reg >> 1) & 0xFF
+
+        if(isMSBSet) {
+            reg = BitUtil.setBit(reg, 7)
+        }
+
+        register.clearN()
+        register.clearH()
+        register.setC(isLSBSet)
+        register.setZ(reg == 0)
+        
+        memoryManager.writeMemory(address, reg)
+    }
+
     private int cpuSLA(int reg) {
         reg = (reg << 1) & 0xFF
         register.clearN()
@@ -976,7 +1040,7 @@ class CPU{
 
         return reg
     }
-    
+
     private void cpuSLAMemory(int address) {
         int reg = memoryManager.readMemory(address)
         reg = (reg << 1) & 0xFF
@@ -985,9 +1049,9 @@ class CPU{
         register.setC(BitUtil.isSet(reg, 7))
         register.setZ(reg == 0)
 
-        memoryManager.writeMemory(reg, address)
+        memoryManager.writeMemory(address, reg)
     }
-    
+
     private int cpuRLC(int reg) {
         int n = reg & 0xFF
         register.A = (reg << 1 | reg >> 7) & 0xFF
@@ -1131,7 +1195,7 @@ class CPU{
         }
 
         register.setZ(reg == 0)
-        memoryManager.writeMemory(reg, address)
+        memoryManager.writeMemory(address, reg)
     }
 
     private int cpuSwapNibbles(int n){
