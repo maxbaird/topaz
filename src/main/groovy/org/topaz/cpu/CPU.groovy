@@ -937,31 +937,55 @@ class CPU{
             case 0x26:
                 cpuSLAMemory()
                 return 16
-                
-                /* shift right into carry */
-                case 0x2F:
-                register.A = cpuSRA(register.A) 
+
+            /* shift right into carry */
+            case 0x2F:
+                register.A = cpuSRA(register.A)
                 return 8
-                case 0x28:
-                register.B = cpuSRA(register.B) 
+            case 0x28:
+                register.B = cpuSRA(register.B)
                 return 8
-                case 0x29:
-                register.@C = cpuSRA(register.C) 
+            case 0x29:
+                register.@C = cpuSRA(register.C)
                 return 8
-                case 0x2A:
-                register.D = cpuSRA(register.D) 
+            case 0x2A:
+                register.D = cpuSRA(register.D)
                 return 8
-                case 0x2B:
-                register.E = cpuSRA(register.E) 
+            case 0x2B:
+                register.E = cpuSRA(register.E)
                 return 8
-                case 0x2C:
-                register.@H = cpuSRA(register.H) 
+            case 0x2C:
+                register.@H = cpuSRA(register.H)
                 return 8
-                case 0x2D:
-                register.L = cpuSRA(register.L) 
+            case 0x2D:
+                register.L = cpuSRA(register.L)
                 return 8
-                case 0x2E:
-                cpuSRAMemory(register.HL) 
+            case 0x2E:
+                cpuSRAMemory(register.HL)
+                return 16
+            case 0x3F:
+                register.A = cpuSRL(register.A)
+                return 8
+            case 0x38:
+                register.B = cpuSRL(register.B)
+                return 8
+            case 0x39:
+                register.@C = cpuSRL(register.C)
+                return 8
+            case 0x3A:
+                register.D = cpuSRL(register.D)
+                return 8
+            case 0x3B:
+                register.E = cpuSRL(register.E)
+                return 8
+            case 0x3C:
+                register.@H = cpuSRL(register.H)
+                return 8
+            case 0x3D:
+                register.L = cpuSRL(register.L)
+                return 8
+            case 0x3E:
+                cpuSRLMemory(register.HL)
                 return 16
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
@@ -991,6 +1015,33 @@ class CPU{
 
         register.setZ(register.A == 0)
         register.clearH()
+    }
+
+    private int cpuSRL(int reg) {
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+
+        reg = (reg >> 1) & 0xFF
+
+        register.clearN()
+        register.clearH()
+        register.setC(isLSBSet)
+        register.setZ(reg == 0)
+
+        return reg
+    }
+
+    private void cpuSRLMemory(int address) {
+        int reg = memoryManager.readMemory(address)
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+
+        reg = (reg >> 1) & 0xFF
+
+        register.clearN()
+        register.clearH()
+        register.setC(isLSBSet)
+        register.setZ(reg == 0)
+
+        memoryManager.writeMemory(address, reg)
     }
 
     private int cpuSRA(int reg) {
@@ -1027,7 +1078,7 @@ class CPU{
         register.clearH()
         register.setC(isLSBSet)
         register.setZ(reg == 0)
-        
+
         memoryManager.writeMemory(address, reg)
     }
 
