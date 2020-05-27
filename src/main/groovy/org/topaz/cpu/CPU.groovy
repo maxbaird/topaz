@@ -833,32 +833,58 @@ class CPU{
             case 0x06:
                 cpuRLCMemory(register.HL)
                 return 16
-                
-                /* rotate left */
-                case 0x17:
-                register.A = cpuRL(register.A) 
+
+            /* rotate left */
+            case 0x17:
+                register.A = cpuRL(register.A)
                 return 8
-                case 0x10:
-                register.B = cpuRL(register.B) 
+            case 0x10:
+                register.B = cpuRL(register.B)
                 return 8
-                case 0x11:
-                register.C = cpuRL(register.C) 
+            case 0x11:
+                register.C = cpuRL(register.C)
                 return 8
-                case 0x12:
-                register.D = cpuRL(register.D) 
+            case 0x12:
+                register.D = cpuRL(register.D)
                 return 8
-                case 0x13:
-                register.E = cpuRL(register.E) 
+            case 0x13:
+                register.E = cpuRL(register.E)
                 return 8
-                case 0x14:
-                register.H = cpuRL(register.H) 
+            case 0x14:
+                register.H = cpuRL(register.H)
                 return 8
-                case 0x15:
-                register.L = cpuRL(register.A) 
+            case 0x15:
+                register.L = cpuRL(register.A)
                 return 8
-                case 0x16:
+            case 0x16:
                 cpuRLMemory(register.HL)
                 return 16
+
+            /* Rotate right through carry */
+            case 0x0F:
+                register.A = cpuRRC(register.A)
+                return 8
+            case 0x08:
+                register.B = cpuRRC(register.B)
+                return 8
+            case 0x09:
+                register.C = cpuRRC(register.C)
+                return 8
+            case 0x0A:
+                register.D = cpuRRC(register.D)
+                return 8
+            case 0x0B:
+                register.E = cpuRRC(register.E)
+                return 8
+            case 0x0C:
+                register.H = cpuRRC(register.H)
+                return 8
+            case 0x0D:
+                register.L = cpuRRC(register.L)
+                return 8
+            case 0x0E:
+                cpuRRCMemory(register.HL) 
+            return 16    
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -937,15 +963,15 @@ class CPU{
 
         return reg
     }
-    
+
     private void cpuRLMemory(int address) {
         int reg = memoryManager.readMemory(address)
-        
+
         boolean isCarrySet = register.isC()
         boolean isMSBSet = BitUtil.isSet(reg, 7)
-        
-        reg = reg << 1
-        
+
+        reg = (reg << 1) & 0xFF
+
         register.clearH()
         register.clearN()
         register.setC(isMSBSet)
@@ -953,7 +979,7 @@ class CPU{
         if(isCarrySet) {
             reg = BitUtil.setBit(reg, 0)
         }
-        
+
         register.setZ(reg == 0)
         memoryManager.writeMemory(address, reg)
     }
@@ -963,7 +989,7 @@ class CPU{
 
         register.clearAllFlags()
 
-        reg = reg >> 1
+        reg = (reg >> 1) & 0xFF
 
         if(isLSBSet) {
             register.setC()
@@ -976,12 +1002,31 @@ class CPU{
 
         return reg
     }
+    
+    private void cpuRRCMemory(int address) {
+        int reg = memoryManager.readMemory(address)
+        
+        boolean isLSBSet = BitUtil.isSet(reg, 0)
+        
+        reg = (reg >> 1) & 0xFF
+        
+        register.clearN()
+        register.clearH()
+        
+        if(isLSBSet) {
+            register.setC()
+            reg = BitUtil.setBit(reg, 7)
+        }
+        
+        register.setZ(reg == 0)
+        memoryManager.writeMemory(address, reg)
+    }
 
     private int cpuRR(int reg) {
         boolean carrySet = register.isC()
         boolean isLSBSet = BitUtil.isSet(reg, 0)
 
-        reg = reg >> 1
+        reg = (reg >> 1) & 0xFF
 
         register.clearH()
         register.clearN()
