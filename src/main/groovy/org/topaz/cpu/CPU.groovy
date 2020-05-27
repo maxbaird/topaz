@@ -1055,136 +1055,136 @@ class CPU{
             case 0x7F : cpuTestBit(register.A, 7); return 8
 
             /* set bit */
-            case 0xC0 : cpuSetBit(register.B, 0); return 8
-            case 0xC1 : cpuSetBit(register.C, 0); return 8
-            case 0xC2 : cpuSetBit(register.D, 0); return 8
-            case 0xC3 : cpuSetBit(register.E, 0); return 8
-            case 0xC4 : cpuSetBit(register.H, 0); return 8
-            case 0xC5 : cpuSetBit(register.L, 0); return 8
-            case 0xC6 : cpuSetBitMemory(register.HL, 0); return 16
-            case 0xC7 : cpuSetBit(register.A, 0); return 8
-            case 0xC8 : cpuSetBit(register.B, 1); return 8
-            case 0xC9 : cpuSetBit(register.C, 1); return 8
-            case 0xCA : cpuSetBit(register.D, 1); return 8
-            case 0xCB : cpuSetBit(register.E, 1); return 8
-            case 0xCC : cpuSetBit(register.H, 1); return 8
-            case 0xCD : cpuSetBit(register.L, 1); return 8
-            case 0xCE : cpuSetBitMemory(register.HL, 1); return 16
-            case 0xCF : cpuSetBit(register.A, 1); return 8
-            case 0xD0 : cpuSetBit(register.B, 2); return 8
-            case 0xD1 : cpuSetBit(register.C, 2); return 8
-            case 0xD2 : cpuSetBit(register.D, 2); return 8
-            case 0xD3 : cpuSetBit(register.E, 2); return 8
-            case 0xD4 : cpuSetBit(register.H, 2); return 8
-            case 0xD5 : cpuSetBit(register.L, 2); return 8
-            case 0xD6 : cpuSetBitMemory(register.HL, 2); return 16
-            case 0xD7 : cpuSetBit(register.A, 2); return 8
-            case 0xD8 : cpuSetBit(register.B, 3); return 8
-            case 0xD9 : cpuSetBit(register.C, 3); return 8
-            case 0xDA : cpuSetBit(register.D, 3); return 8
-            case 0xDB : cpuSetBit(register.E, 3); return 8
-            case 0xDC : cpuSetBit(register.H, 3); return 8
-            case 0xDD : cpuSetBit(register.L, 3); return 8
-            case 0xDE : cpuSetBitMemory(register.HL, 3); return 16
-            case 0xDF : cpuSetBit(register.A, 3); return 8
-            case 0xE0 : cpuSetBit(register.B, 4); return 8
-            case 0xE1 : cpuSetBit(register.C, 4); return 8
-            case 0xE2 : cpuSetBit(register.D, 4); return 8
-            case 0xE3 : cpuSetBit(register.E, 4); return 8
-            case 0xE4 : cpuSetBit(register.H, 4); return 8
-            case 0xE5 : cpuSetBit(register.L, 4); return 8
-            case 0xE6 : cpuSetBitMemory(register.HL, 4); return 16
-            case 0xE7 : cpuSetBit(register.A, 4); return 8
-            case 0xE8 : cpuSetBit(register.B, 5); return 8
-            case 0xE9 : cpuSetBit(register.C, 5); return 8
-            case 0xEA : cpuSetBit(register.D, 5); return 8
-            case 0xEB : cpuSetBit(register.E, 5); return 8
-            case 0xEC : cpuSetBit(register.H, 5); return 8
-            case 0xED : cpuSetBit(register.L, 5); return 8
-            case 0xEE : cpuSetBitMemory(register.HL, 5); return 16
-            case 0xEF : cpuSetBit(register.A, 5); return 8
-            case 0xF0 : cpuSetBit(register.B, 6); return 8
-            case 0xF1 : cpuSetBit(register.B, 6); return 8
-            case 0xF2 : cpuSetBit(register.D, 6); return 8
-            case 0xF3 : cpuSetBit(register.E, 6); return 8
-            case 0xF4 : cpuSetBit(register.H, 6); return 8
-            case 0xF5 : cpuSetBit(register.L, 6); return 8
-            case 0xF6 : cpuSetBitMemory(register.HL, 6); return 16
-            case 0xF7 : cpuSetBit(register.A, 6); return 8
-            case 0xF8 : cpuSetBit(register.B, 7); return 8
-            case 0xF9 : cpuSetBit(register.C, 7); return 8
-            case 0xFA : cpuSetBit(register.D, 7); return 8
-            case 0xFB : cpuSetBit(register.E, 7); return 8
-            case 0xFC : cpuSetBit(register.H, 7); return 8
-            case 0xFD : cpuSetBit(register.L, 7); return 8
-            case 0xFE : cpuSetBitMemory(register.HL, 7); return 16
-            case 0xFF : cpuSetBit(register.A, 7); return 8
-            
+            case 0xC0 : register.B =  cpuSetBit(register.B, 0); return 8
+            case 0xC1 : register.@C =  cpuSetBit(register.C, 0); return 8
+            case 0xC2 : register.D =  cpuSetBit(register.D, 0); return 8
+            case 0xC3 : register.E =  cpuSetBit(register.E, 0); return 8
+            case 0xC4 : register.@H =  cpuSetBit(register.H, 0); return 8
+            case 0xC5 : register.L =  cpuSetBit(register.L, 0); return 8
+            case 0xC6 : register.HL =  cpuSetBitMemory(register.HL, 0); return 16
+            case 0xC7 : register.A =  cpuSetBit(register.A, 0); return 8
+            case 0xC8 : register.B =  cpuSetBit(register.B, 1); return 8
+            case 0xC9 : register.@C =  cpuSetBit(register.C, 1); return 8
+            case 0xCA : register.D =  cpuSetBit(register.D, 1); return 8
+            case 0xCB : register.E =  cpuSetBit(register.E, 1); return 8
+            case 0xCC : register.@H =  cpuSetBit(register.H, 1); return 8
+            case 0xCD : register.L =  cpuSetBit(register.L, 1); return 8
+            case 0xCE : register.HL =  cpuSetBitMemory(register.HL, 1); return 16
+            case 0xCF : register.A =  cpuSetBit(register.A, 1); return 8
+            case 0xD0 : register.B =  cpuSetBit(register.B, 2); return 8
+            case 0xD1 : register.@C =  cpuSetBit(register.C, 2); return 8
+            case 0xD2 : register.D =  cpuSetBit(register.D, 2); return 8
+            case 0xD3 : register.E =  cpuSetBit(register.E, 2); return 8
+            case 0xD4 : register.@H =  cpuSetBit(register.H, 2); return 8
+            case 0xD5 : register.L =  cpuSetBit(register.L, 2); return 8
+            case 0xD6 : register.HL =  cpuSetBitMemory(register.HL, 2); return 16
+            case 0xD7 : register.A =  cpuSetBit(register.A, 2); return 8
+            case 0xD8 : register.B =  cpuSetBit(register.B, 3); return 8
+            case 0xD9 : register.@C =  cpuSetBit(register.C, 3); return 8
+            case 0xDA : register.D =  cpuSetBit(register.D, 3); return 8
+            case 0xDB : register.E =  cpuSetBit(register.E, 3); return 8
+            case 0xDC : register.@H =  cpuSetBit(register.H, 3); return 8
+            case 0xDD : register.L =  cpuSetBit(register.L, 3); return 8
+            case 0xDE : register.HL =  cpuSetBitMemory(register.HL, 3); return 16
+            case 0xDF : register.A =  cpuSetBit(register.A, 3); return 8
+            case 0xE0 : register.B =  cpuSetBit(register.B, 4); return 8
+            case 0xE1 : register.@C =  cpuSetBit(register.C, 4); return 8
+            case 0xE2 : register.D =  cpuSetBit(register.D, 4); return 8
+            case 0xE3 : register.E =  cpuSetBit(register.E, 4); return 8
+            case 0xE4 : register.@H =  cpuSetBit(register.H, 4); return 8
+            case 0xE5 : register.L =  cpuSetBit(register.L, 4); return 8
+            case 0xE6 : register.HL =  cpuSetBitMemory(register.HL, 4); return 16
+            case 0xE7 : register.A =  cpuSetBit(register.A, 4); return 8
+            case 0xE8 : register.B =  cpuSetBit(register.B, 5); return 8
+            case 0xE9 : register.@C =  cpuSetBit(register.C, 5); return 8
+            case 0xEA : register.D =  cpuSetBit(register.D, 5); return 8
+            case 0xEB : register.E =  cpuSetBit(register.E, 5); return 8
+            case 0xEC : register.@H =  cpuSetBit(register.H, 5); return 8
+            case 0xED : register.L =  cpuSetBit(register.L, 5); return 8
+            case 0xEE : register.HL =  cpuSetBitMemory(register.HL, 5); return 16
+            case 0xEF : register.A =  cpuSetBit(register.A, 5); return 8
+            case 0xF0 : register.B =  cpuSetBit(register.B, 6); return 8
+            case 0xF1 : register.@C =  cpuSetBit(register.B, 6); return 8
+            case 0xF2 : register.D =  cpuSetBit(register.D, 6); return 8
+            case 0xF3 : register.E =  cpuSetBit(register.E, 6); return 8
+            case 0xF4 : register.@H =  cpuSetBit(register.H, 6); return 8
+            case 0xF5 : register.L =  cpuSetBit(register.L, 6); return 8
+            case 0xF6 : register.HL =  cpuSetBitMemory(register.HL, 6); return 16
+            case 0xF7 : register.A =  cpuSetBit(register.A, 6); return 8
+            case 0xF8 : register.B =  cpuSetBit(register.B, 7); return 8
+            case 0xF9 : register.@C =  cpuSetBit(register.C, 7); return 8
+            case 0xFA : register.D =  cpuSetBit(register.D, 7); return 8
+            case 0xFB : register.E =  cpuSetBit(register.E, 7); return 8
+            case 0xFC : register.@H =  cpuSetBit(register.H, 7); return 8
+            case 0xFD : register.L =  cpuSetBit(register.L, 7); return 8
+            case 0xFE : register.HL =  cpuSetBitMemory(register.HL, 7); return 16
+            case 0xFF : register.A =  cpuSetBit(register.A, 7); return 8
+
             /* reset bit */
-            case 0x80 : cpuResetBit(register.B, 0); return 8
-            case 0x81 : cpuResetBit(register.C, 0); return 8
-            case 0x82 : cpuResetBit(register.D, 0); return 8
-            case 0x83 : cpuResetBit(register.E, 0); return 8
-            case 0x84 : cpuResetBit(register.H, 0); return 8
-            case 0x85 : cpuResetBit(register.L, 0); return 8
-            case 0x86 : cpuResetBitMemory(register.HL, 0); return 16
-            case 0x87 : cpuResetBit(register.A, 0); return 8
-            case 0x88 : cpuResetBit(register.B, 1); return 8
-            case 0x89 : cpuResetBit(register.C, 1); return 8
-            case 0x8A : cpuResetBit(register.D, 1); return 8
-            case 0x8B : cpuResetBit(register.E, 1); return 8
-            case 0x8C : cpuResetBit(register.H, 1); return 8
-            case 0x8D : cpuResetBit(register.L, 1); return 8
-            case 0x8E : cpuResetBitMemory(register.HL, 1); return 16
-            case 0x8F : cpuResetBit(register.A, 1); return 8
-            case 0x90 : cpuResetBit(register.B, 2); return 8
-            case 0x91 : cpuResetBit(register.C, 2); return 8
-            case 0x92 : cpuResetBit(register.D, 2); return 8
-            case 0x93 : cpuResetBit(register.E, 2); return 8
-            case 0x94 : cpuResetBit(register.H, 2); return 8
-            case 0x95 : cpuResetBit(register.L, 2); return 8
-            case 0x96 : cpuResetBitMemory(register.HL, 2); return 16
-            case 0x97 : cpuResetBit(register.A, 2); return 8
-            case 0x98 : cpuResetBit(register.B, 3); return 8
-            case 0x99 : cpuResetBit(register.C, 3); return 8
-            case 0x9A : cpuResetBit(register.D, 3); return 8
-            case 0x9B : cpuResetBit(register.E, 3); return 8
-            case 0x9C : cpuResetBit(register.H, 3); return 8
-            case 0x9D : cpuResetBit(register.L, 3); return 8
-            case 0x9E : cpuResetBitMemory(register.HL, 3); return 16
-            case 0x9F : cpuResetBit(register.A, 3); return 8
-            case 0xA0 : cpuResetBit(register.B, 4); return 8
-            case 0xA1 : cpuResetBit(register.C, 4); return 8
-            case 0xA2 : cpuResetBit(register.D, 4); return 8
-            case 0xA3 : cpuResetBit(register.E, 4); return 8
-            case 0xA4 : cpuResetBit(register.H, 4); return 8
-            case 0xA5 : cpuResetBit(register.L, 4); return 8
-            case 0xA6 : cpuResetBitMemory(register.HL, 4); return 16
-            case 0xA7 : cpuResetBit(register.A, 4); return 8
-            case 0xA8 : cpuResetBit(register.B, 5); return 8
-            case 0xA9 : cpuResetBit(register.C, 5); return 8
-            case 0xAA : cpuResetBit(register.D, 5); return 8
-            case 0xAB : cpuResetBit(register.E, 5); return 8
-            case 0xAC : cpuResetBit(register.H, 5); return 8
-            case 0xAD : cpuResetBit(register.L, 5); return 8
-            case 0xAE : cpuResetBitMemory(register.HL, 5); return 16
-            case 0xAF : cpuResetBit(register.A, 5); return 8
-            case 0xB0 : cpuResetBit(register.B, 6); return 8
-            case 0xB1 : cpuResetBit(register.C, 6); return 8
-            case 0xB2 : cpuResetBit(register.D, 6); return 8
-            case 0xB3 : cpuResetBit(register.E, 6); return 8
-            case 0xB4 : cpuResetBit(register.H, 6); return 8
-            case 0xB5 : cpuResetBit(register.L, 6); return 8
-            case 0xB6 : cpuResetBitMemory(register.HL, 6); return 16
-            case 0xB7 : cpuResetBit(register.A, 6); return 8
-            case 0xB8 : cpuResetBit(register.B, 7); return 8
-            case 0xB9 : cpuResetBit(register.C, 7); return 8
-            case 0xBA : cpuResetBit(register.D, 7); return 8
-            case 0xBB : cpuResetBit(register.E, 7); return 8
-            case 0xBC : cpuResetBit(register.H, 7); return 8
-            case 0xBD : cpuResetBit(register.L, 7); return 8
-            case 0xBE : cpuResetBitMemory(register.HL, 7); return 16
-            case 0xBF : cpuResetBit(register.A, 7); return 8
+            case 0x80 : register.B =  cpuResetBit(register.B, 0); return 8
+            case 0x81 : register.@C =  cpuResetBit(register.C, 0); return 8
+            case 0x82 : register.D =  cpuResetBit(register.D, 0); return 8
+            case 0x83 : register.E =  cpuResetBit(register.E, 0); return 8
+            case 0x84 : register.@H =  cpuResetBit(register.H, 0); return 8
+            case 0x85 : register.L =  cpuResetBit(register.L, 0); return 8
+            case 0x86 : register.HL =  cpuResetBitMemory(register.HL, 0); return 16
+            case 0x87 : register.A =  cpuResetBit(register.A, 0); return 8
+            case 0x88 : register.B =  cpuResetBit(register.B, 1); return 8
+            case 0x89 : register.@C =  cpuResetBit(register.C, 1); return 8
+            case 0x8A : register.D =  cpuResetBit(register.D, 1); return 8
+            case 0x8B : register.E =  cpuResetBit(register.E, 1); return 8
+            case 0x8C : register.@H =  cpuResetBit(register.H, 1); return 8
+            case 0x8D : register.L =  cpuResetBit(register.L, 1); return 8
+            case 0x8E : register.HL =  cpuResetBitMemory(register.HL, 1); return 16
+            case 0x8F : register.A =  cpuResetBit(register.A, 1); return 8
+            case 0x90 : register.B =  cpuResetBit(register.B, 2); return 8
+            case 0x91 : register.@C =  cpuResetBit(register.C, 2); return 8
+            case 0x92 : register.D =  cpuResetBit(register.D, 2); return 8
+            case 0x93 : register.E =  cpuResetBit(register.E, 2); return 8
+            case 0x94 : register.@H =  cpuResetBit(register.H, 2); return 8
+            case 0x95 : register.L =  cpuResetBit(register.L, 2); return 8
+            case 0x96 : register.HL =  cpuResetBitMemory(register.HL, 2); return 16
+            case 0x97 : register.A =  cpuResetBit(register.A, 2); return 8
+            case 0x98 : register.B =  cpuResetBit(register.B, 3); return 8
+            case 0x99 : register.@C =  cpuResetBit(register.C, 3); return 8
+            case 0x9A : register.D =  cpuResetBit(register.D, 3); return 8
+            case 0x9B : register.E =  cpuResetBit(register.E, 3); return 8
+            case 0x9C : register.@H =  cpuResetBit(register.H, 3); return 8
+            case 0x9D : register.L =  cpuResetBit(register.L, 3); return 8
+            case 0x9E : register.HL =  cpuResetBitMemory(register.HL, 3); return 16
+            case 0x9F : register.A =  cpuResetBit(register.A, 3); return 8
+            case 0xA0 : register.B =  cpuResetBit(register.B, 4); return 8
+            case 0xA1 : register.@C =  cpuResetBit(register.C, 4); return 8
+            case 0xA2 : register.D =  cpuResetBit(register.D, 4); return 8
+            case 0xA3 : register.E =  cpuResetBit(register.E, 4); return 8
+            case 0xA4 : register.@H =  cpuResetBit(register.H, 4); return 8
+            case 0xA5 : register.L =  cpuResetBit(register.L, 4); return 8
+            case 0xA6 : register.HL =  cpuResetBitMemory(register.HL, 4); return 16
+            case 0xA7 : register.A =  cpuResetBit(register.A, 4); return 8
+            case 0xA8 : register.B =  cpuResetBit(register.B, 5); return 8
+            case 0xA9 : register.@C =  cpuResetBit(register.C, 5); return 8
+            case 0xAA : register.D =  cpuResetBit(register.D, 5); return 8
+            case 0xAB : register.E =  cpuResetBit(register.E, 5); return 8
+            case 0xAC : register.@H =  cpuResetBit(register.H, 5); return 8
+            case 0xAD : register.L =  cpuResetBit(register.L, 5); return 8
+            case 0xAE : register.HL =  cpuResetBitMemory(register.HL, 5); return 16
+            case 0xAF : register.A =  cpuResetBit(register.A, 5); return 8
+            case 0xB0 : register.B =  cpuResetBit(register.B, 6); return 8
+            case 0xB1 : register.@C =  cpuResetBit(register.C, 6); return 8
+            case 0xB2 : register.D =  cpuResetBit(register.D, 6); return 8
+            case 0xB3 : register.E =  cpuResetBit(register.E, 6); return 8
+            case 0xB4 : register.@H =  cpuResetBit(register.H, 6); return 8
+            case 0xB5 : register.L =  cpuResetBit(register.L, 6); return 8
+            case 0xB6 : register.HL =  cpuResetBitMemory(register.HL, 6); return 16
+            case 0xB7 : register.A =  cpuResetBit(register.A, 6); return 8
+            case 0xB8 : register.B =  cpuResetBit(register.B, 7); return 8
+            case 0xB9 : register.@C =  cpuResetBit(register.C, 7); return 8
+            case 0xBA : register.D =  cpuResetBit(register.D, 7); return 8
+            case 0xBB : register.E =  cpuResetBit(register.E, 7); return 8
+            case 0xBC : register.@H =  cpuResetBit(register.H, 7); return 8
+            case 0xBD : register.L =  cpuResetBit(register.L, 7); return 8
+            case 0xBE : register.HL =  cpuResetBitMemory(register.HL, 7); return 16
+            case 0xBF : register.A =  cpuResetBit(register.A, 7); return 8
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
                 throw new Exception("Unrecognized extended opcode: " + hexCode)
@@ -1230,11 +1230,11 @@ class CPU{
         register.clearN()
         register.setH()
     }
-    
+
     private int cpuResetBit(int reg, int bit) {
         return BitUtil.clearBit(reg, bit)
     }
-    
+
     private void cpuResetBitMemory(int address, int bit) {
         int memory = memoryManager.readMemory(address)
         memory = BitUtil.clearBit(memory, bit)
