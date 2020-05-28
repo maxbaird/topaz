@@ -783,12 +783,25 @@ class CPU{
             case 0x38:
                 cpuJumpImmediate(true, register.FLAG_C, true)
                 return 8
-            ////////////////////////////////////////////////////
 
+            /* Calls */
+            case 0xCD:
+                cpuCall(false, 0, false)
+                return 12
+            case 0xC4:
+                cpuCall(true, register.FLAG_Z, false)
+                return 12
             case 0xCC:
                 cpuCall(true, register.FLAG_Z, true)
                 return 12
+            case 0xD4:
+                cpuCall(true, register.FLAG_C, false)
+                return 12
+            case 0xDC:
+                cpuCall(true, register.FLAG_C, true)
+                return 12
 
+                /* returns */
             case 0xD0:
                 cpuReturn(true, register.FLAG_C, false)
                 return 8
@@ -1245,6 +1258,36 @@ class CPU{
         register.clearH()
     }
 
+    private void cpuCall(boolean useCondition, int flag, boolean condition) {
+        int word = memoryManager.readWord()
+        /*
+         * Advance 2 positions ahead because two bytes were just read.
+         */
+        register.pc = register.pc + 2
+
+        if(!useCondition) {
+            memoryManager.push(register.pc)
+            register.pc = word
+            return
+        }
+
+        if(BitUtil.isSet(register.F, flag) == condition) {
+            memoryManager.push(register.pc)
+            register.pc = word
+        }
+    }
+
+    private void cpuReturn(boolean useCondition, int flag, boolean condition) {
+        if(!useCondition) {
+            register.pc = memoryManager.pop()
+            return
+        }
+
+        if(BitUtil.isSet(register.F, flag) == condition) {
+            register.pc = memoryManager.pop()
+        }
+    }
+
     private void cpuJump(boolean useJumpCondition, int flag, boolean jumpCondition) {
         int nn = memoryManager.readWord()
         register.pc = register.pc + 2
@@ -1254,7 +1297,7 @@ class CPU{
             return
         }
 
-        if(register.isSet(flag) == jumpCondition) {
+        if(BitUtil.isSet(register.F, flag) == jumpCondition) {
             register.pc = nn
         }
     }
@@ -1267,7 +1310,7 @@ class CPU{
              * Jump unconditionally
              */
             register.pc = register.pc + n
-        }else if(register.isSet(flag) == condition) {
+        }else if(BitUtil.isSet(register.F, flag) == condition) {
             /*
              * Only jump if the condition is met
              */
@@ -1875,35 +1918,4 @@ class CPU{
 
         return reg
     }
-
-    private void cpuCall(boolean useCondition, int flag, boolean condition) {
-        int word = memoryManager.readWord()
-        /*
-         * Advance 2 positions ahead because two bytes were just read.
-         */
-        register.pc = register.pc + 2
-
-        if(!useCondition) {
-            memoryManager.push(register.pc)
-            register.pc = word
-            return
-        }
-
-        if(register.isSet(flag) == condition) {
-            memoryManager.push(register.pc)
-            register.pc = word
-        }
-    }
-
-    private void cpuReturn(boolean useCondition, int flag, boolean condition) {
-        if(!useCondition) {
-            register.pc = memoryManager.pop()
-            return
-        }
-
-        if(register.isSet(flag) == condition) {
-            register.pc = memoryManager.pop()
-        }
-    }
-
 }
