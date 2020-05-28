@@ -765,12 +765,25 @@ class CPU{
             case 0xDA:
                 cpuJump(true, register.FLAG_C, true)
                 return 12
-            ////////////////////////////////////////////////////
-
-
+            case 0xE9:
+                register.pc = register.HL
+                return 4
+            case 0x18:
+                cpuJumpImmediate(false, 0, false)
+                return 8
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
                 return 8
+            case 0x28:
+                cpuJumpImmediate(true, register.FLAG_Z, true)
+                return 8
+            case 0x30:
+                cpuJumpImmediate(true, register.FLAG_C, false)
+                return 8
+            case 0x38:
+                cpuJumpImmediate(true, register.FLAG_C, true)
+                return 8
+            ////////////////////////////////////////////////////
 
             case 0xCC:
                 cpuCall(true, register.FLAG_Z, true)
@@ -1241,7 +1254,7 @@ class CPU{
             return
         }
 
-        if(BitUtil.isSet(register.F, flag) == jumpCondition) {
+        if(register.isSet(flag) == jumpCondition) {
             register.pc = nn
         }
     }
