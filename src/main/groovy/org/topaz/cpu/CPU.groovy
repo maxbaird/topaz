@@ -818,6 +818,32 @@ class CPU{
             case 0xD8:
                 cpuReturn(true, register.FLAG_C, true)
                 return 8
+                
+                /* restarts */
+               case 0xC7:
+               cpuRestart(0x00) 
+               return 32
+               case 0xCF:
+               cpuRestart(0x08) 
+               return 32
+               case 0xD7:
+               cpuRestart(0x10) 
+               return 32
+               case 0xDF:
+               cpuRestart(0x18) 
+               return 32
+               case 0xE7:
+               cpuRestart(0x20) 
+               return 32
+               case 0xEF:
+               cpuRestart(0x28) 
+               return 32
+               case 0xF7:
+               cpuRestart(0x30) 
+               return 32
+               case 0xFF:
+               cpuRestart(0x38) 
+               return 32
 
             case 0xCB:
                 try {
@@ -1269,6 +1295,11 @@ class CPU{
 
         register.setZ(register.A == 0)
         register.clearH()
+    }
+    
+    private void cpuRestart(int n) {
+        memoryManager.push(register.pc)
+        register.pc = n
     }
 
     private void cpuCall(boolean useCondition, int flag, boolean condition) {
