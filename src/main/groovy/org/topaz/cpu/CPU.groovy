@@ -16,6 +16,7 @@ class CPU{
     int executeNextOpcode() {
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
+        //println 'Executing opcode: ' + opcode + 'register.pc = ' + register.pc
         register.pc++
 
         try {
@@ -801,9 +802,21 @@ class CPU{
                 cpuCall(true, register.FLAG_C, true)
                 return 12
 
-                /* returns */
+            /* returns */
+            case 0xC9:
+                cpuReturn(false, 0, false)
+                return 8
+            case 0xC0:
+                cpuReturn(true, register.FLAG_Z, false)
+                return 8
+            case 0xC8:
+                cpuReturn(true, register.FLAG_Z, true)
+                return 8
             case 0xD0:
                 cpuReturn(true, register.FLAG_C, false)
+                return 8
+            case 0xD8:
+                cpuReturn(true, register.FLAG_C, true)
                 return 8
 
             case 0xCB:
