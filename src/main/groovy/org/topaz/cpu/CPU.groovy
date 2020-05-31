@@ -1375,6 +1375,9 @@ class CPU{
     }
 
     public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
+//        println 'in here: ' + useCondition + ', ' + flag + ', ' + condition
+//        println 'flagz: ' + register.isZ()
+//        println 'flags: ' + register.F
         byte n = (byte)memoryManager.readMemory(register.pc)
 
         if(!useCondition) {
@@ -1791,9 +1794,7 @@ class CPU{
         register.clearH()
         register.clearC()
 
-        if(reg == 0) {
-            register.setZ()
-        }
+        register.setZ(reg == 0)
 
         return reg
     }

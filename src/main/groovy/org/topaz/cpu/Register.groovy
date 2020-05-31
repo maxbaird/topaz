@@ -27,6 +27,11 @@ class Register{
         this.setBC(0x0013)
         this.setDE(0x00D8)
         this.setHL(0x014D)
+        
+        this.setZ(true)
+        this.setN(false)
+        this.setH(true)
+        this.setC(true)
     }
 
     private void setFlag(int pos){
