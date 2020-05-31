@@ -23,9 +23,12 @@ class MemoryManager{
     }
 
     private void init() {
+        System.arraycopy(cartridge.memory, 0, this.rom, 0, 0x8000)
+
         this.rom[0xFF05] = 0x00
         this.rom[0xFF06] = 0x00
         this.rom[0xFF07] = 0x00
+        this.rom[0xFF0F] = 0xE1
         this.rom[0xFF10] = 0x80
         this.rom[0xFF11] = 0xBF
         this.rom[0xFF12] = 0xF3
@@ -79,7 +82,6 @@ class MemoryManager{
              */
             return joypad.getJoypadState()
         }
-
         return this.rom[address]
     }
     

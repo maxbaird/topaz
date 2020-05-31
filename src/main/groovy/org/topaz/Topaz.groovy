@@ -13,6 +13,7 @@ class Topaz{
 
     public Topaz(){
         def f = new File("/home/maxx/Documents/Games/terminator2.gb")
+        //def f = new File("/home/maxx/Downloads/dmg0_rom.bin")
         def cartridge = new Cartridge(f)
         emulator = new Emulator(cartridge)
         emulator.start()

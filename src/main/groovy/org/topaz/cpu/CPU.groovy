@@ -13,10 +13,16 @@ class CPU{
     boolean interruptsDisabled = false
     boolean interruptsEnabled = false
 
-    int executeNextOpcode() {
+    int executeNextOpcode(int n) {
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
-        //println 'Executing opcode: ' + opcode + 'register.pc = ' + register.pc
+        def hexCode = java.lang.String.format("0x%2X", opcode)
+        
+        boolean display = (n >= 60 && n <= 100) ? true : false
+        
+        if(display) {
+            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
+        }
         register.pc++
 
         try {
@@ -24,6 +30,10 @@ class CPU{
         }catch(Exception e) {
             println e.message
             System.exit(1)
+        }
+        
+        if(display) {
+            println 'Register.pc after: ' + register.pc + '\n'
         }
         return cycles
     }
@@ -219,6 +229,12 @@ class CPU{
             case 0x7F:
                 cpuLoadImmediate8BitMemory(register.A)
                 return 8
+                
+                case 0x3E:
+                int n = memoryManager.readMemory(register.pc) 
+                register.pc++
+                register.A = n
+                return 8
 
             /* Write register to memory */
             case 0x70:
@@ -292,7 +308,7 @@ class CPU{
                 register.A = cpuROMLoad(register.HL)
                 register.HL = cpu16BitDec(register.HL)
                 return 8
-            case 0x2A:
+           case 0x2A:
                 register.A = cpuROMLoad(register.HL)
                 register.HL = cpu16BitInc(register.HL)
                 return 8
@@ -864,6 +880,7 @@ class CPU{
     }
 
     private int executeExtendedOpcode() {
+        println 'Executing extended opcode'
         /*
          * When the opcode 0xCB is encountered the next immediate byte needs to
          * be decoded and treated as an opcode.
@@ -1344,6 +1361,7 @@ class CPU{
 
     private void cpuJump(boolean useJumpCondition, int flag, boolean jumpCondition) {
         int nn = memoryManager.readWord()
+        println 'Word read: ' + nn
         register.pc = register.pc + 2
 
         if(!useJumpCondition) {
@@ -1351,13 +1369,13 @@ class CPU{
             return
         }
 
-        if(BitUtil.isSet(register.F, flag) == jumpCondition) {
+      if(BitUtil.isSet(register.F, flag) == jumpCondition) {
             register.pc = nn
         }
     }
 
     public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
-        int n = memoryManager.readMemory(register.pc)
+        byte n = (byte)memoryManager.readMemory(register.pc)
 
         if(!useCondition) {
             /*
@@ -1650,7 +1668,7 @@ class CPU{
     }
 
     private int cpu16BitImmediateLoad() {
-        int nn = memoryManager.readWord(register.pc)
+        int nn = memoryManager.readWord()
         register.pc += 2
         return nn
     }

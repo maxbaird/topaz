@@ -33,11 +33,12 @@ class Emulator{
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
         joypad.interruptHandler = interruptHandler
         //TODO Pass an instance of the screen for the GPU to update
-        this.display = new Display()
-        this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
+        //this.display = new Display()
+        //this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
     }
 
     public void start() {
+        println 'start'
         Thread thread = new Thread(new Runnable() {
                     //double interpolation = 0
                     final int TICKS_PER_SECOND = 60
@@ -71,9 +72,14 @@ class Emulator{
         println 'Updating game...'
         int cyclesThisUpdate = 0
 
+        def n = 0
         while(cyclesThisUpdate < MAX_CYCLES) {
+            n++
+            if(n == 1000) {
+                System.exit(-1)
+            }
             int cycles = 0
-            cycles = this.executeNextOpCode()
+            cycles = this.executeNextOpCode(n)
             cyclesThisUpdate += cycles
             this.updateTimers(cycles)
             this.updateGraphics(cycles)
@@ -82,9 +88,9 @@ class Emulator{
         this.renderScreen()
     }
 
-    private int executeNextOpCode() {
+    private int executeNextOpCode(int n) {
         if(!cpu.isHalted) {
-            return cpu.executeNextOpcode()
+            return cpu.executeNextOpcode(n)
         }else {
             /*
              * 4 is the number of cycles the opcode for halting the CPU takes.
@@ -118,7 +124,7 @@ class Emulator{
     }
 
     private void updateGraphics(int cycles) {
-        gpu.updateGraphics(cycles)
+        //gpu.updateGraphics(cycles)
     }
 
     private void handleInterrupts() {
