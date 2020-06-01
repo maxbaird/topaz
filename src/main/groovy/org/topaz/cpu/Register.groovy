@@ -18,16 +18,16 @@ class Register{
     static final int FLAG_N = 6
     static final int FLAG_H = 5
     static final int FLAG_C = 4
-    
+
     public Register() {
         this.pc = 0x100
         this.sp = 0xFFFE
-        
+
         this.setAF(0x01B0)
         this.setBC(0x0013)
         this.setDE(0x00D8)
         this.setHL(0x014D)
-        
+
         this.setZ(true)
         this.setN(false)
         this.setH(true)
@@ -55,11 +55,11 @@ class Register{
         def b2 = s & 0xFF
         return [b1, b2]
     }
-    
+
     def getSPLow() {
-       return split(sp)[1]
+        return split(sp)[1]
     }
-    
+
     def getSPHigh() {
         return split(sp)[0]
     }
@@ -115,11 +115,11 @@ class Register{
     void setZ(){
         setFlag(FLAG_Z)
     }
-    
+
     void clearZ() {
         clearFlag(FLAG_Z)
     }
-    
+
     void setZ(boolean b) {
         b ? setFlag(FLAG_Z) : clearFlag(FLAG_Z)
     }
@@ -127,7 +127,7 @@ class Register{
     void setN(){
         setFlag(FLAG_N)
     }
-    
+
     void clearN() {
         clearFlag(FLAG_N)
     }
@@ -139,9 +139,9 @@ class Register{
     void setH(){
         setFlag(FLAG_H)
     }
-    
+
     void clearH() {
-        clearFlag(FLAG_H)    
+        clearFlag(FLAG_H)
     }
 
     void setH(boolean b) {
@@ -149,9 +149,9 @@ class Register{
     }
 
     void setC(){
-        setFlag(FLAG_C) 
+        setFlag(FLAG_C)
     }
-    
+
     void clearC() {
         clearFlag(FLAG_C)
     }
@@ -159,12 +159,24 @@ class Register{
     void setC(boolean b) {
         b ? setFlag(FLAG_C) : clearFlag(FLAG_C)
     }
-    
+
     void clearAllFlags() {
         f = 0
     }
 
     def printFlags(){
         println String.format("%8s", Integer.toBinaryString(this.F)).replaceAll(" ", "0")
+    }
+
+    @Override
+    String toString(){
+        def str = ''
+        str += 'A: ' + A + '\nB: ' + B + '\nC: ' + C + '\nD: ' + D + '\nE: ' + E + '\nF: ' + F + '\nH: ' + H + '\nL: ' + L + '\n'
+        str += '===========\n'
+        str += 'Z: ' + isZ() + '\nN: ' + isN() + '\nH: ' + isH() + '\nC: ' + isC() + '\n'
+        str += '===========\n'
+        str += 'sp: ' + sp + '\npc: ' + pc
+        str += '\n'
+        return str
     }
 }

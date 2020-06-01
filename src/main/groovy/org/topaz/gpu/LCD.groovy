@@ -218,7 +218,9 @@ class LCD{
                  */
                 status = BitUtil.clearBit(status, COINCIDENCE_FLAG_BIT)
             }
+            println 'LCD about to write to memory: ' + status
             memoryManager.writeMemory(LCD_STATUS, status)
+            println 'LCD done writing to memory'
         }
     }
     

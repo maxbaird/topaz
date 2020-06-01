@@ -4,10 +4,12 @@ import org.topaz.cpu.Register
 import org.topaz.InterruptHandler
 import org.topaz.MemoryManager
 import org.topaz.util.BitUtil
+import org.topaz.debug.StateDumper
 
 class CPU{
     Register register
     MemoryManager memoryManager
+    StateDumper dumper
 
     boolean isHalted = false
     boolean interruptsDisabled = false
@@ -16,9 +18,10 @@ class CPU{
     int executeNextOpcode(int n) {
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
-        def hexCode = java.lang.String.format("0x%2X", opcode)
+        def hexCode = java.lang.String.format("0x%02X", opcode)
         
-        boolean display = (n >= 60 && n <= 100) ? true : false
+//        boolean display = (n >= 3987 && n <= 4000) ? true : false
+       boolean display = (n >= 0 && n <= 10) ? true : false
         
         if(display) {
             println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
@@ -34,6 +37,7 @@ class CPU{
         
         if(display) {
             println 'Register.pc after: ' + register.pc + '\n'
+            dumper.dump(n, hexCode, '/tmp/' + n + '.topaz')
         }
         return cycles
     }
@@ -320,16 +324,22 @@ class CPU{
                 return 8
 
             case 0xE0:
+                println "Register A: " + register.A
                 int n = memoryManager.readMemory(register.pc)
+                println "Memory read: " + n
                 register.pc++
                 int address = 0xFF00 + n
                 memoryManager.writeMemory(address, register.A)
                 return 12
 
             case 0xF0:
+                println "Register A before: " + register.A
                 int n = memoryManager.readMemory(register.pc)
+                println "Immediate value read: " + n
                 register.pc++
                 register.A = memoryManager.readMemory(0xFF00 + n)
+                println "Read from address: " + (0xFF00 + n)
+                println "Register A after: " + register.A
                 return 12
 
             /* 16 bit loads */
@@ -531,7 +541,11 @@ class CPU{
 
             /* Logical OR */
             case 0xB7:
+//                println 'Zero flag before: ' + register.isZ()
+//                println 'Register A before: ' + register.A
                 register.A = cpu8BitOR(register.A, register.A, false)
+//                println 'Zero flag after: ' + register.isZ()
+//                println 'Register A after: ' + register.A
                 return 4
             case 0xB0:
                 register.A = cpu8BitOR(register.A, register.B, false)
@@ -792,6 +806,7 @@ class CPU{
                 cpuJumpImmediate(true, register.FLAG_Z, false)
                 return 8
             case 0x28:
+                println "Zero flag: " + register.isZ()
                 cpuJumpImmediate(true, register.FLAG_Z, true)
                 return 8
             case 0x30:
@@ -1361,7 +1376,6 @@ class CPU{
 
     private void cpuJump(boolean useJumpCondition, int flag, boolean jumpCondition) {
         int nn = memoryManager.readWord()
-        println 'Word read: ' + nn
         register.pc = register.pc + 2
 
         if(!useJumpCondition) {
@@ -1815,7 +1829,9 @@ class CPU{
     private void cpuLoadRegisterToImmediateByte(int reg) {
         int nn = memoryManager.readWord()
         register.pc += 2
+        println 'About to write register A: ' + reg
         memoryManager.writeMemory(nn, reg)
+        println 'Done writing'
     }
 
     private def cpuRegisterLoad(int register2) {
