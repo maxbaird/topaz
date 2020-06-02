@@ -171,7 +171,7 @@ class Register{
     @Override
     String toString(){
         def str = ''
-        str += 'A: ' + A + '\nB: ' + B + '\nC: ' + C + '\nD: ' + D + '\nE: ' + E + '\nF: ' + F + '\nH: ' + H + '\nL: ' + L + '\n'
+        str += 'A: ' + A + '\nB: ' + B + '\nC: ' + C + '\nD: ' + D + '\nE: ' + E + '\nF: ' + F + '\nHL: ' + getHL() + '\n'
         str += '===========\n'
         str += 'Z: ' + isZ() + '\nN: ' + isN() + '\nH: ' + isH() + '\nC: ' + isC() + '\n'
         str += '===========\n'

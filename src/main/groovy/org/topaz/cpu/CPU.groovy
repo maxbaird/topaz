@@ -21,7 +21,7 @@ class CPU{
         def hexCode = java.lang.String.format("0x%02X", opcode)
         
 //        boolean display = (n >= 3987 && n <= 4000) ? true : false
-       boolean display = (n >= 0 && n <= 10) ? true : false
+       boolean display = (n >= 0 && n <= 2) ? true : false
         
         if(display) {
             println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'

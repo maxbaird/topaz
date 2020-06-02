@@ -113,8 +113,9 @@ class LCD{
             /*
              * Also set the LCD mode to 1
              */
-            status &= 252 /* Set bits 1 and 2 to 0 */
+            status = (status & 252) & 0xFF /* Set bits 1 and 2 to 0 */
             status = BitUtil.setBit(status, 0) /* Set bit 0 to 1 */
+            status = BitUtil.clearBit(status, 1)
             memoryManager.writeMemory(LCD_STATUS, status)
             return
         }
@@ -196,7 +197,7 @@ class LCD{
             int LY = memoryManager.readMemory(LY_REGISTER)
             int LYC = memoryManager.readMemory(LYC_REGISTER)
 
-            if(LY == LYC) {
+            if(currentScanLine == LYC) {
                 /*
                  * If the values in the LY and LYC register are equal, then bit
                  * 2 (COINCIDENCE_FLAG_BIT) of the LCD status register is set to
@@ -218,9 +219,7 @@ class LCD{
                  */
                 status = BitUtil.clearBit(status, COINCIDENCE_FLAG_BIT)
             }
-            println 'LCD about to write to memory: ' + status
             memoryManager.writeMemory(LCD_STATUS, status)
-            println 'LCD done writing to memory'
         }
     }
     

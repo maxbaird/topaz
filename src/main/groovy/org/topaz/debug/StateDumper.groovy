@@ -17,6 +17,7 @@ class StateDumper{
     }
     
     def dump(def iteration, def opcode, def fileName){
+        println 'Dumping state: ' + fileName
         sb.length = 0
         sb.append("Iteration: " + iteration + '\n')
         sb.append("Opcode: " + opcode + '\n')

@@ -17,7 +17,7 @@ class GPU{
      * scanLineCounter. If the result is 0 or less, it is time to draw the next
      * scanline.
      */
-    static int SCAN_LINE_CYCLES_COUNTER = CYCLES_BETWEEN_SCANLINES
+    static int SCAN_LINE_CYCLES_COUNTER = 0
 
     /*
      * The screen resolution is 160x144, however, the Gameboy actually draws 153
@@ -68,7 +68,6 @@ class GPU{
         }else {
             return
         }
-
         if(SCAN_LINE_CYCLES_COUNTER <= 0) {
             /*
              * Move to next scanline. Memory is accessed directly instead of using
