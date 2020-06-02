@@ -116,6 +116,7 @@ class LCD{
             status = (status & 252) & 0xFF /* Set bits 1 and 2 to 0 */
             status = BitUtil.setBit(status, 0) /* Set bit 0 to 1 */
             status = BitUtil.clearBit(status, 1)
+            println 'Setting status if LCD is disabled: ' + status
             memoryManager.writeMemory(LCD_STATUS, status)
             return
         }
@@ -135,6 +136,7 @@ class LCD{
             mode = LCD_MODE.V_BLANK
             status = BitUtil.setBit(status, 0)
             status = BitUtil.clearBit(status, 1)
+            println 'Setting status LCD mode1: ' + status
             requestInterrupt = BitUtil.isSet(status, V_BLANK_INTERRUPT_BIT)
         }else {
             /*
@@ -149,6 +151,7 @@ class LCD{
             int mode2Cycles = GPU.CYCLES_BETWEEN_SCANLINES - 80
             int mode3Cycles = mode2Cycles - 172
             
+            println 'Scan lines counter: ' + GPU.SCAN_LINE_CYCLES_COUNTER
             if(GPU.SCAN_LINE_CYCLES_COUNTER >= mode2Cycles) { /* Mode 2 */
                mode = LCD_MODE.OAM_SPRITE_ATTRIBUTE_SEARCH 
                
@@ -159,6 +162,7 @@ class LCD{
                 */
                status = BitUtil.setBit(status, 1)
                status = BitUtil.clearBit(status, 0)
+               println 'Setting status LCD mode2: ' + status
                requestInterrupt = BitUtil.isSet(status, OAM_INTERRUPT_BIT)
 
             }else if(GPU.SCAN_LINE_CYCLES_COUNTER >= mode3Cycles) { /* Mode 3 */
@@ -171,6 +175,7 @@ class LCD{
                 */
                status = BitUtil.setBit(status, 1)
                status = BitUtil.setBit(status, 0)
+               println 'Setting status LCD mode3: ' + status
             }else { /* Mode 0 */
                mode = LCD_MODE.H_BLANK 
                
@@ -180,6 +185,7 @@ class LCD{
                 */
                status = BitUtil.clearBit(status, 1)
                status = BitUtil.clearBit(status, 0)
+               println 'Setting status LCD mode0: ' + status
                requestInterrupt = BitUtil.isSet(status, H_BLANK_INTERRUPT_BIT)
             }
             
@@ -194,7 +200,7 @@ class LCD{
                 interruptHandler.requestInterrupt(InterruptHandler.LCD_INTERRUPT)
             }
             
-            int LY = memoryManager.readMemory(LY_REGISTER)
+            //int LY = memoryManager.readMemory(LY_REGISTER)
             int LYC = memoryManager.readMemory(LYC_REGISTER)
 
             if(currentScanLine == LYC) {
@@ -204,6 +210,7 @@ class LCD{
                  * 1.
                  */
                 status = BitUtil.setBit(status, COINCIDENCE_FLAG_BIT) 
+                println 'Setting status scanline==lyc: ' + status
                
                 if(BitUtil.isSet(status, COINCIDENCE_INTERRUPT_BIT)) {
                     /*
@@ -218,7 +225,9 @@ class LCD{
                  * COINCIDENCE_FLAG_BIT must be set to 0.
                  */
                 status = BitUtil.clearBit(status, COINCIDENCE_FLAG_BIT)
+                println 'Setting status scanline!=lyc: ' + status
             }
+            println "Writing LCD status 2: " + status
             memoryManager.writeMemory(LCD_STATUS, status)
         }
     }

@@ -21,11 +21,11 @@ class CPU{
         def hexCode = java.lang.String.format("0x%02X", opcode)
         
 //        boolean display = (n >= 3987 && n <= 4000) ? true : false
-       boolean display = (n >= 0 && n <= 2) ? true : false
+       boolean display = (n >= 0 && n <= 20) ? true : false
         
-        if(display) {
-            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
-        }
+//        if(display) {
+//            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
+//        }
         register.pc++
 
         try {
@@ -36,7 +36,7 @@ class CPU{
         }
         
         if(display) {
-            println 'Register.pc after: ' + register.pc + '\n'
+            //println 'Register.pc after: ' + register.pc + '\n'
             dumper.dump(n, hexCode, '/tmp/' + n + '.topaz')
         }
         return cycles

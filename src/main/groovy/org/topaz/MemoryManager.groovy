@@ -99,10 +99,6 @@ class MemoryManager{
     }
 
     void writeMemory(int address, int data) {
-        if(address == 65345 && data == 2) {
-            println 'Writing to (address, data) ' + address + ', ' + data 
-            System.exit(-1)
-        }
         /* Read only cartridge memory, no *normal* writes allowed */
         if(address < 0x8000) {
             /*
