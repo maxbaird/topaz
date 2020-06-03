@@ -37,7 +37,7 @@ class CPU{
         
         if(display) {
             //println 'Register.pc after: ' + register.pc + '\n'
-            dumper.dump(n, hexCode, '/tmp/' + n + '.topaz')
+            dumper.dump(n, hexCode, cycles, '/tmp/' + n + '.topaz')
         }
         println 'Cycles spent: ' + cycles
         return cycles
@@ -805,7 +805,7 @@ class CPU{
                 return 8
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
-                return 8
+                return 12 
             case 0x28:
                 println "Zero flag: " + register.isZ()
                 cpuJumpImmediate(true, register.FLAG_Z, true)
