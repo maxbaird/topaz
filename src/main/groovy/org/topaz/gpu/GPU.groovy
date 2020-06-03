@@ -65,6 +65,7 @@ class GPU{
 
         if(lcd.isLCDEnabled()) {
             SCAN_LINE_CYCLES_COUNTER = SCAN_LINE_CYCLES_COUNTER - cycles
+            println 'Decremented scanlines counter: ' + SCAN_LINE_CYCLES_COUNTER 
         }else {
             return
         }
@@ -79,7 +80,7 @@ class GPU{
             int currentLine = memoryManager.readMemory(LCD.LY_REGISTER)
 
             /* Reset the scanline counter */
-            SCAN_LINE_CYCLES_COUNTER = CYCLES_BETWEEN_SCANLINES
+            SCAN_LINE_CYCLES_COUNTER += CYCLES_BETWEEN_SCANLINES
 
             if(currentLine == V_BLANK_SCANLINE_START) {
                 /* Request the appropriate interrupt if in a vertical blank period */

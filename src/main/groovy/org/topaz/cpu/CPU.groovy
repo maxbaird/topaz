@@ -39,6 +39,7 @@ class CPU{
             //println 'Register.pc after: ' + register.pc + '\n'
             dumper.dump(n, hexCode, '/tmp/' + n + '.topaz')
         }
+        println 'Cycles spent: ' + cycles
         return cycles
     }
 
@@ -783,7 +784,7 @@ class CPU{
             /* Jumps */
             case 0xC3:
                 cpuJump(false, 0, false)
-                return 12
+                return 16
             case 0xC2:
                 cpuJump(true, register.FLAG_Z, false)
                 return 12
@@ -819,7 +820,7 @@ class CPU{
             /* Calls */
             case 0xCD:
                 cpuCall(false, 0, false)
-                return 12
+                return 24 
             case 0xC4:
                 cpuCall(true, register.FLAG_Z, false)
                 return 12
