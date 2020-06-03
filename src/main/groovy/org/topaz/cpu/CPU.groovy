@@ -39,7 +39,6 @@ class CPU{
             //println 'Register.pc after: ' + register.pc + '\n'
             dumper.dump(n, hexCode, cycles, '/tmp/' + n + '.topaz')
         }
-        println 'Cycles spent: ' + cycles
         return cycles
     }
 

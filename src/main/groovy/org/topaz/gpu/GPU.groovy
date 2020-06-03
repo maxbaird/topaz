@@ -65,7 +65,6 @@ class GPU{
 
         if(lcd.isLCDEnabled()) {
             SCAN_LINE_CYCLES_COUNTER = SCAN_LINE_CYCLES_COUNTER - cycles
-            println 'Decremented scanlines counter: ' + SCAN_LINE_CYCLES_COUNTER 
         }else {
             return
         }
