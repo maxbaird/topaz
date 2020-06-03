@@ -21,7 +21,7 @@ class CPU{
         def hexCode = java.lang.String.format("0x%02X", opcode)
         
 //        boolean display = (n >= 3987 && n <= 4000) ? true : false
-       boolean display = (n >= 0 && n <= 20) ? true : false
+       boolean display = (n >= 0 && n <= 200) ? true : false
         
 //        if(display) {
 //            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
@@ -804,7 +804,7 @@ class CPU{
                 return 8
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
-                return 12 
+                return register.isZ() ? 8 : 12 
             case 0x28:
                 println "Zero flag: " + register.isZ()
                 cpuJumpImmediate(true, register.FLAG_Z, true)
@@ -836,7 +836,7 @@ class CPU{
             /* returns */
             case 0xC9:
                 cpuReturn(false, 0, false)
-                return 8
+                return 16
             case 0xC0:
                 cpuReturn(true, register.FLAG_Z, false)
                 return 8
@@ -1389,9 +1389,6 @@ class CPU{
     }
 
     public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
-//        println 'in here: ' + useCondition + ', ' + flag + ', ' + condition
-//        println 'flagz: ' + register.isZ()
-//        println 'flags: ' + register.F
         byte n = (byte)memoryManager.readMemory(register.pc)
 
         if(!useCondition) {
