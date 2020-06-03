@@ -21,7 +21,7 @@ class CPU{
         def hexCode = java.lang.String.format("0x%02X", opcode)
         
 //        boolean display = (n >= 3987 && n <= 4000) ? true : false
-       boolean display = (n >= 0 && n <= 200) ? true : false
+       boolean display = (n >= 3980 && n <= 4000 ) ? true : false
         
 //        if(display) {
 //            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
@@ -324,22 +324,16 @@ class CPU{
                 return 8
 
             case 0xE0:
-                println "Register A: " + register.A
                 int n = memoryManager.readMemory(register.pc)
-                println "Memory read: " + n
                 register.pc++
                 int address = 0xFF00 + n
                 memoryManager.writeMemory(address, register.A)
                 return 12
 
             case 0xF0:
-                println "Register A before: " + register.A
                 int n = memoryManager.readMemory(register.pc)
-                println "Immediate value read: " + n
                 register.pc++
                 register.A = memoryManager.readMemory(0xFF00 + n)
-                println "Read from address: " + (0xFF00 + n)
-                println "Register A after: " + register.A
                 return 12
 
             /* 16 bit loads */
@@ -541,11 +535,7 @@ class CPU{
 
             /* Logical OR */
             case 0xB7:
-//                println 'Zero flag before: ' + register.isZ()
-//                println 'Register A before: ' + register.A
                 register.A = cpu8BitOR(register.A, register.A, false)
-//                println 'Zero flag after: ' + register.isZ()
-//                println 'Register A after: ' + register.A
                 return 4
             case 0xB0:
                 register.A = cpu8BitOR(register.A, register.B, false)
@@ -806,9 +796,8 @@ class CPU{
                 cpuJumpImmediate(true, register.FLAG_Z, false)
                 return register.isZ() ? 8 : 12 
             case 0x28:
-                println "Zero flag: " + register.isZ()
                 cpuJumpImmediate(true, register.FLAG_Z, true)
-                return 8
+                return register.isZ() ? 12 : 8 
             case 0x30:
                 cpuJumpImmediate(true, register.FLAG_C, false)
                 return 8
@@ -1782,10 +1771,8 @@ class CPU{
         register.clearN()
         register.setH()
         register.clearC()
+        register.setZ(reg == 0x0)
 
-        if(reg == 0x0) {
-            register.setZ()
-        }
         return reg
     }
 
@@ -1826,9 +1813,7 @@ class CPU{
     private void cpuLoadRegisterToImmediateByte(int reg) {
         int nn = memoryManager.readWord()
         register.pc += 2
-        println 'About to write register A: ' + reg
         memoryManager.writeMemory(nn, reg)
-        println 'Done writing'
     }
 
     private def cpuRegisterLoad(int register2) {
@@ -1880,20 +1865,20 @@ class CPU{
         /* Set flags */
         register.clearAllFlags()
 
-        if(reg == 0) {
-            register.setZ()
-        }
+        register.setZ(reg == 0)
 
         int halfCarry = initialValue & 0xF
         halfCarry = halfCarry + (runningSum & 0xF)
 
-        if(halfCarry > 0xF) {
-            register.setH()
-        }
-
-        if((initialValue + runningSum) > 0xFF) {
-            register.setC()
-        }
+//        if(halfCarry > 0xF) {
+//            register.setH()
+//        }
+//
+//        if((initialValue + runningSum) > 0xFF) {
+//            register.setC()
+//        }
+          register.setH(halfCarry > 0xF)
+          register.setC((initialValue + runningSum) > 0xFF)
 
         return reg
     }
@@ -1942,9 +1927,7 @@ class CPU{
         /* now set flags */
         register.clearAllFlags()
 
-        if(reg == 0) {
-            register.setZ()
-        }
+        register.setZ(reg == 0)
 
         register.setN()
 
@@ -1998,9 +1981,7 @@ class CPU{
 
         register.clearAllFlags()
 
-        if(reg == 0) {
-            register.setZ()
-        }
+        register.setZ(reg == 0)
 
         return reg
     }

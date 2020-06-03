@@ -78,7 +78,7 @@ class Emulator{
         def n = 0
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
-            if(n == 250) {
+            if(n == 6000) {
                 println 'exiting'
                 System.exit(-1)
             }
