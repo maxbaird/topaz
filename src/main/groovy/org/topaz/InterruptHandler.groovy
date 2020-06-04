@@ -8,12 +8,19 @@ class InterruptHandler{
     static final int V_BLANK_INTERRUPT = 0
     static final int LCD_INTERRUPT = 1
     static final int TIMER_INTERRUPT = 2
+    static final int SERIAL_INTERRUPT = 3
     static final int JOYPAD_INTERRUPT = 4
 
     /*
      * Map for the Interrupt Service Routines for each interrupt.
      */
-    private static final def ISR = [V_BLANK:0x40, LCD:0x48, TIMER:0x50, JOYPAD:0x60]
+    private static final def ISR = [
+        V_BLANK : 0x40,
+        LCD : 0x48,
+        TIMER : 0x50,
+        SERIAL : 0x58,
+        JOYPAD : 0x60
+    ].asUnmodifiable()
 
     /*
      * The Interrupt Enable register (IE_REGISTER) is located at 0xFFFF and is
@@ -29,13 +36,6 @@ class InterruptHandler{
      * IF_REGISTER.
      */
     private final int IF_REGISTER = 0xFF0F
-
-    /*
-     * The interruptsEnabled part of game memory. It is just a value that is
-     * toggled to enable or disable the servicing of interrupts. A false value
-     * means interrupts are disabled.
-     */
-    boolean interruptsEnabled = false
 
     MemoryManager memoryManager
     CPU cpu /* to access stack pointer */
@@ -53,63 +53,79 @@ class InterruptHandler{
 
     public void handleInterrupts() {
         /*
-         * THis method is used in the main emulation loop to handle
-         * any interrupts.
+         * Get all interrupts requested
+         * 
+         * FF0F - IF - Interrupt Flag (R/W)
+         *     Bit 0: V-Blank  Interrupt Request (INT 40h)  (1=Request)
+         *     Bit 1: LCD STAT Interrupt Request (INT 48h)  (1=Request)
+         *     Bit 2: Timer    Interrupt Request (INT 50h)  (1=Request)
+         *     Bit 3: Serial   Interrupt Request (INT 58h)  (1=Request)
+         *     Bit 4: Joypad   Interrupt Request (INT 60h)  (1=Request)
          */
-        if(interruptsEnabled) {/* Ensure interrupts are enabled */
+        int request = memoryManager.readMemory(IF_REGISTER)
 
+        /*
+         * Get all interrupts enabled
+         * 
+         * FFFF - IE - Interrupt Enable (R/W)
+         *     Bit 0: V-Blank  Interrupt Enable  (INT 40h)  (1=Enable)
+         *     Bit 1: LCD STAT Interrupt Enable  (INT 48h)  (1=Enable)
+         *     Bit 2: Timer    Interrupt Enable  (INT 50h)  (1=Enable)
+         *     Bit 3: Serial   Interrupt Enable  (INT 58h)  (1=Enable)
+         *     Bit 4: Joypad   Interrupt Enable  (INT 60h)  (1=Enable)
+         */
+        int enabled = memoryManager.readMemory(IE_REGISTER)
+
+        if(request > 0) {
             /*
-             * Get all interrupts requested
+             * If any interrupts were requested, they are serviced in order
+             * of their priority. Only enabled interrupts are serviced.
              */
-            int request = memoryManager.readMemory(IF_REGISTER)
-
-            /*
-             * Get all interrupts enabled
-             */
-            int enabled = memoryManager.readMemory(IE_REGISTER)
-
-            if(request > 0) {
-                /*
-                 * If any interrupts were requested, they are serviced in order
-                 * of their priority. Only enabled interrupts are serviced.
-                 */
-                5.times {it ->
-                    if(BitUtil.isSet(request, it)) {
-                        if(BitUtil.isSet(enabled, it)) {
-                            serviceInterrupt(it)
-                        }
+            5.times {it ->
+                if(BitUtil.isSet(request, it)) {
+                    if(BitUtil.isSet(enabled, it)) {
+                        serviceInterrupt(it)
                     }
                 }
             }
         }
     }
 
-    void serviceInterrupt(int interruptId) {
+    private void serviceInterrupt(int interruptId) {
+        if(!cpu.interruptMaster && cpu.isHalted) {
+            cpu.isHalted = false
+            return
+        }
+
         /*
          * The protocol for servicing an interrupt is to set the interrupt
          * enabled switch to false and unset its corresponding bit in the
          * IF_REGISTER.
          */
-        interruptsEnabled = false
+        cpu.interruptMaster = false
         cpu.isHalted = false
         int request = memoryManager.readMemory(IF_REGISTER)
         request = BitUtil.clearBit(request, interruptId)
         memoryManager.writeMemory(IF_REGISTER, request)
-        
+
         /*
          * The current execution address is pushed onto the stack
          */
-        memoryManager.push(cpu.register.pc) 
-        
+        memoryManager.push(cpu.register.pc)
+
         switch(interruptId) {
-           /*
-            * Based on the interruptId, the appropriate instruction service
-            * routine is assigned to the program counter.
-            */
-           case V_BLANK_INTERRUPT : cpu.register.pc = ISR.V_BLANK; break
-           case LCD_INTERRUPT : cpu.register.pc = ISR.LCD; break
-           case TIMER_INTERRUPT : cpu.register.pc = ISR.TIMER; break
-           case JOYPAD_INTERRUPT : cpu.register.pc = ISR.JOYPAD; break
+            /*
+             * Based on the interruptId, the appropriate instruction service
+             * routine is assigned to the program counter.
+             */
+            case V_BLANK_INTERRUPT : cpu.register.pc = ISR.V_BLANK; break
+            case LCD_INTERRUPT : cpu.register.pc = ISR.LCD; break
+            case TIMER_INTERRUPT : cpu.register.pc = ISR.TIMER; break
+            case SERIAL_INTERRUPT : cpu.register.pc = ISR.SERIAL; break
+            case JOYPAD_INTERRUPT : cpu.register.pc = ISR.JOYPAD; break
+            default:
+                throw new Exception("Unknown Interrupt: " + interruptId)
+                System.exit(-1)
         }
     }
 }

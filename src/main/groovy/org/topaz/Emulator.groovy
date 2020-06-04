@@ -71,14 +71,14 @@ class Emulator{
         thread.start()
     }
 
+    def n = 0
     public void update() {
         println 'Updating game...'
         int cyclesThisUpdate = 0
 
-        def n = 0
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
-            if(n == 6000) {
+            if(n == 9000) {
                 println 'exiting'
                 System.exit(-1)
             }
@@ -87,7 +87,7 @@ class Emulator{
             cyclesThisUpdate += cycles
             this.updateTimers(cycles)
             this.updateGraphics(cycles)
-            this.handleInterrupts()
+            cyclesThisUpdate += this.handleInterrupts()
         }
         this.renderScreen()
     }
@@ -99,28 +99,28 @@ class Emulator{
             /*
              * 4 is the number of cycles the opcode for halting the CPU takes.
              */
-            return 4    
+            return 4
         }
-        
-        /*
-         * Interrupts are only enabled or disabled after the next instruction.
-         * Opcode 0xF3 disables interrupt and opcode 0xFB enables them. So if
-         * the previous instruction was neither the opcode for enabling or
-         * disabling interrupts, the boolean values are reset.
-         */
-        if(cpu.interruptsDisabled) {
-            if(memoryManager.readMemory(register.pc - 1) != 0xF3) {
-                cpu.interruptsDisabled = false
-                interruptHandler.interruptsEnabled = false
-            }
-        }
-        
-        if(cpu.interruptsEnabled) {
-            if(memoryManager.readMemory(register.pc - 1) != 0xFB) {
-                cpu.interruptsEnabled = false
-                interruptHandler.interruptsEnabled = true
-            }
-        }
+
+        //        /*
+        //         * Interrupts are only enabled or disabled after the next instruction.
+        //         * Opcode 0xF3 disables interrupt and opcode 0xFB enables them. So if
+        //         * the previous instruction was neither the opcode for enabling or
+        //         * disabling interrupts, the boolean values are reset.
+        //         */
+        //        if(cpu.pendingInterruptDisabled) {
+        //            if(memoryManager.readMemory(register.pc - 1) != 0xF3) {
+        //                cpu.pendingInterruptDisabled = false
+        //                interruptHandler.interruptsEnabled = false
+        //            }
+        //        }
+        //
+        //        if(cpu.pendingInterruptEnabled) {
+        //            if(memoryManager.readMemory(register.pc - 1) != 0xFB) {
+        //                cpu.pendingInterruptEnabled = false
+        //                interruptHandler.interruptsEnabled = true
+        //            }
+        //        }
     }
 
     private void updateTimers(int cycles) {
@@ -131,8 +131,31 @@ class Emulator{
         gpu.updateGraphics(cycles)
     }
 
-    private void handleInterrupts() {
-        interruptHandler.handleInterrupts()
+    private int handleInterrupts() {
+        /*
+         *  If the EI (enable interrupt) instruction was executed the interrupt
+         *  master is set as enabled for the next instruction cycle.
+         */
+        if (cpu.pendingInterruptEnabled) {
+            cpu.pendingInterruptEnabled = false
+            cpu.interruptMaster = true
+            return 0
+        }
+
+        /*
+         * If the CPU is neither interrupted or halted, there is no need to
+         * proceed with handling interrupts.
+         */
+        if(!cpu.interruptMaster && !cpu.isHalted) {
+            return 0
+        }
+
+        if(cpu.interruptMaster || cpu.isHalted) {
+            interruptHandler.handleInterrupts()
+            return 20
+        }
+
+        return 0
     }
 
     private void renderScreen() {

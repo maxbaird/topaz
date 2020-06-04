@@ -12,20 +12,24 @@ class CPU{
     StateDumper dumper
 
     boolean isHalted = false
-    boolean interruptsDisabled = false
-    boolean interruptsEnabled = false
+    boolean interruptMaster = false
+    boolean pendingInterruptEnabled = false
 
     int executeNextOpcode(int n) {
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
         def hexCode = java.lang.String.format("0x%02X", opcode)
-        
+        //println 'opcode: ' + hexCode
 //        boolean display = (n >= 3987 && n <= 4000) ? true : false
-       boolean display = (n >= 3980 && n <= 4000 ) ? true : false
-        
+       boolean display = (n >= 8000 && n <= 8500 ) ? true : false
+       //display = false
+               
 //        if(display) {
 //            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
 //        }
+        if(display) {
+            println 'Register.pc is: ' + register.pc
+        }
         register.pc++
 
         try {
@@ -36,7 +40,7 @@ class CPU{
         }
         
         if(display) {
-            //println 'Register.pc after: ' + register.pc + '\n'
+            //println 'Register.pc is: ' + register.pc
             dumper.dump(n, hexCode, cycles, '/tmp/' + n + '.topaz')
         }
         return cycles
@@ -746,11 +750,11 @@ class CPU{
                 return 4
 
             case 0xF3:
-                this.interruptsDisabled = true
+                this.interruptMaster = true
                 return 4
 
             case 0xFB:
-                this.interruptsEnabled = true
+                this.pendingInterruptEnabled = true
                 return 4
 
             /* Rotates and shifts */
@@ -1360,7 +1364,7 @@ class CPU{
 
     private void cpuReturnFromInterrupt() {
         register.pc = memoryManager.pop()
-        interruptsEnabled = true
+        interruptMaster = true
     }
 
     private void cpuJump(boolean useJumpCondition, int flag, boolean jumpCondition) {
@@ -1843,7 +1847,7 @@ class CPU{
     }
 
     private int cpu8BitAdd(int reg, int value, boolean addImmediate, boolean addCarry) {
-        int initialValue = register
+        int initialValue = reg
         int runningSum = 0
 
         if(addImmediate) {
