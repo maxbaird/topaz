@@ -19,7 +19,8 @@ class CPU{
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
         def hexCode = java.lang.String.format("0x%02X", opcode)
-        boolean display = (n >= 8230 && n <= 8500 ) ? true : false
+        //boolean display = (n >= 8230 && n <= 8500 ) ? true : false
+        boolean display = (n >= 8258 && n <= 8262 ) ? true : false
 
         register.pc++
         def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0
@@ -1495,12 +1496,11 @@ class CPU{
     }
 
     private int cpuSLA(int reg) {
+        register.setC(BitUtil.isSet(reg, 7))
         reg = (reg << 1) & 0xFF
         register.clearN()
         register.clearH()
-        register.setC(BitUtil.isSet(reg, 7))
         register.setZ(reg == 0)
-
         return reg
     }
 
