@@ -16,18 +16,19 @@ class StateDumper{
         sb = new StringBuilder(memoryManager.rom.length * 3)
     }
     
-    def dump(def iteration, def opcode, def cycles, def fileName){
+    def dump(def iteration, def opcode, def extendedOpcode, def cycles, def fileName){
         println 'Dumping state: ' + fileName
         sb.length = 0
         sb.append("Iteration: " + iteration + '\n')
         sb.append("Opcode: " + opcode + '\n')
+        sb.append("Extended Opcode: " + extendedOpcode + '\n')
         sb.append("Cycles: " + cycles + '\n')
         sb.append('===========\n')
         sb.append(register.toString())
         sb.append('===========\n')
         
         memoryManager.rom.eachWithIndex{it, idx->
-            sb.append(String.format("0x%02X", idx) + ': ' + it + '\n')
+            sb.append(String.format("0x%02X: %d\n", idx, it))
         }
         
         new File(fileName).newWriter().withWriter {w->

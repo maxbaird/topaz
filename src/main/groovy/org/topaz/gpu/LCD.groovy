@@ -116,7 +116,6 @@ class LCD{
             status = (status & 252) & 0xFF /* Set bits 1 and 2 to 0 */
             status = BitUtil.setBit(status, 0) /* Set bit 0 to 1 */
             status = BitUtil.clearBit(status, 1)
-            println 'Writing LCD status1: ' + status
             memoryManager.writeMemory(LCD_STATUS, status)
             return
         }
@@ -223,7 +222,6 @@ class LCD{
              */
             status = BitUtil.clearBit(status, COINCIDENCE_FLAG_BIT)
         }
-        println 'Writing LCD status2: ' + status
         memoryManager.writeMemory(LCD_STATUS, status)
 
     }

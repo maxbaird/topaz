@@ -22,6 +22,7 @@ class CPU{
         boolean display = (n >= 8230 && n <= 8500 ) ? true : false
 
         register.pc++
+        def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0
 
         try {
             cycles = executeOpcode(opcode)
@@ -31,7 +32,8 @@ class CPU{
         }
 
         if(display) {
-            dumper.dump(n, hexCode, cycles, '/tmp/' + n + '.topaz')
+            def exOpcode = String.format("0x%02X", extendedOpcode)
+            dumper.dump(n, hexCode, exOpcode, cycles, '/tmp/' + n + '.topaz')
         }
         return cycles
     }
@@ -866,7 +868,10 @@ class CPU{
 
             case 0xCB:
                 try {
-                    return executeExtendedOpcode()
+                   /* 0xCB itself takes 4 cycles to execute so add this to
+                    * cycles taken by the extended opcode
+                    */
+                    return 4 + executeExtendedOpcode()
                 }catch(Exception e) {
                     throw e
                 }
