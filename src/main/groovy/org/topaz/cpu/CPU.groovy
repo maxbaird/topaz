@@ -19,17 +19,8 @@ class CPU{
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
         def hexCode = java.lang.String.format("0x%02X", opcode)
-        //println 'opcode: ' + hexCode
-//        boolean display = (n >= 3987 && n <= 4000) ? true : false
-       boolean display = (n >= 8000 && n <= 8500 ) ? true : false
-       //display = false
-               
-//        if(display) {
-//            println 'Executing Opcode ' + n + ' : ' + opcode + ' ('+hexCode+')'
-//        }
-        if(display) {
-            println 'Register.pc is: ' + register.pc
-        }
+        boolean display = (n >= 8230 && n <= 8500 ) ? true : false
+
         register.pc++
 
         try {
@@ -38,9 +29,8 @@ class CPU{
             println e.message
             System.exit(1)
         }
-        
+
         if(display) {
-            //println 'Register.pc is: ' + register.pc
             dumper.dump(n, hexCode, cycles, '/tmp/' + n + '.topaz')
         }
         return cycles
@@ -237,9 +227,9 @@ class CPU{
             case 0x7F:
                 cpuLoadImmediate8BitMemory(register.A)
                 return 8
-                
-                case 0x3E:
-                int n = memoryManager.readMemory(register.pc) 
+
+            case 0x3E:
+                int n = memoryManager.readMemory(register.pc)
                 register.pc++
                 register.A = n
                 return 8
@@ -316,7 +306,7 @@ class CPU{
                 register.A = cpuROMLoad(register.HL)
                 register.HL = cpu16BitDec(register.HL)
                 return 8
-           case 0x2A:
+            case 0x2A:
                 register.A = cpuROMLoad(register.HL)
                 register.HL = cpu16BitInc(register.HL)
                 return 8
@@ -798,10 +788,10 @@ class CPU{
                 return 8
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
-                return register.isZ() ? 8 : 12 
+                return register.isZ() ? 8 : 12
             case 0x28:
                 cpuJumpImmediate(true, register.FLAG_Z, true)
-                return register.isZ() ? 12 : 8 
+                return register.isZ() ? 12 : 8
             case 0x30:
                 cpuJumpImmediate(true, register.FLAG_C, false)
                 return 8
@@ -812,7 +802,7 @@ class CPU{
             /* Calls */
             case 0xCD:
                 cpuCall(false, 0, false)
-                return 24 
+                return 24
             case 0xC4:
                 cpuCall(true, register.FLAG_Z, false)
                 return 12
@@ -1376,7 +1366,7 @@ class CPU{
             return
         }
 
-      if(BitUtil.isSet(register.F, flag) == jumpCondition) {
+        if(BitUtil.isSet(register.F, flag) == jumpCondition) {
             register.pc = nn
         }
     }
@@ -1874,15 +1864,15 @@ class CPU{
         int halfCarry = initialValue & 0xF
         halfCarry = halfCarry + (runningSum & 0xF)
 
-//        if(halfCarry > 0xF) {
-//            register.setH()
-//        }
-//
-//        if((initialValue + runningSum) > 0xFF) {
-//            register.setC()
-//        }
-          register.setH(halfCarry > 0xF)
-          register.setC((initialValue + runningSum) > 0xFF)
+        //        if(halfCarry > 0xF) {
+        //            register.setH()
+        //        }
+        //
+        //        if((initialValue + runningSum) > 0xFF) {
+        //            register.setC()
+        //        }
+        register.setH(halfCarry > 0xF)
+        register.setC((initialValue + runningSum) > 0xFF)
 
         return reg
     }
