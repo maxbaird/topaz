@@ -31,7 +31,7 @@ class Timer{
      * pass between incrementing the register can be calculated.
      */
     final int CLOCKSPEED = 4194304
-    static int timerCounter = 1024
+    static int timerCounter = 0
     int dividerCounter = 0
 
     MemoryManager memoryManager
@@ -41,14 +41,14 @@ class Timer{
         incrementDividerRegister(cycles)
 
         if(isClockEnabled()) {
-            timerCounter = timerCounter - cycles
+            timerCounter = timerCounter + cycles
 
-            if(timerCounter <= 0) {
+            if(timerCounter >= getClockFreqCount()) {
                 /*
-                 * If timerCounter <= 0 enough CPU cycles have passed and the
-                 * timer should be updated.
+                 * If timerCounter >= the current clock frequency enough CPU
+                 * cycles have passed and the timer should be updated.
                  */
-                setClockFrequency(getClockFrequency())
+                setClockFrequency()
 
                 if(memoryManager.readMemory(TIMA) == 255) {
                     /*
@@ -75,16 +75,21 @@ class Timer{
          */
         return BitUtil.isSet(memoryManager.readMemory(TMC), 2)
     }
-    
-    static void setClockFrequency(int frequency) {
-        switch(frequency) {
-           case 0: timerCounter = 1024; break /* frequency is 4096 */
-           case 1: timerCounter = 16; break /* frequency is 262144 */
-           case 2: timerCounter = 64; break /* frequency is 65536 */
-           case 3: timerCounter = 256; break /* frequency is 16832 */
+
+    static void setClockFrequency() {
+        timerCounter = 0
+    }
+
+    int getClockFreqCount() {
+        switch(getClockFrequency()) {
+            case 0: return 1024
+            case 1: return 16
+            case 2: return 64
+            case 3: return 256
+            default: return 1024
         }
     }
-    
+
     private void incrementDividerRegister(int cycles) {
         /*
          * The timer divider register is located at address 0xFF04 and
@@ -93,8 +98,7 @@ class Timer{
          * 256 CPU cycles.
          */
         dividerCounter = dividerCounter + cycles
-        
-        if(dividerCounter >= 256) {
+        if(dividerCounter >= 255) {
             dividerCounter = 0
             /*
              * The divider register is incremented directly instead of using the
@@ -104,14 +108,17 @@ class Timer{
              * and the writeMemory method follows this behaviour.
              */
             memoryManager.rom[0xFF04]++
+            if(memoryManager.rom[0xFF04] == 256) {
+               memoryManager.rom[0xFF04] = 0 
+            }
         }
     }
-    
+
     public int getClockFrequency() {
-       /*
-        * The clock frequency is combination of bits 1 and 0 of the Timer
-        * controller (TMC at address 0xFF07).
-        */
+        /*
+         * The clock frequency is combination of bits 1 and 0 of the Timer
+         * controller (TMC at address 0xFF07).
+         */
         return memoryManager.readMemory(TMC) & 0x3
     }
 }

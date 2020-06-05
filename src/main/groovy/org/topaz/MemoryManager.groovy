@@ -129,7 +129,7 @@ class MemoryManager{
             int newFrequency = getClockFrequency()
             
             if(currentFrequency != newFrequency) {
-                Timer.setClockFrequency(getClockFrequency())
+                Timer.setClockFrequency()
             }
         }else if(address == 0xFF04) {
             /*

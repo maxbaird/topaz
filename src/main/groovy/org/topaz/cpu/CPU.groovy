@@ -19,8 +19,8 @@ class CPU{
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
         def hexCode = java.lang.String.format("0x%02X", opcode)
-        //boolean display = (n >= 8259 && n <= 8500 ) ? true : false
-        boolean display = (n >= 8286 && n <= 8290 ) ? true : false
+        //boolean display = (n >= 8287 && n <= 8500 ) ? true : false
+        boolean display = (n >= 8345 && n <= 8355 ) ? true : false
 
         register.pc++
         def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0
