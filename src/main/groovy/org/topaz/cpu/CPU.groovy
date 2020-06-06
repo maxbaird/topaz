@@ -5,6 +5,7 @@ import org.topaz.InterruptHandler
 import org.topaz.MemoryManager
 import org.topaz.util.BitUtil
 import org.topaz.debug.StateDumper
+import org.topaz.Topaz
 
 class CPU{
     Register register
@@ -19,7 +20,7 @@ class CPU{
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
         def hexCode = java.lang.String.format("0x%02X", opcode)
-        boolean display = (n >= 8399 && n <= 8500 ) ? true : false
+        boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false
 
         register.pc++
         def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0

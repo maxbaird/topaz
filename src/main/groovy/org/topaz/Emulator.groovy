@@ -10,6 +10,7 @@ import org.topaz.InterruptHandler
 import org.topaz.Joypad
 import org.topaz.ui.Display
 import org.topaz.debug.StateDumper
+import org.topaz.Topaz
 
 class Emulator{
     private static final MAX_CYCLES = 69905
@@ -78,7 +79,7 @@ class Emulator{
 
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
-            if(n == 9000) {
+            if(n == Topaz.executionLimit) {
                 println 'exiting'
                 System.exit(-1)
             }
