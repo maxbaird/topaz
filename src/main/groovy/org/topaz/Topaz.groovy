@@ -28,12 +28,17 @@ class Topaz{
                 "Executin Limit: " + executionLimit + "\n"
 
         println str
-        
-        new Topaz()
+            println 'args length: ' + args.length 
+        if(args.length >= 2) {
+            new Topaz(args[1])
+        }else {
+            new Topaz(null)
+        }
     }
 
-    public Topaz(){
-        def f = new File("/home/maxx/Documents/Games/terminator2.gb")
+    public Topaz(def path){
+        def f = (path != null) ? new File(path) : new File("/home/maxx/Documents/Games/terminator2.gb")
+        //def f = new File("/home/maxx/Documents/Games/terminator2.gb")
         //def f = new File("/home/maxx/Downloads/dmg0_rom.bin")
         def cartridge = new Cartridge(f)
         emulator = new Emulator(cartridge)
