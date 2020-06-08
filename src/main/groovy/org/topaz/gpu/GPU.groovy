@@ -140,7 +140,7 @@ class GPU{
          * remaining, etc.
          */
         final int WINDOW_Y = memoryManager.readMemory(0xFF4A)
-        final int WINDOW_X = memoryManager.readMemory(0xFF4B)
+        final int WINDOW_X = memoryManager.readMemory(0xFF4B) - 7
 
         //     +----------------------------------------------------------->256px
         //     |                                   ^
@@ -195,254 +195,263 @@ class GPU{
             if(WINDOW_Y <= memoryManager.readMemory(LCD.LY_REGISTER)) {
                 usingWindow = true
             }
+        }
 
+        /*
+         * The tile data is stored in two memory regions, 0x8800 - 0x97FF and
+         * 0x8000 - 0x8FFF. Bit 4 of the LCD Control register indicates
+         * which region should be used for loading the tile data. If this bit
+         * is 0, memory region 0x8800 - 0x97FF is used, otherwise region
+         * 0x8000 - 0x8FFF is used.
+         */
+        if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_AND_WINDOW_TILE_DATA_SELECT)) {
+            tileData = TILE_DATA_LOCATION_1
+        }else {
+            tileData = TILE_DATA_LOCATION_2
             /*
-             * The tile data is stored in two memory regions, 0x8800 - 0x97FF and
-             * 0x8000 - 0x8FFF. Bit 4 of the LCD Control register indicates
-             * which region should be used for loading the tile data. If this bit
-             * is 0, memory region 0x8800 - 0x97FF is used, otherwise region
-             * 0x8000 - 0x8FFF is used.
+             * While the Gameboy seems to largely use unsigned bytes, there
+             * is a quirk when it comes to tiles. As it turns out, if the
+             * tile data must be read from memory region 0x8000 - 0x97FF,
+             * then the tile identifier used has the layout of a signed byte
+             * and ranges from -127 (an invalid index) to 127. The signed
+             * nature of the byte needs to be accounted for when indexing the
+             * tile.
              */
-            if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_AND_WINDOW_TILE_DATA_SELECT)) {
-                tileData = TILE_DATA_LOCATION_1
-            }else {
-                tileData = TILE_DATA_LOCATION_2
-                /*
-                 * While the Gameboy seems to largely use unsigned bytes, there
-                 * is a quirk when it comes to tiles. As it turns out, if the
-                 * tile data must be read from memory region 0x8000 - 0x97FF,
-                 * then the tile identifier used has the layout of a signed byte
-                 * and ranges from -127 (an invalid index) to 127. The signed
-                 * nature of the byte needs to be accounted for when indexing the
-                 * tile.
-                 */
-                isUnsigned = false
-            }
+            isUnsigned = false
+        }
 
-            if(usingWindow == false) {
-                /*
-                 * If the current scanline is not being drawn in the window, get
-                 * the correct memory region to load the background tile indexes
-                 * from.
-                 */
-                if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_TILE_MAP_DISPLAY_SELECT)) {
-                    memoryRegion = 0x9C00
-                }else {
-                    memoryRegion = 0x9800
-                }
-            }else {
-                /*
-                 * Otherwise, load the window's list of of tile indexes from the
-                 * specified memory region.
-                 */
-                if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.WINDOW_TILE_MAP_DISPLAY_SELECT)) {
-                    memoryRegion = 0x9C00
-                }else {
-                    memoryRegion = 0x9800
-                }
-            }
-
+        if(usingWindow == false) {
             /*
-             * The yPosition is used to calculate which of the 32 vertical tiles
-             * the current scanline is drawing. Tiles can belong to either the
-             * background or the non-scrolling window drawn above the background.
+             * If the current scanline is not being drawn in the window, get
+             * the correct memory region to load the background tile indexes
+             * from.
              */
-            int yPosition = 0
-
-            if(usingWindow == false) {
-                /*
-                 * If the current scanline is currently drawing the background,
-                 * then the yPosition calculated is with respect to the
-                 * background's Y location within the 256x256 screen.
-                 */
-                yPosition = SCROLL_Y + memoryManager.readMemory(LCD.LY_REGISTER)
+            if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_TILE_MAP_DISPLAY_SELECT)) {
+                memoryRegion = 0x9C00
             }else {
-                /*
-                 * If the current scanline is currently drawing the window, then
-                 * the yPosition calculated is with respect to the window's Y
-                 * location within the background.
-                 */
-                yPosition = memoryManager.readMemory(LCD.LY_REGISTER) - WINDOW_Y
+                memoryRegion = 0x9800
             }
+        }else {
+            /*
+             * Otherwise, load the window's list of of tile indexes from the
+             * specified memory region.
+             */
+            if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.WINDOW_TILE_MAP_DISPLAY_SELECT)) {
+                memoryRegion = 0x9C00
+            }else {
+                memoryRegion = 0x9800
+            }
+        }
 
-            final int PIXEL_ROWS_PER_TILE = 8
-            final int TILES_PER_ROW = 32
+        /*
+         * The yPosition is used to calculate which of the 32 vertical tiles
+         * the current scanline is drawing. Tiles can belong to either the
+         * background or the non-scrolling window drawn above the background.
+         */
+        int yPosition = 0
+
+        if(usingWindow == false) {
+            /*
+             * If the current scanline is currently drawing the background,
+             * then the yPosition calculated is with respect to the
+             * background's Y location within the 256x256 screen.
+             */
+            yPosition = SCROLL_Y + memoryManager.readMemory(LCD.LY_REGISTER)
+        }else {
+            /*
+             * If the current scanline is currently drawing the window, then
+             * the yPosition calculated is with respect to the window's Y
+             * location within the background.
+             */
+            yPosition = memoryManager.readMemory(LCD.LY_REGISTER) - WINDOW_Y
+        }
+
+        final int PIXEL_ROWS_PER_TILE = 8
+        final int TILES_PER_ROW = 32
+
+        /*
+         * The background is free to scroll around to any 160x144 pixels of
+         * the available 256x256 pixels. To programmatically know the unique
+         * row of pixels for rendering, a calculation is performed. The
+         * yPosition represents the scanline's absolute position in the
+         * 256x256 grid. The correct row of tiles that the scanline is within
+         * is found by first dividing the yPosition by the number of pixel
+         * rows per tile. We are only interested in the integer result of
+         * this calculation. The result is then multiplied by the number of
+         * tiles per row. The final result is the starting position of the
+         * row in which the current scanline is within the 32x32 tile grid.
+         * 
+         * As an example:
+         * Assume that the background (of size 160x144 pixels) is at the
+         * upper left position of the 256x256 available pixels. This means
+         * that SCROLL_Y and SCROLL_X will be 0 (the background's offset is 0
+         * from each axis as it is flush against it). Next, assume that the
+         * current scanline is at position 42. The yPosition's calculation is
+         * SCROLL_Y + scanline, since SCROLL_Y is 0 this gives us yPosition =
+         * 0 + 42. To get the correct row index, the yPosition is first
+         * divided by the number of pixel rows per tile (each tile is 8x8
+         * pixels). This gives 42/8 = 5 (remember we are only interested in
+         * the integer part of the result). In the 32x32 grid of tiles, the
+         * value 5 represents the 5th row of tiles. To get the index value of
+         * the starting tile of the 5th row, it is multiplied by the number
+         * of tiles per row (32) thus giving the tile row's starting index
+         * value 5*32 = 160. The value 160 is the value at which the tile row
+         * of the scanline *starts*. Remember that the background can be
+         * offset from that starting position anywhere along the 32x32 tile
+         * grid. The calculation of the xPosition gives the correct tile at
+         * which the background begins.
+         */
+
+        int tileRowStart = ((yPosition / PIXEL_ROWS_PER_TILE) as int) * TILES_PER_ROW
+
+        LCD.WIDTH.times {pixel->
+            int xPosition = pixel + SCROLL_X
 
             /*
-             * The background is free to scroll around to any 160x144 pixels of
-             * the available 256x256 pixels. To programmatically know the unique
-             * row of pixels for rendering, a calculation is performed. The
-             * yPosition represents the scanline's absolute position in the
-             * 256x256 grid. The correct row of tiles that the scanline is within
-             * is found by first dividing the yPosition by the number of pixel
-             * rows per tile. We are only interested in the integer result of
-             * this calculation. The result is then multiplied by the number of
-             * tiles per row. The final result is the starting position of the
-             * row in which the current scanline is within the 32x32 tile grid.
+             * Translate the current x position to the window if a window is
+             * being drawn.
+             */
+            if(usingWindow) {
+                if(pixel >= WINDOW_X) {
+                    xPosition = pixel - WINDOW_X
+                }
+            }
+
+            /*
+             * This calculation determines which of the 32 tiles along the
+             * x-axis on the 256x256 grid of tiles the current pixel's
+             * xPosition falls within, i.e., which tile column.
              * 
-             * As an example:
-             * Assume that the background (of size 160x144 pixels) is at the
-             * upper left position of the 256x256 available pixels. This means
-             * that SCROLL_Y and SCROLL_X will be 0 (the background's offset is 0
-             * from each axis as it is flush against it). Next, assume that the
-             * current scanline is at position 42. The yPosition's calculation is
-             * SCROLL_Y + scanline, since SCROLL_Y is 0 this gives us yPosition =
-             * 0 + 42. To get the correct row index, the yPosition is first
-             * divided by the number of pixel rows per tile (each tile is 8x8
-             * pixels). This gives 42/8 = 5 (remember we are only interested in
-             * the integer part of the result). In the 32x32 grid of tiles, the
-             * value 5 represents the 5th row of tiles. To get the index value of
-             * the starting tile of the 5th row, it is multiplied by the number
-             * of tiles per row (32) thus giving the tile row's starting index
-             * value 5*32 = 160. The value 160 is the value at which the tile row
-             * of the scanline *starts*. Remember that the background can be
-             * offset from that starting position anywhere along the 32x32 tile
-             * grid. The calculation of the xPosition gives the correct tile at
-             * which the background begins.
+             * For example:
+             * For simplicity, assume that the background aligned to the
+             * upper left of the 256x256 pixels such that SCROLL_X and
+             * SCROLL_Y are both 0. Pixel 0 of the scanline would be 0/8 = 0.
+             * This means that the pixel falls in the first line of the tile
+             * (again, we are only interested in the integer result). Pixels
+             * 0 to 7 would give a result of zero. However, when we're at
+             * pixel 8 of the scanline the values become 8/8 = 1, thus
+             * indicating that the pixel is in the second tile of the column.
+             * Again this continues for pixels 8 to 15. And in much the same
+             * way, pixels 16 to 23 will give a result of 2, etc.
+             *
              */
+            int tileColumn = (xPosition / TILE_PIXEL_WIDTH) as int
 
-            int tileRowStart = ((yPosition / PIXEL_ROWS_PER_TILE) as int) * TILES_PER_ROW
+            /*
+             * The address of the tile to read from memory is calculated as
+             * follows: tileRow + tileColumn represent the offset into the
+             * selected memoryRegion that holds the list of all tiles. Adding
+             * their sum to the memoryRegion therefore gives the tile's
+             * address.
+             */
+            int tileAddress = memoryRegion + tileRowStart + tileColumn
 
-            LCD.WIDTH.times {pixel->
-                int xPosition = pixel + SCROLL_X
+            int tileNumber = 0//memoryManager.readMemory(tileAddress)
 
-                /*
-                 * Translate the current x position to the window if a window is
-                 * being drawn.
-                 */
-                if(usingWindow) {
-                    if(pixel >= WINDOW_X) {
-                        xPosition = pixel - WINDOW_X
-                    }
-                }
 
-                /*
-                 * This calculation determines which of the 32 tiles along the
-                 * x-axis on the 256x256 grid of tiles the current pixel's
-                 * xPosition falls within, i.e., which tile column.
-                 * 
-                 * For example:
-                 * For simplicity, assume that the background aligned to the
-                 * upper left of the 256x256 pixels such that SCROLL_X and
-                 * SCROLL_Y are both 0. Pixel 0 of the scanline would be 0/8 = 0.
-                 * This means that the pixel falls in the first line of the tile
-                 * (again, we are only interested in the integer result). Pixels
-                 * 0 to 7 would give a result of zero. However, when we're at
-                 * pixel 8 of the scanline the values become 8/8 = 1, thus
-                 * indicating that the pixel is in the second tile of the column.
-                 * Again this continues for pixels 8 to 15. And in much the same
-                 * way, pixels 16 to 23 will give a result of 2, etc.
-                 *
-                 */
-                int tileColumn = (xPosition / TILE_PIXEL_WIDTH) as int
-                int tileId = 0
-
-                /*
-                 * The address of the tile to read from memory is calculated as
-                 * follows: tileRow + tileColumn represent the offset into the
-                 * selected memoryRegion that holds the list of all tiles. Adding
-                 * their sum to the memoryRegion therefore gives the tile's
-                 * address.
-                 */
-                int tileAddress = memoryRegion + tileRowStart + tileColumn
-
-                int tileNumber = memoryManager.readMemory(tileAddress)
-
-                int tileLocation = tileData
-
-                if(isUnsigned) {
-                    /*
-                     * If the tile memory data was read from the region 0x8000 -
-                     * 0x8FFF then the tileNumber read from the tileAddress is an
-                     * unsigned byte and the identifier ranges from 0 to 255.
-                     */
-                    tileLocation = tileLocation + (tileNumber * SIZE_OF_TILE_IN_MEMORY)
-                }else {
-                    /*
-                     * If the memory region was 0x8800 - 0x97FF, then the
-                     * identifier is signed and ranges from -127 to 127.
-                     */
-                    final int OFFSET = 128
-                    tileLocation = tileLocation + ((tileNumber + OFFSET) * SIZE_OF_TILE_IN_MEMORY)
-                }
-
-                /*
-                 * This calculation determines the row of pixels of the current
-                 * tile that the scanline is on.
-                 */
-                int tilePixelRow = yPosition % TILE_PIXEL_HEIGHT
-
-                /*
-                 * Each row of pixels is made by combining two rows of tile data.
-                 */
-                tilePixelRow = tilePixelRow * 2
-                int pixelData1 = memoryManager.readMemory(tileLocation + tilePixelRow)
-                int pixelData2 = memoryManager.readMemory(tileLocation + tilePixelRow + 1)
-
-                int colourBit = xPosition % TILE_PIXEL_WIDTH
-
-                /*
-                 * Get the xPosition of the bit with respect to the tile.
-                 * However, the bit's index position is not the same as the bit's
-                 * significance. So, for the 8 bits making up a tile row, index
-                 * position 0 of the bit is really bit position 7. Index position
-                 * 1 is bit position 6. And so the correct conversion is made by
-                 * first subtracting 7 and take the absolute value.
-                 */
-                colourBit = Math.abs((colourBit - 7))
-
-                /*
-                 * Two rows of bits are combined to form a single row of pixels.
-                 * The combination of the rows allows for pixel colours to be
-                 * generated. The combined bits result in a value that maps to
-                 * one of four possible colours.
-                 */
-                int colourNumber = BitUtil.getValue(pixelData2, colourBit)
-                colourNumber = colourNumber << 1
-                colourNumber = colourNumber | BitUtil.getValue(pixelData1, colourBit)
-
-                /*
-                 * The BG (Background) palette data register assigns gray shades
-                 * to the colour numbers of the BG and window tiles.
-                 * 
-                 * Bit 7-6 - Shade for Colour Number 3
-                 * Bit 5-4 - Shade for Colour Number 2
-                 * Bit 3-2 - Shade for Colour Number 1
-                 * Bit 1-0 - Shade for Colour Number 0
-                 * 
-                 * The four possible shades of gray are:
-                 * 0 White
-                 * 1 Light gray
-                 * 2 Dark Gray
-                 * 3 Black
-                 */
-                final int BG_PALETTE_DATA = 0xFF47
-
-                Colour colour = getColour(colourNumber, BG_PALETTE_DATA)
-                int red = 0
-                int green = 0
-                int blue = 0
-
-                switch(colour) {
-                    case Colour.WHITE : red = 255; green = 255; blue = 255; break
-                    case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break
-                    case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break
-                }
-
-                int scanline = memoryManager.readMemory(LCD.LY_REGISTER)
-
-                if(scanline < 0 || scanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
-                    /*
-                     * Skip the current iteration if scanline or pixel are not
-                     * within the screen's bounds.
-                     */
-                    return /* really just a continue statement */
-                }
-
-                screenData[pixel][scanline][0] = red
-                screenData[pixel][scanline][1] = green
-                screenData[pixel][scanline][2] = blue
+            if(isUnsigned) {
+                tileNumber = memoryManager.readMemory(tileAddress)
+            }else {
+                tileNumber = (byte)memoryManager.readMemory(tileAddress)
             }
+
+            int tileLocation = tileData
+            if(isUnsigned) {
+                /*
+                 * If the tile memory data was read from the region 0x8000 -
+                 * 0x8FFF then the tileNumber read from the tileAddress is an
+                 * unsigned byte and the identifier ranges from 0 to 255.
+                 */
+                tileLocation = tileLocation + (tileNumber * SIZE_OF_TILE_IN_MEMORY)
+            }else {
+                /*
+                 * If the memory region was 0x8800 - 0x97FF, then the
+                 * identifier is signed and ranges from -127 to 127.
+                 */
+                final int OFFSET = 128
+                tileLocation = tileLocation + ((tileNumber + OFFSET) * SIZE_OF_TILE_IN_MEMORY)
+            }
+
+            /*
+             * This calculation determines the row of pixels of the current
+             * tile that the scanline is on.
+             */
+            int tilePixelRow = yPosition % TILE_PIXEL_HEIGHT
+
+            /*
+             * Each row of pixels is made by combining two rows of tile data.
+             */
+            tilePixelRow = tilePixelRow * 2
+            int pixelData1 = memoryManager.readMemory(tileLocation + tilePixelRow)
+            int pixelData2 = memoryManager.readMemory(tileLocation + tilePixelRow + 1)
+
+            int colourBit = xPosition % TILE_PIXEL_WIDTH
+
+            /*
+             * Get the xPosition of the bit with respect to the tile.
+             * However, the bit's index position is not the same as the bit's
+             * significance. So, for the 8 bits making up a tile row, index
+             * position 0 of the bit is really bit position 7. Index position
+             * 1 is bit position 6. And so the correct conversion is made by
+             * first subtracting 7 and take the absolute value.
+             */
+            colourBit = Math.abs(colourBit - 7)
+
+            /*
+             * Two rows of bits are combined to form a single row of pixels.
+             * The combination of the rows allows for pixel colours to be
+             * generated. The combined bits result in a value that maps to
+             * one of four possible colours.
+             */
+            int colourNumber = BitUtil.getValue(pixelData2, colourBit)
+            colourNumber = (colourNumber << 1) & 0xFF
+            colourNumber = colourNumber | BitUtil.getValue(pixelData1, colourBit)
+
+            /*
+             * The BG (Background) palette data register assigns gray shades
+             * to the colour numbers of the BG and window tiles.
+             * 
+             * Bit 7-6 - Shade for Colour Number 3
+             * Bit 5-4 - Shade for Colour Number 2
+             * Bit 3-2 - Shade for Colour Number 1
+             * Bit 1-0 - Shade for Colour Number 0
+             * 
+             * The four possible shades of gray are:
+             * 0 White
+             * 1 Light gray
+             * 2 Dark Gray
+             * 3 Black
+             */
+            final int BG_PALETTE_DATA = 0xFF47
+
+            Colour colour = getColour(colourNumber, BG_PALETTE_DATA)
+            int red = 0
+            int green = 0
+            int blue = 0
+
+            switch(colour) {
+                case Colour.WHITE : red = 255; green = 255; blue = 255; break
+                case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break
+                case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break
+                case Colour.BLACK: red = 0x0; green = 0x0; blue = 0x0; break
+            }
+
+            int scanline = memoryManager.readMemory(LCD.LY_REGISTER)
+
+            if(scanline < 0 || scanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
+                /*
+                 * Skip the current iteration if scanline or pixel are not
+                 * within the screen's bounds.
+                 */
+                return /* really just a continue statement */
+            }
+
+            //println 'colour: ' + colour
+            //println 'red: ' + red + ', green: ' + green + ', blue: ' + blue
+
+            screenData[pixel][scanline - 1][0] = red
+            screenData[pixel][scanline - 1][1] = green
+            screenData[pixel][scanline - 1][2] = blue
         }
     }
 
@@ -580,8 +589,8 @@ class GPU{
 
                     /* The rest of code is roughly the same as what happens for the tiles */
                     int colourNumber = BitUtil.getValue(tileData2, colourBit)
-                    colourNumber = colourNumber << 1
-                    colourNumber = colourNumber | BitUtil.getValue(tileData1, colourBit)
+                    colourNumber = (colourNumber << 1) & 0xFF
+                    colourNumber = (colourNumber | BitUtil.getValue(tileData1, colourBit)) & 0xFF
 
                     /*
                      * Sprites can use either of these two palettes based on the
@@ -604,7 +613,7 @@ class GPU{
                      * White is transparent for sprites
                      */
                     if(colour == Colour.WHITE) {
-                        return /* skip this iteration */
+                        continue
                     }
 
                     int red = 0
@@ -615,6 +624,7 @@ class GPU{
                         case Colour.WHITE : red = 255; green = 255; blue = 255; break
                         case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break
                         case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break
+                        case Colour.BLACK: red = 0x0; green = 0x0; blue = 0x0; break
                     }
 
                     /*
@@ -632,9 +642,9 @@ class GPU{
                         continue
                     }
 
-                    screenData[pixel][scanline][0] = red
-                    screenData[pixel][scanline][1] = green
-                    screenData[pixel][scanline][2] = blue
+                    screenData[pixel][scanline - 1][0] = red
+                    screenData[pixel][scanline - 1][1] = green
+                    screenData[pixel][scanline - 1][2] = blue
                 }
             }
         }
@@ -644,6 +654,7 @@ class GPU{
         Colour colour = Colour.WHITE
 
         int palette = memoryManager.readMemory(address)
+        //println 'Palette: ' + palette + ', Colour number: ' + colourNumber
         int hi = 0
         int lo = 0
 
@@ -655,9 +666,9 @@ class GPU{
         }
 
         int c = 0
-        c = BitUtil.getValue(palette, hi) << 1
-        c = c | BitUtil.getValue(palette, lo)
-
+        c = (BitUtil.getValue(palette, hi) << 1)
+        c = (c | BitUtil.getValue(palette, lo))
+        println 'getting color: ' + c
         switch(c){
             case 0: colour = Colour.WHITE; break
             case 1: colour = Colour.LIGHT_GRAY; break

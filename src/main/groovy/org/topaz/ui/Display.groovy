@@ -20,9 +20,9 @@ class Display extends JPanel{
     public Display() {
         displayHeight = LCD.HEIGHT
         displayWidth = LCD.WIDTH
-        canvas = new BufferedImage(displayWidth, displayHeight, BufferedImage.TYPE_INT_ARGB)
+        this.canvas = new BufferedImage(displayWidth, displayHeight, BufferedImage.TYPE_INT_RGB)
         createGUI()
-        clearDisplay()
+        //clearDisplay()
     }
     
     private void createGUI() {
@@ -40,26 +40,26 @@ class Display extends JPanel{
     public void paintComponent(Graphics g) {
         super.paintComponent(g)
         Graphics2D g2D = (Graphics2D)g
-        g2D.drawImage(canvas, null, null)
+        g2D.drawImage(this.canvas, null, null)
     }
 
-    private clearDisplay() {
-        /*
-         * Clears screen to white
-         */
-        displayWidth.times{x->
-            displayHeight.times {y->
-                canvas.setRGB(x, y, Color.WHITE.getRGB())
-            }
-        }
-    }
+//    private clearDisplay() {
+//        /*
+//         * Clears screen to white
+//         */
+//        displayWidth.times{x->
+//            displayHeight.times {y->
+//                this.canvas.setRGB(x, y, Color.WHITE.getRGB())
+//            }
+//        }
+//    }
     
     private update(int[][][] screenData) {
         Color c
         displayWidth.times{x->
             displayHeight.times {y->
                 c = new Color(screenData[x][y][0], screenData[x][y][1], screenData[x][y][2])
-                canvas.setRGB(x, y, c.RGB)
+                this.canvas.setRGB(x, y, c.RGB)
             }
         }
         repaint() 

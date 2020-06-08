@@ -34,7 +34,7 @@ class CPU{
 
         if(display) {
             def exOpcode = String.format("0x%02X", extendedOpcode)
-            dumper.dump(n, hexCode, exOpcode, cycles, '/tmp/' + n + '.topaz')
+            //dumper.dump(n, hexCode, exOpcode, cycles, '/tmp/' + n + '.topaz')
         }
         return cycles
     }
@@ -884,7 +884,6 @@ class CPU{
     }
 
     private int executeExtendedOpcode() {
-        println 'Executing extended opcode'
         /*
          * When the opcode 0xCB is encountered the next immediate byte needs to
          * be decoded and treated as an opcode.

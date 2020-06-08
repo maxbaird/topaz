@@ -38,7 +38,7 @@ class Topaz{
 	}
 
 	public Topaz(def path){
-		def f = (path != null) ? new File(path) : new File("../terminator2.gb")
+		def f = (path != null) ? new File(path) : new File("/home/maxx/Documents/Games/terminator2.gb")
 		//def f = new File("/home/maxx/Documents/Games/terminator2.gb")
 		//def f = new File("/home/maxx/Downloads/dmg0_rom.bin")
 		def cartridge = new Cartridge(f)

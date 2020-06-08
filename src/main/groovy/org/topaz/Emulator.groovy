@@ -79,8 +79,11 @@ class Emulator{
 
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
-            if(n == Topaz.executionLimit) {
-                println 'exiting'
+//            if(n == Topaz.executionLimit) {
+            if(n == 330000) {
+                println 'exiting at : ' + n
+                println 'Press enter to continue...'
+                System.in.newReader().readLine()
                 System.exit(-1)
             }
             int cycles = 0
