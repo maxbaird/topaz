@@ -788,7 +788,7 @@ class CPU{
                 return 4
             case 0x18:
                 cpuJumpImmediate(false, 0, false)
-                return 8
+                return 12 
             case 0x20:
                 cpuJumpImmediate(true, register.FLAG_Z, false)
                 return register.isZ() ? 8 : 12
@@ -828,7 +828,7 @@ class CPU{
                 return 8
             case 0xC8:
                 cpuReturn(true, register.FLAG_Z, true)
-                return 8
+                return register.isZ() ? 20 : 8
             case 0xD0:
                 cpuReturn(true, register.FLAG_C, false)
                 return 8

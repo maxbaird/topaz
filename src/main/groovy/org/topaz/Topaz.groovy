@@ -5,43 +5,44 @@ import org.topaz.cpu.Register
 import org.topaz.Emulator
 
 class Topaz{
-    Emulator emulator
-    static int executionStart
-    static int executionEnd
-    static int executionLimit
+	Emulator emulator
+	static int executionStart
+	static int executionEnd
+	static int executionLimit
 
-    public static void main(String []args) {
-        def val
-        try {
-            val = args[0] as int
-        }catch(Exception e) {
-            println 'Error converting ' + args[0] + ':' + e.message
-            System.exit(-1)
-        }
+	public static void main(String []args) {
+		def val = 0
 
-        executionStart = val
-        executionEnd = val + 500
-        executionLimit = executionEnd + 500
+		if(args.length != 0 ) {
+			try {
+				val = args[0] as int
+			}catch(Exception e) {
+				println 'Error converting ' + args[0] + ':' + e.message
+				System.exit(-1)
+			}
+		}
 
-        def str = "Execution Start: " + executionStart + "\n" +
-                "Execution End: " + executionEnd + "\n" +
-                "Executin Limit: " + executionLimit + "\n"
+		executionStart = val
+		executionEnd = val + 500
+		executionLimit = executionEnd + 500
 
-        println str
-            println 'args length: ' + args.length 
-        if(args.length >= 2) {
-            new Topaz(args[1])
-        }else {
-            new Topaz(null)
-        }
-    }
+		def str = "Execution Start: " + executionStart + "\n" +
+				"Execution End: " + executionEnd + "\n" +
+				"Executin Limit: " + executionLimit + "\n"
 
-    public Topaz(def path){
-        def f = (path != null) ? new File(path) : new File("/home/maxx/Documents/Games/terminator2.gb")
-        //def f = new File("/home/maxx/Documents/Games/terminator2.gb")
-        //def f = new File("/home/maxx/Downloads/dmg0_rom.bin")
-        def cartridge = new Cartridge(f)
-        emulator = new Emulator(cartridge)
-        emulator.start()
-    }
+		if(args.length >= 2) {
+			new Topaz(args[1])
+		}else {
+			new Topaz(null)
+		}
+	}
+
+	public Topaz(def path){
+		def f = (path != null) ? new File(path) : new File("../terminator2.gb")
+		//def f = new File("/home/maxx/Documents/Games/terminator2.gb")
+		//def f = new File("/home/maxx/Downloads/dmg0_rom.bin")
+		def cartridge = new Cartridge(f)
+		emulator = new Emulator(cartridge)
+		emulator.start()
+	}
 }
