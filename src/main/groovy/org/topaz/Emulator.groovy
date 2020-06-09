@@ -90,7 +90,7 @@ class Emulator{
             cycles = this.executeNextOpCode(n)
             cyclesThisUpdate += cycles
             this.updateTimers(cycles)
-            this.updateGraphics(cycles)
+            this.updateGraphics(cycles, n)
             cyclesThisUpdate += this.handleInterrupts()
         }
         this.renderScreen()
@@ -131,8 +131,8 @@ class Emulator{
         timer.updateTimer(cycles)
     }
 
-    private void updateGraphics(int cycles) {
-        gpu.updateGraphics(cycles)
+    private void updateGraphics(int cycles, int n) {
+        gpu.updateGraphics(cycles, n)
     }
 
     private int handleInterrupts() {

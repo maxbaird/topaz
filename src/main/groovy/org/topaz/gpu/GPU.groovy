@@ -6,6 +6,7 @@ import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
 import org.topaz.ui.Display
 import java.lang.Math
+import org.topaz.debug.GPUDumper
 
 class GPU{
     static final int CYCLES_BETWEEN_SCANLINES = 456
@@ -52,15 +53,18 @@ class GPU{
         BLACK
     }
 
+    GPUDumper dumper /* used for debugging */
+        
     public GPU(MemoryManager memoryManager, InterruptHandler interruptHandler, Display display) {
         this.memoryManager = memoryManager
         this.interruptHandler = interruptHandler
         this.display = display
         this.screenData = new int[LCD.WIDTH][LCD.HEIGHT][3]
         lcd = new LCD(memoryManager: memoryManager, interruptHandler: interruptHandler)
+        dumper = new GPUDumper()
     }
 
-    public void updateGraphics(int cycles) {
+    public void updateGraphics(int cycles, int n) {
         lcd.setLCDStatus()
 
         if(lcd.isLCDEnabled()) {
@@ -91,12 +95,12 @@ class GPU{
                  */
                 memoryManager.rom[LCD.LY_REGISTER] = 0
             }else if(currentLine < V_BLANK_SCANLINE_START) {
-                drawScanLine()
+                drawScanLine(n)
             }
         }
     }
 
-    private void drawScanLine() {
+    private void drawScanLine(int n) {
         /*
          * The Gameboy does not have a direct frame buffer and instead uses
          * a tiling system. Tiles are 8x8 pixels that are placed on the screen
@@ -107,7 +111,7 @@ class GPU{
         int control = memoryManager.readMemory(LCD.LCDC_REGISTER)
 
         if(BitUtil.isSet(control, LCD.ControlRegisterBit.BG_DISPLAY)) {
-            renderTiles()
+            renderTiles(n)
         }
 
         if(BitUtil.isSet(control, LCD.ControlRegisterBit.OBJ_SPRITE_DISPLAY_ENABLE)) {
@@ -119,7 +123,7 @@ class GPU{
         display.update(screenData)
     }
 
-    private void renderTiles() {
+    private void renderTiles(int n) {
         /*
          * SCROLL_X and SCROLL_Y specify the position in the 256x256 background
          * (BG) map from which to start drawing the background. This is necessary
@@ -303,6 +307,14 @@ class GPU{
          */
 
         int tileRowStart = ((yPosition / PIXEL_ROWS_PER_TILE) as int) * TILES_PER_ROW
+        
+        dumper.scrollx = SCROLL_X
+        dumper.scrolly = SCROLL_Y
+        dumper.windowy = WINDOW_Y
+        dumper.tileData = tileData
+        dumper.backgroundMemory = memoryRegion
+        dumper.yPosition = yPosition
+        dumper.tileRow = tileRowStart
 
         LCD.WIDTH.times {pixel->
             int xPosition = pixel + SCROLL_X
@@ -403,6 +415,7 @@ class GPU{
              * generated. The combined bits result in a value that maps to
              * one of four possible colours.
              */
+            //printf 'pixelData2: %d, tileLocation: %d, tileNumber: %d\n', pixelData2, tileLocation, tileNumber
             int colourNumber = BitUtil.getValue(pixelData2, colourBit)
             colourNumber = (colourNumber << 1) & 0xFF
             colourNumber = colourNumber | BitUtil.getValue(pixelData1, colourBit)
@@ -452,7 +465,23 @@ class GPU{
             screenData[pixel][scanline - 1][0] = red
             screenData[pixel][scanline - 1][1] = green
             screenData[pixel][scanline - 1][2] = blue
+            
+            dumper.xPosition[pixel] = xPosition
+            dumper.tileColumn[pixel] = tileColumn
+            dumper.tileNumber[pixel] = tileNumber
+            dumper.tileAddress[pixel] = tileAddress
+            dumper.tileLocation[pixel] = tileLocation
+            dumper.currentLine[pixel] = tilePixelRow 
+            dumper.pixelData1[pixel] = pixelData1
+            dumper.pixelData2[pixel] = pixelData2 
+            dumper.colourBit[pixel] = colourBit
+            dumper.colourNumber[pixel] = colourNumber
+            dumper.red[pixel] = red
+            dumper.green[pixel] = green 
+            dumper.blue[pixel] = blue 
         }
+        
+        dumper.dump(n, '/tmp/' + n + '.topaz')
     }
 
     private void renderSprites() {
@@ -668,7 +697,6 @@ class GPU{
         int c = 0
         c = (BitUtil.getValue(palette, hi) << 1)
         c = (c | BitUtil.getValue(palette, lo))
-        println 'getting color: ' + c
         switch(c){
             case 0: colour = Colour.WHITE; break
             case 1: colour = Colour.LIGHT_GRAY; break
