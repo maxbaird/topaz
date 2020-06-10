@@ -64,7 +64,7 @@ class GPU{
         dumper = new GPUDumper()
     }
 
-    public void updateGraphics(int cycles, int n) {
+    public void updateGraphics(int cycles) {
         lcd.setLCDStatus()
 
         if(lcd.isLCDEnabled()) {
@@ -86,6 +86,7 @@ class GPU{
             SCAN_LINE_CYCLES_COUNTER += CYCLES_BETWEEN_SCANLINES
 
             if(currentLine == V_BLANK_SCANLINE_START) {
+                drawScanLine()
                 /* Request the appropriate interrupt if in a vertical blank period */
                 interruptHandler.requestInterrupt(InterruptHandler.V_BLANK_INTERRUPT)
             }else if(currentLine > V_BLANK_SCANLINE_END) {
@@ -95,12 +96,13 @@ class GPU{
                  */
                 memoryManager.rom[LCD.LY_REGISTER] = 0
             }else if(currentLine < V_BLANK_SCANLINE_START) {
-                drawScanLine(n)
+                drawScanLine()
             }
         }
     }
 
-    private void drawScanLine(int n) {
+    def n = 0
+    private void drawScanLine() {
         /*
          * The Gameboy does not have a direct frame buffer and instead uses
          * a tiling system. Tiles are 8x8 pixels that are placed on the screen
@@ -111,6 +113,7 @@ class GPU{
         int control = memoryManager.readMemory(LCD.LCDC_REGISTER)
 
         if(BitUtil.isSet(control, LCD.ControlRegisterBit.BG_DISPLAY)) {
+            n++
             renderTiles(n)
         }
 
@@ -144,7 +147,7 @@ class GPU{
          * remaining, etc.
          */
         final int WINDOW_Y = memoryManager.readMemory(0xFF4A)
-        final int WINDOW_X = memoryManager.readMemory(0xFF4B) - 7
+        final int WINDOW_X = (memoryManager.readMemory(0xFF4B) - 7) & 0xFF
 
         //     +----------------------------------------------------------->256px
         //     |                                   ^
@@ -189,8 +192,9 @@ class GPU{
         int memoryRegion = 0
         boolean isUnsigned = true
         boolean usingWindow = false
+        final int LCD_CONTROL = memoryManager.readMemory(LCD.LCDC_REGISTER)
 
-        if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.WINDOW_DISPLAY_ENABLE)) {
+        if(BitUtil.isSet(LCD_CONTROL, LCD.ControlRegisterBit.WINDOW_DISPLAY_ENABLE)) {
             /*
              * Is the current scanline being drawn within the windows Y position?
              * This is later needed for determining which memory region
@@ -208,7 +212,7 @@ class GPU{
          * is 0, memory region 0x8800 - 0x97FF is used, otherwise region
          * 0x8000 - 0x8FFF is used.
          */
-        if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_AND_WINDOW_TILE_DATA_SELECT)) {
+        if(BitUtil.isSet(LCD_CONTROL, LCD.ControlRegisterBit.BG_AND_WINDOW_TILE_DATA_SELECT)) {
             tileData = TILE_DATA_LOCATION_1
         }else {
             tileData = TILE_DATA_LOCATION_2
@@ -230,7 +234,7 @@ class GPU{
              * the correct memory region to load the background tile indexes
              * from.
              */
-            if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.BG_TILE_MAP_DISPLAY_SELECT)) {
+            if(BitUtil.isSet(LCD_CONTROL, LCD.ControlRegisterBit.BG_TILE_MAP_DISPLAY_SELECT)) {
                 memoryRegion = 0x9C00
             }else {
                 memoryRegion = 0x9800
@@ -240,7 +244,7 @@ class GPU{
              * Otherwise, load the window's list of of tile indexes from the
              * specified memory region.
              */
-            if(BitUtil.isSet(LCD.LCDC_REGISTER, LCD.ControlRegisterBit.WINDOW_TILE_MAP_DISPLAY_SELECT)) {
+            if(BitUtil.isSet(LCD_CONTROL, LCD.ControlRegisterBit.WINDOW_TILE_MAP_DISPLAY_SELECT)) {
                 memoryRegion = 0x9C00
             }else {
                 memoryRegion = 0x9800
@@ -260,14 +264,14 @@ class GPU{
              * then the yPosition calculated is with respect to the
              * background's Y location within the 256x256 screen.
              */
-            yPosition = SCROLL_Y + memoryManager.readMemory(LCD.LY_REGISTER)
+            yPosition = (SCROLL_Y + memoryManager.readMemory(LCD.LY_REGISTER)) & 0xFF
         }else {
             /*
              * If the current scanline is currently drawing the window, then
              * the yPosition calculated is with respect to the window's Y
              * location within the background.
              */
-            yPosition = memoryManager.readMemory(LCD.LY_REGISTER) - WINDOW_Y
+            yPosition = (memoryManager.readMemory(LCD.LY_REGISTER) - WINDOW_Y) & 0xFF
         }
 
         final int PIXEL_ROWS_PER_TILE = 8
@@ -310,6 +314,7 @@ class GPU{
         
         dumper.scrollx = SCROLL_X
         dumper.scrolly = SCROLL_Y
+        dumper.windowx = WINDOW_X
         dumper.windowy = WINDOW_Y
         dumper.tileData = tileData
         dumper.backgroundMemory = memoryRegion
@@ -451,6 +456,20 @@ class GPU{
 
             int scanline = memoryManager.readMemory(LCD.LY_REGISTER)
 
+            dumper.xPosition[pixel] = xPosition
+            dumper.tileColumn[pixel] = tileColumn
+            dumper.tileNumber[pixel] = tileNumber
+            dumper.tileAddress[pixel] = tileAddress
+            dumper.tileLocation[pixel] = tileLocation
+            dumper.currentLine[pixel] = tilePixelRow 
+            dumper.pixelData1[pixel] = pixelData1
+            dumper.pixelData2[pixel] = pixelData2 
+            dumper.colourBit[pixel] = colourBit
+            dumper.colourNumber[pixel] = colourNumber
+            dumper.red[pixel] = red
+            dumper.green[pixel] = green 
+            dumper.blue[pixel] = blue 
+
             if(scanline < 0 || scanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
                 /*
                  * Skip the current iteration if scanline or pixel are not
@@ -465,23 +484,12 @@ class GPU{
             screenData[pixel][scanline - 1][0] = red
             screenData[pixel][scanline - 1][1] = green
             screenData[pixel][scanline - 1][2] = blue
-            
-            dumper.xPosition[pixel] = xPosition
-            dumper.tileColumn[pixel] = tileColumn
-            dumper.tileNumber[pixel] = tileNumber
-            dumper.tileAddress[pixel] = tileAddress
-            dumper.tileLocation[pixel] = tileLocation
-            dumper.currentLine[pixel] = tilePixelRow 
-            dumper.pixelData1[pixel] = pixelData1
-            dumper.pixelData2[pixel] = pixelData2 
-            dumper.colourBit[pixel] = colourBit
-            dumper.colourNumber[pixel] = colourNumber
-            dumper.red[pixel] = red
-            dumper.green[pixel] = green 
-            dumper.blue[pixel] = blue 
         }
         
-        dumper.dump(n, '/tmp/' + n + '.topaz')
+      if(n >= 461 && n <= 800) {
+           dumper.dump(n, '/tmp/' + n + '.topaz')
+           //System.exit(-1)
+       }
     }
 
     private void renderSprites() {
