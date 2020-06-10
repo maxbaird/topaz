@@ -9,9 +9,11 @@ import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Dimension
+import java.awt.event.KeyEvent
+import java.awt.event.KeyListener
 //import java.awt.EventQueue
 
-class Display extends JPanel{
+class Display extends JPanel implements KeyListener{
     private BufferedImage canvas
     JFrame frame
     private int displayHeight 
@@ -34,6 +36,10 @@ class Display extends JPanel{
         frame.add(this)
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         frame.setVisible(true)
+        
+        this.addKeyListener(this)
+        this.focusable = true
+        this.requestFocusInWindow()
     }
 
     @Override
@@ -63,5 +69,22 @@ class Display extends JPanel{
             }
         }
         repaint() 
+    }
+
+    @Override
+    public void keyPressed(KeyEvent arg0) {
+       println 'key pressed' 
+    }
+
+    @Override
+    public void keyReleased(KeyEvent arg0) {
+        println 'key released'
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent arg0) {
+        println 'Key typed?'
+        
     }
 }

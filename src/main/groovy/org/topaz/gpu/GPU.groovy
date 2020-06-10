@@ -487,7 +487,7 @@ class GPU{
         }
         
       if(n >= 461 && n <= 800) {
-           dumper.dump(n, '/tmp/' + n + '.topaz')
+           //dumper.dump(n, '/tmp/' + n + '.topaz')
            //System.exit(-1)
        }
     }
