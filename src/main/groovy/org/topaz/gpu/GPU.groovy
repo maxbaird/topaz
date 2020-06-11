@@ -86,7 +86,7 @@ class GPU{
             SCAN_LINE_CYCLES_COUNTER += CYCLES_BETWEEN_SCANLINES
 
             if(currentLine == V_BLANK_SCANLINE_START) {
-                drawScanLine()
+               // drawScanLine()
                 /* Request the appropriate interrupt if in a vertical blank period */
                 interruptHandler.requestInterrupt(InterruptHandler.V_BLANK_INTERRUPT)
             }else if(currentLine > V_BLANK_SCANLINE_END) {

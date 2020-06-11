@@ -1,7 +1,7 @@
 package org.topaz.ui
 
-import org.topaz.gpu.GPU
 import org.topaz.gpu.LCD
+import org.topaz.Joypad
 import java.awt.image.BufferedImage
 import javax.swing.JPanel
 import javax.swing.JFrame
@@ -15,31 +15,36 @@ import java.awt.event.KeyListener
 
 class Display extends JPanel implements KeyListener{
     private BufferedImage canvas
-    JFrame frame
+    private JFrame frame
     private int displayHeight 
     private int displayWidth 
+    private Joypad joypad
 
-    public Display() {
+    public Display(Joypad joypad) {
         displayHeight = LCD.HEIGHT
         displayWidth = LCD.WIDTH
         this.canvas = new BufferedImage(displayWidth, displayHeight, BufferedImage.TYPE_INT_RGB)
+        this.joypad = joypad
         createGUI()
         //clearDisplay()
     }
     
     private void createGUI() {
         frame = new JFrame()
-        frame.setResizable(false)
-        frame.setLocationRelativeTo(null)
-        frame.setSize(new Dimension(displayWidth, displayHeight))
-        frame.setTitle("GroovyBoy")
+        this.setPreferredSize(new Dimension(displayWidth, displayHeight))
         frame.add(this)
+        frame.setResizable(false)
+        frame.pack()
+        frame.setLocationRelativeTo(null)
+        frame.setTitle("GroovyBoy")
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         frame.setVisible(true)
         
         this.addKeyListener(this)
         this.focusable = true
         this.requestFocusInWindow()
+        println this.getSize().height
+        println this.getSize().width
     }
 
     @Override
@@ -72,19 +77,17 @@ class Display extends JPanel implements KeyListener{
     }
 
     @Override
-    public void keyPressed(KeyEvent arg0) {
-       println 'key pressed' 
+    public void keyPressed(KeyEvent k) {
+        joypad.keyPressed(k.keyCode)
     }
 
     @Override
     public void keyReleased(KeyEvent arg0) {
-        println 'key released'
         
     }
 
     @Override
     public void keyTyped(KeyEvent arg0) {
-        println 'Key typed?'
         
     }
 }

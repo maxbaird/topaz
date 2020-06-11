@@ -37,7 +37,7 @@ class Emulator{
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
         joypad.interruptHandler = interruptHandler
         //TODO Pass an instance of the screen for the GPU to update
-        this.display = new Display()
+        this.display = new Display(joypad)
         this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
     }
 
@@ -45,7 +45,7 @@ class Emulator{
         println 'start'
         Thread thread = new Thread(new Runnable() {
                     //double interpolation = 0
-                    final int TICKS_PER_SECOND = 60
+                    final int TICKS_PER_SECOND = 60 
                     final int SKIP_TICKS = 1000 / TICKS_PER_SECOND
                     final int MAX_FRAMESKIP = 5
                     @Override
@@ -74,11 +74,15 @@ class Emulator{
 
     def n = 0
     public void update() {
-        println 'Updating game...'
+        //println 'Updating game...'
         int cyclesThisUpdate = 0
 
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
+            if ((n%100000) == 0) {
+                
+                println n
+            }
 //            if(n == Topaz.executionLimit) {
             if(n == 330000) {
                 println 'exiting at : ' + n
@@ -87,6 +91,7 @@ class Emulator{
                 //System.exit(-1)
             }
             int cycles = 0
+            //cyclesThisUpdate += 4
             cycles = this.executeNextOpCode(n)
             cyclesThisUpdate += cycles
             this.updateTimers(cycles)

@@ -3,6 +3,7 @@ package org.topaz
 import org.topaz.util.BitUtil
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
+import java.awt.event.KeyEvent
 
 class Joypad{
     /*
@@ -30,15 +31,17 @@ class Joypad{
      * VBA emulator defaults the A button to Z
      * and the B button to X.
      */
-    //    public static final int A_KEY = 4
-    //    public static final int B_KEY = 5
-    //    public static final int START_KEY = 7
-    //    public static final int SELECT_KEY = 6
-    //    public static final int RIGHT_KEY = 0
-    //    public static final int LEFT_KEY = 1
-    //    public static final int UP_KEY = 2
-    //    public static final int DOWN_KEY = 3
 
+    def inputMap =[(KeyEvent.VK_Z):4,
+        (KeyEvent.VK_X):5,
+        (KeyEvent.VK_ENTER):7,
+        (KeyEvent.VK_BACK_SPACE):6,
+        (KeyEvent.VK_RIGHT):0,
+        (KeyEvent.VK_LEFT):1,
+        (KeyEvent.VK_UP):2,
+        (KeyEvent.VK_DOWN):3
+    ].asUnmodifiable()
+    
     /*
      * 
      */
@@ -61,6 +64,7 @@ class Joypad{
     private InterruptHandler interruptHandler
 
     int getJoypadState() {
+        println 'Getting joypad state'
         int keyRegister = MemoryManager.rom[KEY_REGISTER]
         
         /*
@@ -69,7 +73,7 @@ class Joypad{
          * keypress is represented by 0, if we flip the bits, we can detect
          * keypresses as 1.
          */
-        keyRegister = keyRegister ^ 0xFF
+        keyRegister = (keyRegister ^ 0xFF) * 0xFF
 
         /*
          * Is the game trying to read the standard buttons? Note that the
@@ -117,7 +121,17 @@ class Joypad{
         return keyRegister
     }
 
-    public void keyPressed(int key) {
+    public void keyPressed(int keyCode) {
+        
+        if(inputMap[keyCode] == null) {
+            println 'Invalid key pressed'
+            return
+        }
+        
+        println 'key press'
+
+        int key = inputMap[keyCode]
+        
         boolean  previouslyUnset = false
 
         /*
