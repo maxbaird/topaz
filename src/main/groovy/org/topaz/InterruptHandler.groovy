@@ -1,8 +1,7 @@
 package org.topaz
 
-import org.topaz.cpu.Register
 import org.topaz.util.BitUtil
-import org.topaz.cpu.CPU
+import org.topaz.cpu.CPU2
 
 class InterruptHandler{
     static final int V_BLANK_INTERRUPT = 0
@@ -38,7 +37,7 @@ class InterruptHandler{
     private final int IF_REGISTER = 0xFF0F
 
     MemoryManager memoryManager
-    CPU cpu /* to access stack pointer */
+    CPU2 cpu /* to access stack pointer */
 
 
     public void requestInterrupt(int interruptId) {

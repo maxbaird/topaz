@@ -1,7 +1,7 @@
 package org.topaz
 
 import org.topaz.util.BitUtil
-import org.topaz.cpu.Register
+import org.topaz.cpu.Register2
 import org.topaz.gpu.LCD
 import org.topaz.DMAHandler
 import org.topaz.Joypad
@@ -11,10 +11,10 @@ class MemoryManager{
     public static int []rom
 
     Cartridge cartridge
-    Register register
+    Register2 register
     Joypad joypad
 
-    public MemoryManager(Cartridge cartridge, Register register, Joypad joypad) {
+    public MemoryManager(Cartridge cartridge, Register2 register, Joypad joypad) {
         this.cartridge = cartridge
         this.register = register
         this.joypad = joypad

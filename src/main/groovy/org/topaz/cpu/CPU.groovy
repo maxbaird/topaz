@@ -19,23 +19,24 @@ class CPU{
     int executeNextOpcode(int n) {
         int cycles = 0
         int opcode = memoryManager.readMemory(register.pc)
-        def hexCode = java.lang.String.format("0x%02X", opcode)
-        boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false
+        
+        //def hexCode = java.lang.String.format("0x%02X", opcode)
+        //boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false
 
         register.pc++
-        def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0
+        //def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0
 
-        try {
-            cycles = executeOpcode(opcode)
-        }catch(Exception e) {
-            println e.message
-            System.exit(1)
-        }
+        cycles = executeOpcode(opcode)
+//        try {
+//        }catch(Exception e) {
+//            println e.message
+//            System.exit(1)
+//        }
 
-        if(display) {
-            def exOpcode = String.format("0x%02X", extendedOpcode)
-            //dumper.dump(n, hexCode, exOpcode, cycles, '/tmp/' + n + '.topaz')
-        }
+//        if(display) {
+//            def exOpcode = String.format("0x%02X", extendedOpcode)
+//            //dumper.dump(n, hexCode, exOpcode, cycles, '/tmp/' + n + '.topaz')
+//        }
         return cycles
     }
 
@@ -868,18 +869,25 @@ class CPU{
                 return 32
 
             case 0xCB:
-                try {
                    /* 0xCB itself takes 4 cycles to execute so add this to
                     * cycles taken by the extended opcode
                     */
                     return 4 + executeExtendedOpcode()
-                }catch(Exception e) {
-                    throw e
-                }
+//                try {
+//                   /* 0xCB itself takes 4 cycles to execute so add this to
+//                    * cycles taken by the extended opcode
+//                    */
+//                    return 4 + executeExtendedOpcode()
+//                }catch(Exception e) {
+//                    throw e
+//                }
 
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
-                throw new Exception("Unrecognized opcode: " + hexCode)
+                  println 'Unrecognized opcode: ' + hexCode
+                  System.exit(-1)
+//                def hexCode = java.lang.String.format("0x%2X", opcode)
+//                throw new Exception("Unrecognized opcode: " + hexCode)
         }
     }
 
@@ -1294,7 +1302,9 @@ class CPU{
             case 0xBF : register.A =  cpuResetBit(register.A, 7); return 8
             default:
                 def hexCode = java.lang.String.format("0x%2X", opcode)
-                throw new Exception("Unrecognized extended opcode: " + hexCode)
+                  println 'Unrecognized extended opcode: ' + hexCode
+//                def hexCode = java.lang.String.format("0x%2X", opcode)
+//                throw new Exception("Unrecognized extended opcode: " + hexCode)
         }
     }
 

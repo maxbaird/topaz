@@ -1,9 +1,9 @@
 package org.topaz
 
 import org.topaz.Cartridge
-import org.topaz.cpu.Register
+import org.topaz.cpu.Register2
 import org.topaz.gpu.GPU
-import org.topaz.cpu.CPU
+import org.topaz.cpu.CPU2
 import org.topaz.MemoryManager
 import org.topaz.Timer
 import org.topaz.InterruptHandler
@@ -15,9 +15,9 @@ import org.topaz.Topaz
 class Emulator{
     private static final MAX_CYCLES = 69905
 
-    CPU cpu
+    CPU2 cpu
     GPU gpu
-    Register register
+    Register2 register
     MemoryManager memoryManager
     Cartridge cartridge
     Timer timer
@@ -28,16 +28,16 @@ class Emulator{
 
     public Emulator(Cartridge cartridge){
         this.cartridge = cartridge
-        this.register = new Register()
+        this.register = new Register2()
         this.joypad = new Joypad()
         this.memoryManager = new MemoryManager(this.cartridge, this.register, this.joypad)
         this.dumper = new StateDumper(this.memoryManager, this.register)
-        this.cpu = new CPU(memoryManager: this.memoryManager, register:this.register, dumper:this.dumper)
+        this.cpu = new CPU2(this.memoryManager, this.register, this.dumper)
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
         joypad.interruptHandler = interruptHandler
         //TODO Pass an instance of the screen for the GPU to update
-        this.display = new Display(joypad)
+        //this.display = new Display(joypad)
         this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
     }
 
@@ -56,9 +56,7 @@ class Emulator{
                         while (true) {
                             loops = 0
                             while (System.currentTimeMillis() > next_game_tick && loops < MAX_FRAMESKIP) {
-
                                 update()
-
                                 next_game_tick += SKIP_TICKS
                                 loops++
                             }
@@ -80,25 +78,23 @@ class Emulator{
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
             if ((n%100000) == 0) {
-                
                 println n
             }
 //            if(n == Topaz.executionLimit) {
-            if(n == 330000) {
-                println 'exiting at : ' + n
-                println 'Press enter to continue...'
-                //System.in.newReader().readLine()
-                //System.exit(-1)
-            }
+//            if(n == 330000) {
+//                println 'exiting at : ' + n
+//                println 'Press enter to continue...'
+//                //System.in.newReader().readLine()
+//                //System.exit(-1)
+//            }
             int cycles = 0
-            //cyclesThisUpdate += 4
             cycles = this.executeNextOpCode(n)
             cyclesThisUpdate += cycles
-            this.updateTimers(cycles)
-            this.updateGraphics(cycles)
-            cyclesThisUpdate += this.handleInterrupts()
+//            this.updateTimers(cycles)
+//            this.updateGraphics(cycles)
+//            cyclesThisUpdate += this.handleInterrupts()
         }
-        this.renderScreen()
+//        this.renderScreen()
     }
 
     private int executeNextOpCode(int n) {
