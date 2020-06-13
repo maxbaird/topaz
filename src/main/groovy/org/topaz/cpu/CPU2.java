@@ -4,7 +4,7 @@ import org.topaz.MemoryManager;
 import org.topaz.util.BitUtil;
 import org.topaz.debug.StateDumper;
 
-class CPU2 {
+public class CPU2 {
     Register2 register;
     MemoryManager memoryManager;
     StateDumper dumper;

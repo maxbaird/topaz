@@ -1,6 +1,6 @@
 package org.topaz.cpu;
 
-class Register2{
+public class Register2{
     public int A;
     public int B;
     public int C;

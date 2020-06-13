@@ -23,10 +23,14 @@ application {
 
 sourceSets {
     main {
-      java { srcDirs = ["src/main/groovy/org/topaz/cpu"] }    // no source dirs for the java compiler
-      groovy { srcDirs = ["src/main/groovy"] }  // compile   everything in src/ with groovy
+        java {
+            srcDirs = [] // don't compile Java code twice
+        }
+        groovy {
+            srcDirs = [ 'src/main/groovy']
+        }
     }
-  }
+}
 
 task fatjar(type: Jar) {
     manifest {

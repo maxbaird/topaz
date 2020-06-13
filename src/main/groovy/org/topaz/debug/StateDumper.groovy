@@ -1,15 +1,15 @@
 package org.topaz.debug
 
-import org.topaz.cpu.Register
+import org.topaz.cpu.Register2
 import org.topaz.MemoryManager
 
 class StateDumper{
-    Register register
+    Register2 register
     MemoryManager memoryManager
     
     StringBuilder sb
     
-    public StateDumper(MemoryManager memoryManager, Register register){
+    public StateDumper(MemoryManager memoryManager, Register2 register){
         this.memoryManager = memoryManager
         this.register = register
         

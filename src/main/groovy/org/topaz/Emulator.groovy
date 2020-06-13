@@ -37,7 +37,7 @@ class Emulator{
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
         joypad.interruptHandler = interruptHandler
         //TODO Pass an instance of the screen for the GPU to update
-        //this.display = new Display(joypad)
+        this.display = new Display(joypad)
         this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
     }
 
@@ -89,7 +89,7 @@ class Emulator{
 //            }
             int cycles = 0
             cycles = this.executeNextOpCode(n)
-            cyclesThisUpdate += cycles
+//            cyclesThisUpdate += cycles
 //            this.updateTimers(cycles)
 //            this.updateGraphics(cycles)
 //            cyclesThisUpdate += this.handleInterrupts()
