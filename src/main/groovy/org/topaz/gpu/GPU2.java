@@ -5,6 +5,8 @@ import org.topaz.MemoryManager;
 import org.topaz.InterruptHandler;
 import org.topaz.util.BitUtil;
 import org.topaz.ui.Display;
+
+import java.awt.Color;
 import java.lang.Math;
 import org.topaz.debug.GPUDumper;
 
@@ -560,7 +562,8 @@ class GPU2{
         final int SPRITE_SIZE = 4;
         final int SPRITE_ATTRIBUTE_TABLE = 0xFE00;
 
-        SPRITE_TILE_AMT.times { sprite->
+//        SPRITE_TILE_AMT.times { sprite->
+        for(int sprite = 0; sprite < SPRITE_TILE_AMT; sprite++) {
             /*
              * Sprite takes 4 bytes in the sprite attribute table. So calculate
              * it's base address and read its associated bytes offset from the
@@ -648,12 +651,12 @@ class GPU2{
                         colourAddress = SPRITE_PALETTE_0;
                     }
 
-                    Colour colour = getColour(colourNumber, colourAddress);
+                    Color color = getColour(colourNumber, colourAddress);
 
                     /*
                      * White is transparent for sprites
                      */
-                    if(colour == Colour.WHITE) {
+                    if(color == Color.WHITE) {
                         continue;
                     }
 
@@ -661,11 +664,11 @@ class GPU2{
                     int green = 0;
                     int blue = 0;
 
-                    switch(colour) {
-                        case Colour.WHITE : red = 255; green = 255; blue = 255; break;
-                        case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
-                        case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
-                        case Colour.BLACK: red = 0x0; green = 0x0; blue = 0x0; break;
+                    switch(color) {
+                        case Color.WHITE : red = 255; green = 255; blue = 255; break;
+                        case Color.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
+                        case Color.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
+                        case Color.BLACK: red = 0x0; green = 0x0; blue = 0x0; break;
                     }
 
                     /*
@@ -691,8 +694,8 @@ class GPU2{
         }
     }
 
-    private Colour getColour(int colourNumber, int address){
-        Colour colour = Colour.WHITE;
+    private Color getColour(int colourNumber, int address){
+        Color color = Color.WHITE;
 
         int palette = memoryManager.readMemory(address);
         //println 'Palette: ' + palette + ', Colour number: ' + colourNumber
@@ -710,12 +713,12 @@ class GPU2{
         c = (BitUtil.getValue(palette, hi) << 1);
         c = (c | BitUtil.getValue(palette, lo));
         switch(c){
-            case 0: colour = Colour.WHITE; break;
-            case 1: colour = Colour.LIGHT_GRAY; break;
-            case 2: colour = Colour.DARK_GRAY; break;
-            case 3: colour = Colour.BLACK; break;
+            case 0: color = Color.WHITE; break;
+            case 1: color = Color.LIGHT_GRAY; break;
+            case 2: color = Color.DARK_GRAY; break;
+            case 3: color = Color.BLACK; break;
         }
 
-        return colour;
+        return color;
     }
 }
