@@ -7,29 +7,29 @@ class GPUDumper{
     final int PIXEL_AMT = 160
     StringBuilder sb = new StringBuilder()
 
-    int scrollx
-    int scrolly
-    int windowx
-    int windowy
-    int tileData
-    int backgroundMemory
-    int yPosition
-    int tileRow
+    public int scrollx
+    public int scrolly
+    public int windowx
+    public int windowy
+    public int tileData
+    public int backgroundMemory
+    public int yPosition
+    public int tileRow
 
     /* data within pixel loop */
-    int[] xPosition = new int[PIXEL_AMT]
-    int[] tileColumn = new int[PIXEL_AMT]
-    int[] tileNumber = new int[PIXEL_AMT]
-    int[] tileAddress = new int[PIXEL_AMT]
-    int[] tileLocation = new int[PIXEL_AMT]
-    int[] currentLine = new int[PIXEL_AMT] /* just line in gameboy.live code */
-    int[] pixelData1 = new int[PIXEL_AMT]
-    int[] pixelData2 = new int[PIXEL_AMT]
-    int[] colourBit = new int[PIXEL_AMT]
-    int[] colourNumber = new int[PIXEL_AMT]
-    int[] red = new int[PIXEL_AMT]
-    int[] green = new int[PIXEL_AMT]
-    int[] blue = new int[PIXEL_AMT]
+    public int[] xPosition = new int[PIXEL_AMT]
+    public int[] tileColumn = new int[PIXEL_AMT]
+    public int[] tileNumber = new int[PIXEL_AMT]
+    public int[] tileAddress = new int[PIXEL_AMT]
+    public int[] tileLocation = new int[PIXEL_AMT]
+    public int[] currentLine = new int[PIXEL_AMT] /* just line in gameboy.live code */
+    public int[] pixelData1 = new int[PIXEL_AMT]
+    public int[] pixelData2 = new int[PIXEL_AMT]
+    public int[] colourBit = new int[PIXEL_AMT]
+    public int[] colourNumber = new int[PIXEL_AMT]
+    public int[] red = new int[PIXEL_AMT]
+    public int[] green = new int[PIXEL_AMT]
+    public int[] blue = new int[PIXEL_AMT]
 
     void dump(def iteration, def filename) {
         println 'Dumping GPU state: ' + filename

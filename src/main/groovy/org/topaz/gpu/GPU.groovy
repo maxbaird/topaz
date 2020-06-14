@@ -60,7 +60,7 @@ class GPU{
         this.interruptHandler = interruptHandler
         this.display = display
         this.screenData = new int[LCD.WIDTH][LCD.HEIGHT][3]
-        lcd = new LCD(memoryManager: memoryManager, interruptHandler: interruptHandler)
+        lcd = new LCD(memoryManager, interruptHandler)
         dumper = new GPUDumper()
     }
 
@@ -112,12 +112,18 @@ class GPU{
          */
         int control = memoryManager.readMemory(LCD.LCDC_REGISTER)
 
-        if(BitUtil.isSet(control, LCD.ControlRegisterBit.BG_DISPLAY)) {
-            renderTiles()
+//        if(BitUtil.isSet(control, LCD.ControlRegisterBit.BG_DISPLAY)) {
+        if(BitUtil.isSet(control, 0)) {
+            n++
+            println ' getting here: ' + n
+            if(n>=300000 && n <= 300500) {
+              println 'n within range: ' + n 
+            }
+            renderTiles(n)
         }
 
         if(BitUtil.isSet(control, LCD.ControlRegisterBit.OBJ_SPRITE_DISPLAY_ENABLE)) {
-            n++
+            //n++
             renderSprites(n)
         }
     }
@@ -126,7 +132,7 @@ class GPU{
        display.update(screenData)
     }
 
-    private void renderTiles() {
+    private void renderTiles(int n) {
         /*
          * SCROLL_X and SCROLL_Y specify the position in the 256x256 background
          * (BG) map from which to start drawing the background. This is necessary
@@ -312,14 +318,14 @@ class GPU{
 
         int tileRowStart = ((yPosition / PIXEL_ROWS_PER_TILE) as int) * TILES_PER_ROW
         
-//        dumper.scrollx = SCROLL_X
-//        dumper.scrolly = SCROLL_Y
-//        dumper.windowx = WINDOW_X
-//        dumper.windowy = WINDOW_Y
-//        dumper.tileData = tileData
-//        dumper.backgroundMemory = memoryRegion
-//        dumper.yPosition = yPosition
-//        dumper.tileRow = tileRowStart
+        dumper.scrollx = SCROLL_X
+        dumper.scrolly = SCROLL_Y
+        dumper.windowx = WINDOW_X
+        dumper.windowy = WINDOW_Y
+        dumper.tileData = tileData
+        dumper.backgroundMemory = memoryRegion
+        dumper.yPosition = yPosition
+        dumper.tileRow = tileRowStart
 
         LCD.WIDTH.times {pixel->
             int xPosition = pixel + SCROLL_X
@@ -456,19 +462,19 @@ class GPU{
 
             int scanline = memoryManager.readMemory(LCD.LY_REGISTER)
 
-//            dumper.xPosition[pixel] = xPosition
-//            dumper.tileColumn[pixel] = tileColumn
-//            dumper.tileNumber[pixel] = tileNumber
-//            dumper.tileAddress[pixel] = tileAddress
-//            dumper.tileLocation[pixel] = tileLocation
-//            dumper.currentLine[pixel] = tilePixelRow 
-//            dumper.pixelData1[pixel] = pixelData1
-//            dumper.pixelData2[pixel] = pixelData2 
-//            dumper.colourBit[pixel] = colourBit
-//            dumper.colourNumber[pixel] = colourNumber
-//            dumper.red[pixel] = red
-//            dumper.green[pixel] = green 
-//            dumper.blue[pixel] = blue 
+            dumper.xPosition[pixel] = xPosition
+            dumper.tileColumn[pixel] = tileColumn
+            dumper.tileNumber[pixel] = tileNumber
+            dumper.tileAddress[pixel] = tileAddress
+            dumper.tileLocation[pixel] = tileLocation
+            dumper.currentLine[pixel] = tilePixelRow 
+            dumper.pixelData1[pixel] = pixelData1
+            dumper.pixelData2[pixel] = pixelData2 
+            dumper.colourBit[pixel] = colourBit
+            dumper.colourNumber[pixel] = colourNumber
+            dumper.red[pixel] = red
+            dumper.green[pixel] = green 
+            dumper.blue[pixel] = blue 
 
             if(scanline < 0 || scanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
                 /*
@@ -484,6 +490,10 @@ class GPU{
             screenData[pixel][scanline - 1][0] = red
             screenData[pixel][scanline - 1][1] = green
             screenData[pixel][scanline - 1][2] = blue
+        }
+
+        if(n>=300000 && n <= 300500) {
+            dumper.dump(n, "/tmp/"+n+".gpu");
         }
     }
 

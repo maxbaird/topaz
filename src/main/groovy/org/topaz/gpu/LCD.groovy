@@ -3,10 +3,10 @@ package org.topaz.gpu
 import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
-import org.topaz.gpu.GPU
+import org.topaz.gpu.GPU2
 import java.util.Map
 
-class LCD{
+public class LCD{
     /*
      * This is the LCDC (LCD Control) register. Bit 7 of this register is
      * checked during the V-Blank to enable or disable the display.
@@ -101,7 +101,7 @@ class LCD{
     InterruptHandler interruptHandler
     
     public LCD(MemoryManager memoryManager, InterruptHandler interruptHandler) {
-        this.memorymanager = memorymanager
+        this.memoryManager = memoryManager
         this.interruptHandler = interruptHandler
     }
 
@@ -113,7 +113,7 @@ class LCD{
              * When the LCD is disabled reset scanLineCounter and set the
              * current scanline to 0.
              */
-            GPU.SCAN_LINE_CYCLES_COUNTER = GPU.CYCLES_BETWEEN_SCANLINES
+            GPU2.SCAN_LINE_CYCLES_COUNTER = GPU2.CYCLES_BETWEEN_SCANLINES
             memoryManager.rom[LY_REGISTER] = 0
 
             /*
@@ -132,7 +132,7 @@ class LCD{
         int mode = LCD_MODE.H_BLANK
         boolean requestInterrupt = false
 
-        if(currentScanLine >= GPU.V_BLANK_SCANLINE_START) {
+        if(currentScanLine >= GPU2.V_BLANK_SCANLINE_START) {
             /*
              * We are currently in the vertical blank (V-Blank) period.
              * So bits 0 and 1 are set to:
@@ -152,10 +152,10 @@ class LCD{
              * Mode 0: (H-Blank) takes the remaining cycles
              */
 
-            int mode2Cycles = GPU.CYCLES_BETWEEN_SCANLINES - 80
+            int mode2Cycles = GPU2.CYCLES_BETWEEN_SCANLINES - 80
             int mode3Cycles = mode2Cycles - 172
 
-            if(GPU.SCAN_LINE_CYCLES_COUNTER >= mode2Cycles) {
+            if(GPU2.SCAN_LINE_CYCLES_COUNTER >= mode2Cycles) {
                 /* Mode 2 */
                 mode = LCD_MODE.OAM_SPRITE_ATTRIBUTE_SEARCH
 
@@ -167,7 +167,7 @@ class LCD{
                 status = BitUtil.setBit(status, 1)
                 status = BitUtil.clearBit(status, 0)
                 requestInterrupt = BitUtil.isSet(status, OAM_INTERRUPT_BIT)
-            }else if(GPU.SCAN_LINE_CYCLES_COUNTER >= mode3Cycles) {
+            }else if(GPU2.SCAN_LINE_CYCLES_COUNTER >= mode3Cycles) {
                 /* Mode 3 */
                 mode = LCD_MODE.LCD_DRIVER_TRANSFER
 

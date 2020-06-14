@@ -2,7 +2,7 @@ package org.topaz
 
 import org.topaz.Cartridge
 import org.topaz.cpu.Register2
-import org.topaz.gpu.GPU
+import org.topaz.gpu.GPU2
 import org.topaz.cpu.CPU2
 import org.topaz.MemoryManager
 import org.topaz.Timer
@@ -16,7 +16,7 @@ class Emulator{
     private static final MAX_CYCLES = 69905
 
     CPU2 cpu
-    GPU gpu
+    GPU2 gpu
     Register2 register
     MemoryManager memoryManager
     Cartridge cartridge
@@ -38,7 +38,7 @@ class Emulator{
         joypad.interruptHandler = interruptHandler
         //TODO Pass an instance of the screen for the GPU to update
         this.display = new Display(joypad)
-        this.gpu = new GPU(this.memoryManager, this.interruptHandler, this.display)
+        this.gpu = new GPU2(this.memoryManager, this.interruptHandler, this.display)
     }
 
     public void start() {

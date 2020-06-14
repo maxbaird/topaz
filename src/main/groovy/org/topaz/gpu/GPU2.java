@@ -1,16 +1,14 @@
 package org.topaz.gpu;
 
-import org.topaz.gpu.LCD;
 import org.topaz.MemoryManager;
 import org.topaz.InterruptHandler;
 import org.topaz.util.BitUtil;
 import org.topaz.ui.Display;
 
-import java.awt.Color;
 import java.lang.Math;
 import org.topaz.debug.GPUDumper;
 
-class GPU2{
+public class GPU2{
     static final int CYCLES_BETWEEN_SCANLINES = 456;
 
     /*
@@ -116,12 +114,13 @@ class GPU2{
 
         //if(BitUtil.isSet(control, LCD.ControlRegisterBit.BG_DISPLAY)) {
         if(BitUtil.isSet(control, 0)) {
-            renderTiles();
+            n++;
+            renderTiles(n);
         }
 
 //        if(BitUtil.isSet(control, LCD.ControlRegisterBit.OBJ_SPRITE_DISPLAY_ENABLE)) {
         if(BitUtil.isSet(control, 1)) {
-            n++;
+            //n++;
             renderSprites(n);
         }
     }
@@ -130,7 +129,7 @@ class GPU2{
        display.update(screenData);
     }
 
-    private void renderTiles() {
+    private void renderTiles(int n) {
         /*
          * SCROLL_X and SCROLL_Y specify the position in the 256x256 background
          * (BG) map from which to start drawing the background. This is necessary
@@ -320,14 +319,14 @@ class GPU2{
 
         int tileRowStart = ((int)(yPosition / PIXEL_ROWS_PER_TILE)) * TILES_PER_ROW;
         
-//        dumper.scrollx = SCROLL_X
-//        dumper.scrolly = SCROLL_Y
-//        dumper.windowx = WINDOW_X
-//        dumper.windowy = WINDOW_Y
-//        dumper.tileData = tileData
-//        dumper.backgroundMemory = memoryRegion
-//        dumper.yPosition = yPosition
-//        dumper.tileRow = tileRowStart
+//        dumper.scrollx = SCROLL_X;
+//        dumper.scrolly = SCROLL_Y;
+//        dumper.windowx = WINDOW_X;
+//        dumper.windowy = WINDOW_Y;
+//        dumper.tileData = tileData;
+//        dumper.backgroundMemory = memoryRegion;
+//        dumper.yPosition = yPosition;
+//        dumper.tileRow = tileRowStart;
 
 //        LCD.WIDTH.times {pixel->
         for(int pixel = 0; pixel < LCD.WIDTH; pixel++) {
@@ -407,7 +406,7 @@ class GPU2{
             /*
              * Each row of pixels is made by combining two rows of tile data.
              */
-            tilePixelRow = tilePixelRow * 2
+            tilePixelRow = tilePixelRow * 2;
             int pixelData1 = memoryManager.readMemory(tileLocation + tilePixelRow);
             int pixelData2 = memoryManager.readMemory(tileLocation + tilePixelRow + 1);
 
@@ -457,27 +456,27 @@ class GPU2{
             int blue = 0;
 
             switch(colour) {
-                case Colour.WHITE : red = 255; green = 255; blue = 255; break;
-                case Colour.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
-                case Colour.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
-                case Colour.BLACK: red = 0x0; green = 0x0; blue = 0x0; break;
+                case WHITE : red = 255; green = 255; blue = 255; break;
+                case LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
+                case DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
+                case BLACK: red = 0x0; green = 0x0; blue = 0x0; break;
             }
 
             int scanline = memoryManager.readMemory(LCD.LY_REGISTER);
 
-//            dumper.xPosition[pixel] = xPosition
-//            dumper.tileColumn[pixel] = tileColumn
-//            dumper.tileNumber[pixel] = tileNumber
-//            dumper.tileAddress[pixel] = tileAddress
-//            dumper.tileLocation[pixel] = tileLocation
-//            dumper.currentLine[pixel] = tilePixelRow 
-//            dumper.pixelData1[pixel] = pixelData1
-//            dumper.pixelData2[pixel] = pixelData2 
-//            dumper.colourBit[pixel] = colourBit
-//            dumper.colourNumber[pixel] = colourNumber
-//            dumper.red[pixel] = red
-//            dumper.green[pixel] = green 
-//            dumper.blue[pixel] = blue 
+//            dumper.xPosition[pixel] = xPosition;
+//            dumper.tileColumn[pixel] = tileColumn;
+//            dumper.tileNumber[pixel] = tileNumber;
+//            dumper.tileAddress[pixel] = tileAddress;
+//            dumper.tileLocation[pixel] = tileLocation;
+//            dumper.currentLine[pixel] = tilePixelRow ;
+//            dumper.pixelData1[pixel] = pixelData1;
+//            dumper.pixelData2[pixel] = pixelData2 ;
+//            dumper.colourBit[pixel] = colourBit;
+//            dumper.colourNumber[pixel] = colourNumber;
+//            dumper.red[pixel] = red;
+//            dumper.green[pixel] = green ;
+//            dumper.blue[pixel] = blue ;
 
             if(scanline < 0 || scanline > (LCD.HEIGHT - 1) || pixel < 0 || pixel > (LCD.WIDTH - 1)) {
                 /*
@@ -494,6 +493,11 @@ class GPU2{
             screenData[pixel][scanline - 1][1] = green;
             screenData[pixel][scanline - 1][2] = blue;
         }
+//        
+//        if(n>=100000 && n <= 100500) {
+//            dumper.dump(n, "/tmp/"+n+".gpu2");
+//        }
+        
     }
 
     private void renderSprites(int n) {
@@ -548,14 +552,14 @@ class GPU2{
         boolean use8x16 = false;
         final int LCD_CONTROL = memoryManager.readMemory(LCD.LCDC_REGISTER);
 
-        def spriteAttributeBit = [
-            BACKGROUND_PRIORITY : 7,
-            Y_FLIP : 6,
-            X_FLIP : 5,
-            PALETTE_NUMBER : 4
-        ].asUnmodifiable()
+//        def spriteAttributeBit = [
+//            BACKGROUND_PRIORITY : 7,
+//            Y_FLIP : 6,
+//            X_FLIP : 5,
+//            PALETTE_NUMBER : 4
+//        ].asUnmodifiable()
 
-        if(BitUtil.isSet(LCD_CONTROL, LCD.ControlRegisterBit.OBJ_SPRITE_SIZE)) {
+        if(BitUtil.isSet(LCD_CONTROL, 2)) {
             use8x16 = true;
         }
 
@@ -575,8 +579,10 @@ class GPU2{
             int tileLocation = memoryManager.readMemory(SPRITE_ATTRIBUTE_TABLE + spriteIndex + 2);
             int attributes = memoryManager.readMemory(SPRITE_ATTRIBUTE_TABLE + spriteIndex + 3);
 
-            boolean yFlip = BitUtil.isSet(attributes, spriteAttributeBit.Y_FLIP);
-            boolean xFlip = BitUtil.isSet(attributes, spriteAttributeBit.X_FLIP);
+//            boolean yFlip = BitUtil.isSet(attributes, spriteAttributeBit.Y_FLIP);
+            boolean yFlip = BitUtil.isSet(attributes, 6);
+//            boolean xFlip = BitUtil.isSet(attributes, spriteAttributeBit.X_FLIP);
+            boolean xFlip = BitUtil.isSet(attributes, 5);
 
             int scanline = memoryManager.readMemory(LCD.LY_REGISTER);
 
@@ -645,18 +651,19 @@ class GPU2{
 
                     int colourAddress = 0;
 
-                    if(BitUtil.isSet(attributes, spriteAttributeBit.PALETTE_NUMBER)) {
+//                    if(BitUtil.isSet(attributes, spriteAttributeBit.PALETTE_NUMBER)) {
+                    if(BitUtil.isSet(attributes, 4)) {
                         colourAddress = SPRITE_PALETTE_1;
                     }else {
                         colourAddress = SPRITE_PALETTE_0;
                     }
 
-                    Color color = getColour(colourNumber, colourAddress);
+                    Colour colour = getColour(colourNumber, colourAddress);
 
                     /*
                      * White is transparent for sprites
                      */
-                    if(color == Color.WHITE) {
+                    if(colour == Colour.WHITE) {
                         continue;
                     }
 
@@ -664,11 +671,11 @@ class GPU2{
                     int green = 0;
                     int blue = 0;
 
-                    switch(color) {
-                        case Color.WHITE : red = 255; green = 255; blue = 255; break;
-                        case Color.LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
-                        case Color.DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
-                        case Color.BLACK: red = 0x0; green = 0x0; blue = 0x0; break;
+                    switch(colour) {
+                        case WHITE : red = 255; green = 255; blue = 255; break;
+                        case LIGHT_GRAY: red = 0xCC; green = 0xCC; blue = 0xCC; break;
+                        case DARK_GRAY: red = 0x77; green = 0x77; blue = 0x77; break;
+                        case BLACK: red = 0x0; green = 0x0; blue = 0x0; break;
                     }
 
                     /*
@@ -694,11 +701,10 @@ class GPU2{
         }
     }
 
-    private Color getColour(int colourNumber, int address){
-        Color color = Color.WHITE;
-
+    private Colour getColour(int colourNumber, int address){
+        Colour colour = Colour.WHITE;
         int palette = memoryManager.readMemory(address);
-        //println 'Palette: ' + palette + ', Colour number: ' + colourNumber
+
         int hi = 0;
         int lo = 0;
 
@@ -712,13 +718,14 @@ class GPU2{
         int c = 0;
         c = (BitUtil.getValue(palette, hi) << 1);
         c = (c | BitUtil.getValue(palette, lo));
+
         switch(c){
-            case 0: color = Color.WHITE; break;
-            case 1: color = Color.LIGHT_GRAY; break;
-            case 2: color = Color.DARK_GRAY; break;
-            case 3: color = Color.BLACK; break;
+            case 0: colour = Colour.WHITE; break;
+            case 1: colour = Colour.LIGHT_GRAY; break;
+            case 2: colour = Colour.DARK_GRAY; break;
+            case 3: colour = Colour.BLACK; break;
         }
 
-        return color;
+        return colour;
     }
 }
