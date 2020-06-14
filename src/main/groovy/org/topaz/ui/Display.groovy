@@ -65,7 +65,7 @@ class Display extends JPanel implements KeyListener{
 //        }
 //    }
     
-    private update(int[][][] screenData) {
+    public update(int[][][] screenData) {
         Color c
         displayWidth.times{x->
             displayHeight.times {y->

@@ -4,13 +4,14 @@ import org.topaz.MemoryManager
 import org.topaz.InterruptHandler
 import org.topaz.util.BitUtil
 import org.topaz.gpu.GPU
+import java.util.Map
 
 class LCD{
     /*
      * This is the LCDC (LCD Control) register. Bit 7 of this register is
      * checked during the V-Blank to enable or disable the display.
      */
-    static final int LCDC_REGISTER = 0xFF40
+    public static final int LCDC_REGISTER = 0xFF40
 
     /*
      * This is a mapping for each bit in the control register. Mostly used by
@@ -43,7 +44,7 @@ class LCD{
      * vertical line to which the present data is transferred to the LCD Driver.
      * It can take any value between 0 to 153.
      */
-    static final int LY_REGISTER = 0xFF44
+    public static final int LY_REGISTER = 0xFF44
 
     /*
      * This is the LYC (LY Compare) register. The gameboy compares the value of the
@@ -53,8 +54,8 @@ class LCD{
      */
     static final int LYC_REGISTER = 0xFF45
 
-    static final int HEIGHT = 144
-    static final int WIDTH = 160
+    public static final int HEIGHT = 144
+    public static final int WIDTH = 160
 
     /* 
      * The current LCD status is held at address 0xFF41.The LCD goes through 4
@@ -98,6 +99,11 @@ class LCD{
 
     MemoryManager memoryManager
     InterruptHandler interruptHandler
+    
+    public LCD(MemoryManager memoryManager, InterruptHandler interruptHandler) {
+        this.memorymanager = memorymanager
+        this.interruptHandler = interruptHandler
+    }
 
     public void setLCDStatus() {
         int status = memoryManager.readMemory(LCD_STATUS)

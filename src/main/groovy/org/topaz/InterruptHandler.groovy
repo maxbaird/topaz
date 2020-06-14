@@ -4,7 +4,7 @@ import org.topaz.util.BitUtil
 import org.topaz.cpu.CPU2
 
 class InterruptHandler{
-    static final int V_BLANK_INTERRUPT = 0
+    public static final int V_BLANK_INTERRUPT = 0
     static final int LCD_INTERRUPT = 1
     static final int TIMER_INTERRUPT = 2
     static final int SERIAL_INTERRUPT = 3
