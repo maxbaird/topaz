@@ -21,17 +21,6 @@ application {
  mainClassName = 'org.topaz.Topaz'
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = [] // don't compile Java code twice
-        }
-        groovy {
-            srcDirs = [ 'src/main/groovy']
-        }
-    }
-}
-
 task fatjar(type: Jar) {
     manifest {
         attributes 'Main-Class': 'org.topaz.Topaz'

@@ -81,20 +81,20 @@ class Emulator{
                 println n
             }
 //            if(n == Topaz.executionLimit) {
-//            if(n == 330000) {
-//                println 'exiting at : ' + n
-//                println 'Press enter to continue...'
-//                //System.in.newReader().readLine()
-//                //System.exit(-1)
-//            }
+            if(n == 330000) {
+                println 'exiting at : ' + n
+                println 'Press enter to continue...'
+                System.in.newReader().readLine()
+                //System.exit(-1)
+            }
             int cycles = 0
             cycles = this.executeNextOpCode(n)
-//            cyclesThisUpdate += cycles
-//            this.updateTimers(cycles)
-//            this.updateGraphics(cycles)
-//            cyclesThisUpdate += this.handleInterrupts()
+            cyclesThisUpdate += cycles
+            this.updateTimers(cycles)
+            this.updateGraphics(cycles)
+            cyclesThisUpdate += this.handleInterrupts()
         }
-//        this.renderScreen()
+        this.renderScreen()
     }
 
     private int executeNextOpCode(int n) {
