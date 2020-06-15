@@ -7,6 +7,7 @@ import org.topaz.ui.Display;
 
 import java.lang.Math;
 import org.topaz.debug.GPUDumper;
+import org.topaz.debug.SpriteDumper;
 
 public class GPU2{
     static final int CYCLES_BETWEEN_SCANLINES = 456;
@@ -54,6 +55,7 @@ public class GPU2{
     };
 
     GPUDumper dumper; /* used for debugging */
+    SpriteDumper spriteDumper;
         
     public GPU2(MemoryManager memoryManager, InterruptHandler interruptHandler, Display display) {
         this.memoryManager = memoryManager;
@@ -62,6 +64,7 @@ public class GPU2{
         this.screenData = new int[LCD.WIDTH][LCD.HEIGHT][3];
         lcd = new LCD(memoryManager, interruptHandler);
         dumper = new GPUDumper();
+        spriteDumper = new SpriteDumper();
     }
 
     public void updateGraphics(int cycles) {
@@ -114,13 +117,12 @@ public class GPU2{
 
         //if(BitUtil.isSet(control, LCD.ControlRegisterBit.BG_DISPLAY)) {
         if(BitUtil.isSet(control, 0)) {
-            n++;
             renderTiles(n);
         }
 
 //        if(BitUtil.isSet(control, LCD.ControlRegisterBit.OBJ_SPRITE_DISPLAY_ENABLE)) {
         if(BitUtil.isSet(control, 1)) {
-            //n++;
+            n++;
             renderSprites(n);
         }
     }
@@ -565,6 +567,9 @@ public class GPU2{
 
         final int SPRITE_SIZE = 4;
         final int SPRITE_ATTRIBUTE_TABLE = 0xFE00;
+        
+        spriteDumper.use8x16 = use8x16;
+        spriteDumper.lcdControl = LCD_CONTROL;
 
 //        SPRITE_TILE_AMT.times { sprite->
         for(int sprite = 0; sprite < SPRITE_TILE_AMT; sprite++) {
@@ -627,6 +632,20 @@ public class GPU2{
                  * colour data, pixel 1 is bit 6, etc.
                  */
 
+                spriteDumper.index[sprite] = spriteIndex;
+                spriteDumper.yPosition[sprite] = yPosition;
+                spriteDumper.xPosition[sprite] = xPosition;
+                spriteDumper.tileLocation[sprite] = tileLocation;
+                spriteDumper.attributes[sprite] = attributes;
+                spriteDumper.yFlip[sprite] = yFlip ? 1 : 0;
+                spriteDumper.xFlip[sprite] = xFlip ? 1 : 0;
+                spriteDumper.scanline[sprite] = scanline;
+                spriteDumper.ysize[sprite] = ySize;
+                spriteDumper.line[sprite] = line;
+                spriteDumper.dataAddress[sprite] = tileDataAddress;
+                spriteDumper.data1[sprite] = tileData1;
+                spriteDumper.data2[sprite] = tileData2;
+                
                 for(int tilePixel = 7; tilePixel >=0; tilePixel--) {
                     int colourBit = tilePixel;
 
@@ -685,6 +704,13 @@ public class GPU2{
                     pixel = pixel + 7;
 
                     pixel = xPosition + pixel;
+                    
+                    spriteDumper.colorbit[sprite][tilePixel] = colourBit;
+                    spriteDumper.colorNum[sprite][tilePixel] = colourNumber;
+                    spriteDumper.colorAddress[sprite][tilePixel] = colourAddress;
+                    //spriteDumper.color[sprite][tilePixel] = colour;
+                    //spriteDumper.xPix[sprite][tilePixel] = ;
+                    spriteDumper.pixel[sprite][tilePixel] = pixel;
 
                     /*
                      * Final sanity check!
@@ -698,6 +724,10 @@ public class GPU2{
                     screenData[pixel][scanline - 1][2] = blue;
                 }
             }
+        }
+        
+        if(n >= 0 && n <= 500) {
+            spriteDumper.dump(n, "/tmp/"+n+".topaz");
         }
     }
 
