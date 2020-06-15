@@ -5,7 +5,9 @@ import org.topaz.cpu.Register2
 import org.topaz.gpu.LCD
 import org.topaz.DMAHandler
 import org.topaz.Joypad
+import groovy.transform.*
 
+@CompileStatic
 class MemoryManager{
     private static final int MEMORY_SIZE = 0x10000
     public static int []rom
@@ -309,7 +311,7 @@ class MemoryManager{
         }
     }
 
-    private void doRAMBankChange(data) {
+    private void doRAMBankChange(int data) {
         /*
          * This should only be done in MCB1. 
          */

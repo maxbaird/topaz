@@ -9,9 +9,9 @@ public class CPU2 {
     MemoryManager memoryManager;
     StateDumper dumper;
 
-    boolean isHalted = false;
-    boolean interruptMaster = false;
-    boolean pendingInterruptEnabled = false;
+    public boolean isHalted = false;
+    public boolean interruptMaster = false;
+    public boolean pendingInterruptEnabled = false;
     
     public CPU2(MemoryManager memoryManager, Register2 register, StateDumper dumper) {
         this.memoryManager = memoryManager;
@@ -19,7 +19,7 @@ public class CPU2 {
         this.dumper = dumper;
     }
 
-    int executeNextOpcode(int n) {
+    public int executeNextOpcode(int n) {
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc);
 

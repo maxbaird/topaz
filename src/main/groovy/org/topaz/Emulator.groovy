@@ -11,9 +11,11 @@ import org.topaz.Joypad
 import org.topaz.ui.Display
 import org.topaz.debug.StateDumper
 import org.topaz.Topaz
+import groovy.transform.*
 
+@CompileStatic
 class Emulator{
-    private static final MAX_CYCLES = 69905
+    private static final int MAX_CYCLES = 69905
 
     CPU2 cpu
     GPU2 gpu
@@ -46,7 +48,7 @@ class Emulator{
         Thread thread = new Thread(new Runnable() {
                     //double interpolation = 0
                     final int TICKS_PER_SECOND = 60 
-                    final int SKIP_TICKS = 1000 / TICKS_PER_SECOND
+                    final int SKIP_TICKS = (int)(1000 / TICKS_PER_SECOND)
                     final int MAX_FRAMESKIP = 5
                     @Override
                     public void run() {
@@ -70,7 +72,7 @@ class Emulator{
         thread.start()
     }
 
-    def n = 0
+    int n = 0
     public void update() {
         //println 'Updating game...'
         int cyclesThisUpdate = 0
