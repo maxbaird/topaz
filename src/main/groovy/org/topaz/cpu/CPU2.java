@@ -23,12 +23,13 @@ public class CPU2 {
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc);
 
-        // def hexCode = java.lang.String.format("0x%02X", opcode);
+        String hexCode = java.lang.String.format("0x%02X", opcode);
         // boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ?
+        boolean display = (n >= 280000 && n <= 280500) ? true : false;
         // true : false
 
         register.pc++;
-        // def extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc)
+        int extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc) : 0x0;
         // : 0x0
 
         cycles = executeOpcode(opcode);
@@ -38,10 +39,10 @@ public class CPU2 {
 //            System.exit(1);
 //        }
 
-//        if(display) {
-//            def exOpcode = String.format("0x%02X", extendedOpcode);
-//            //dumper.dump(n, hexCode, exOpcode, cycles, '/tmp/' + n + '.topaz');
-//        }
+        if(display) {
+            String exOpcode = String.format("0x%02X", extendedOpcode);
+            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+        }
         return cycles;
     }
 

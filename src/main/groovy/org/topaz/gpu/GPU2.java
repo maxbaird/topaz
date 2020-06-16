@@ -67,7 +67,8 @@ public class GPU2{
         spriteDumper = new SpriteDumper();
     }
 
-    public void updateGraphics(int cycles) {
+    public void updateGraphics(int cycles, int n) {
+        //System.out.println("Updating graphics: " + cycles + ", n: " + n);
         lcd.setLCDStatus();
 
         if(lcd.isLCDEnabled()) {
@@ -89,7 +90,7 @@ public class GPU2{
             SCAN_LINE_CYCLES_COUNTER += CYCLES_BETWEEN_SCANLINES;
 
             if(currentLine == V_BLANK_SCANLINE_START) {
-               // drawScanLine()
+                drawScanLine();
                 /* Request the appropriate interrupt if in a vertical blank period */
                 interruptHandler.requestInterrupt(InterruptHandler.V_BLANK_INTERRUPT);
             }else if(currentLine > V_BLANK_SCANLINE_END) {
@@ -726,9 +727,9 @@ public class GPU2{
             }
         }
         
-        if(n >= 0 && n <= 500) {
-            spriteDumper.dump(n, "/tmp/"+n+".topaz");
-        }
+//        if(n >= 5500 && n <= 6500) {
+//            spriteDumper.dump(n, "/tmp/"+n+".topaz");
+//        }
     }
 
     private Colour getColour(int colourNumber, int address){
