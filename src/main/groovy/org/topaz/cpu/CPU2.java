@@ -25,7 +25,7 @@ public class CPU2 {
 
         String hexCode = java.lang.String.format("0x%02X", opcode);
         // boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ?
-        boolean display = (n >= 280000 && n <= 280500) ? true : false;
+        boolean display = (n >= 1 && n <= 10) ? true : false;
         // true : false
 
         register.pc++;

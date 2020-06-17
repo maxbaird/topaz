@@ -33,17 +33,17 @@ public class Register2{
         this.setH(true);
         this.setC(true);
     }
-
+    
     private void setFlag(int pos){
-        this.F = this.F | (1 << pos);
+        this.F = (this.F | (1 << pos)) & 0xFF;
     }
 
     private void clearFlag(int pos){
         this.F = ~(1 << pos) & this.F & 0xFF;
     }
 
-    boolean isSet(int pos){
-        return (this.F & (1 << pos)) == 1;
+    private boolean isSet(int pos){
+        return ((this.F >> pos) & 1) == 1;
     }
 
     private int combine(int b1, int b2){
@@ -57,83 +57,83 @@ public class Register2{
         return b;
     }
 
-    int getSPLow() {
+    public int getSPLow() {
         return split(sp)[1];
     }
 
-    int getSPHigh() {
+    public int getSPHigh() {
         return split(sp)[0];
     }
 
-    int getAF(){
+    public int getAF(){
         return combine(A,F);
     }
 
-    int getBC(){
+    public int getBC(){
         return combine(B,C);
     }
 
-    int getDE(){
+    public int getDE(){
         return combine(D,E);
     }
 
-    int getHL(){
+    public int getHL(){
         return combine(H,L);
     }
 
-    void setAF(int s){
+    public void setAF(int s){
         int b[] = new int[2];
         b = split(s); 
         A = b[0];
         F = b[1];
     }
 
-    void setBC(int s){
+    public void setBC(int s){
         int b[] = new int[2];
         b = split(s); 
         B = b[0];
         C = b[1];
     }
 
-    void setDE(int s){
+    public void setDE(int s){
         int b[] = new int[2];
         b = split(s); 
         D = b[0];
         E = b[1];
     }
 
-    void setHL(int s){
+    public void setHL(int s){
         int b[] = new int[2];
         b = split(s); 
         H = b[0];
         L = b[1];
     }
 
-    boolean isZ(){
+    public boolean isZ(){
         return isSet(FLAG_Z);
     }
 
-    boolean isN(){
+    public boolean isN(){
         return isSet(FLAG_N);
     }
 
-    boolean isH(){
+    public boolean isH(){
         return isSet(FLAG_H);
     }
 
-    boolean isC(){
+    public boolean isC(){
         return isSet(FLAG_C);
     }
 
-    void setZ(){
+    public void setZ(){
         setFlag(FLAG_Z);
     }
 
-    void clearZ() {
+    public void clearZ() {
         clearFlag(FLAG_Z);
     }
 
-    void setZ(boolean b) {
+    public void setZ(boolean b) {
         if(b) {
             setFlag(FLAG_Z);
         }else {
@@ -141,15 +141,15 @@ public class Register2{
         }
     }
 
-    void setN(){
+    public void setN(){
         setFlag(FLAG_N);
     }
 
-    void clearN() {
+    public void clearN() {
         clearFlag(FLAG_N);
     }
 
-    void setN(boolean b) {
+    public void setN(boolean b) {
         if(b) {
             setFlag(FLAG_N); 
         }else {
@@ -157,15 +157,15 @@ public class Register2{
         }
     }
 
-    void setH(){
+    public void setH(){
         setFlag(FLAG_H);
     }
 
-    void clearH() {
+    public void clearH() {
         clearFlag(FLAG_H);
     }
 
-    void setH(boolean b) {
+    public void setH(boolean b) {
         if(b) {
             setFlag(FLAG_H); 
         }else {
@@ -173,15 +173,15 @@ public class Register2{
         }
     }
 
-    void setC(){
+    public void setC(){
         setFlag(FLAG_C);
     }
 
-    void clearC() {
+    public void clearC() {
         clearFlag(FLAG_C);
     }
 
-    void setC(boolean b) {
+    public void setC(boolean b) {
         if(b) {
             setFlag(FLAG_C);
         }else{
@@ -189,11 +189,11 @@ public class Register2{
         }
     }
 
-    void clearAllFlags() {
+    public void clearAllFlags() {
         F = 0;
     }
 
-    void printFlags(){
+    public void printFlags(){
         System.out.println(String.format("%8s", Integer.toBinaryString(this.F)).replaceAll(" ", "0"));
     }
 
