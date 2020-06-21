@@ -1,6 +1,7 @@
 package org.topaz.cpu;
 
 import org.topaz.MemoryManager;
+import org.topaz.Topaz;
 import org.topaz.util.BitUtil;
 import org.topaz.debug.StateDumper;
 
@@ -20,12 +21,19 @@ public class CPU2 {
     }
 
     public int executeNextOpcode(int n) {
+        
+        if(register.getHL() == 104448) {
+           System.out.println("Register HL will cause an out of bounds: " + n);
+           //System.exit(-1);
+        }
+        
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc);
 
         String hexCode = java.lang.String.format("0x%02X", opcode);
-        // boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ?
-        boolean display = (n >= 1 && n <= 10) ? true : false;
+        //boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
+        boolean display = (n >= 1 && n <= 500) ? true : false;
+        display = false;
         // true : false
 
         register.pc++;
@@ -2093,7 +2101,12 @@ public class CPU2 {
 
     private int cpu8BitInc(int n) {
         int initialN = n;
-        n++;
+//        n++;
+//        if(n == 256) {
+//            n = 0;
+//        }
+        
+        //System.out.println("N after: " + n);
         register.setZ(n == 0);
         register.setN(false);
         register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F);

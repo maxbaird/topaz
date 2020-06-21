@@ -6,9 +6,9 @@ import org.topaz.Emulator
 
 class Topaz{
 	Emulator emulator
-	static int executionStart
-	static int executionEnd
-	static int executionLimit
+	public static int executionStart
+	public static int executionEnd
+	public static int executionLimit
 
 	public static void main(String []args) {
 		def val = 0
@@ -38,7 +38,10 @@ class Topaz{
 	}
 
 	public Topaz(def path){
-		def f = (path != null) ? new File(path) : new File("/home/maxx/Documents/Games/terminator2.gb")
+        String rom = "/home/maxx/Downloads/cpu_instrs/cpu_instrs.gb"
+        //String rom = "/home/maxx/Documents/Games/terminator2.gb"
+
+		def f = (path != null) ? new File(path) : new File(rom)
 		//def f = new File("/home/maxx/Documents/Games/terminator2.gb")
 		//def f = new File("/home/maxx/Downloads/dmg0_rom.bin")
 		def cartridge = new Cartridge(f)
