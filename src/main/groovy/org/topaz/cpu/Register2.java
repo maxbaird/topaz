@@ -12,8 +12,8 @@ public class Register2{
     public UInt H = new UInt(UInt.EIGHT_BITS);
     public UInt L = new UInt(UInt.EIGHT_BITS);
 
-    public int pc;
-    public int sp;
+    public UInt pc = new UInt(UInt.SIXTEEN_BITS);
+    public UInt sp = new UInt(UInt.SIXTEEN_BITS);
 
     /* flag bits */
     public static final int FLAG_Z = 7;
@@ -22,8 +22,8 @@ public class Register2{
     public static final int FLAG_C = 4;
 
     public Register2() {
-        this.pc = 0x100;
-        this.sp = 0xFFFE;
+        this.pc.setValue(0x100);
+        this.sp.setValue(0xFFFE);
 
         this.setAF(0x01B0);
         this.setBC(0x0013);
@@ -48,8 +48,8 @@ public class Register2{
         return ((this.F.getValue() >> pos) & 1) == 1;
     }
 
-    private int combine(int b1, int b2){
-        return b1 << 8 | b2;
+    private int combine(UInt b1, UInt b2){
+        return b1.getValue() << 8 | b2.getValue();
     }
 
     private int[] split(int s){
@@ -60,27 +60,27 @@ public class Register2{
     }
 
     public int getSPLow() {
-        return split(sp)[1];
+        return split(sp.getValue())[1];
     }
 
     public int getSPHigh() {
-        return split(sp)[0];
+        return split(sp.getValue())[0];
     }
 
     public int getAF(){
-        return combine(A.getValue(),F.getValue());
+        return combine(A, F);
     }
 
     public int getBC(){
-        return combine(B.getValue(),C.getValue());
+        return combine(B, C);
     }
 
     public int getDE(){
-        return combine(D.getValue(),E.getValue());
+        return combine(D, E);
     }
 
     public int getHL(){
-        return combine(H.getValue(),L.getValue());
+        return combine(H, L);
     }
 
     public void setAF(int s){

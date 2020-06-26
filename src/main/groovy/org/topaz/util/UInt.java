@@ -29,7 +29,7 @@ public class UInt{
     
     public void setValue(int value){
         verify(value);
-        this.value = value;
+        this.value = value & mask;
     }
     
     public int getValue(){
@@ -44,5 +44,13 @@ public class UInt{
     public void sub(int value){
         verify(value);
         this.value = (this.value - value) & mask;
+    }
+    
+    public void inc() {
+        this.value = (this.value + 1) & mask;
+    }
+    
+    public void dec() {
+        this.value = (this.value - 1) & mask;
     }
 }
