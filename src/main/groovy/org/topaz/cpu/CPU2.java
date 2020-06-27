@@ -549,60 +549,60 @@ public class CPU2 {
 
             /* Logical OR */
             case 0xB7:
-                register.A = cpu8BitOR(register.A, register.A, false);
+                register.A.setValue(cpu8BitOR(register.A, register.A, false));
                 return 4;
             case 0xB0:
-                register.A = cpu8BitOR(register.A, register.getBC(), false);
+                register.A.setValue(cpu8BitOR(register.A, register.getBC(), false));
                 return 4;
             case 0xB1:
-                register.A = cpu8BitOR(register.A, register.C, false);
+                register.A.setValue(cpu8BitOR(register.A, register.C, false));
                 return 4;
             case 0xB2:
-                register.A = cpu8BitOR(register.A, register.D, false);
+                register.A.setValue(cpu8BitOR(register.A, register.D, false));
                 return 4;
             case 0xB3:
-                register.A = cpu8BitOR(register.A, register.E, false);
+                register.A.setValue(cpu8BitOR(register.A, register.E, false));
                 return 4;
             case 0xB4:
-                register.A = cpu8BitOR(register.A, register.H, false);
+                register.A.setValue(cpu8BitOR(register.A, register.H, false));
                 return 4;
             case 0xB5:
-                register.A = cpu8BitOR(register.A, register.L, false);
+                register.A.setValue(cpu8BitOR(register.A, register.L, false));
                 return 4;
             case 0xB6:
-                register.A = cpu8BitOR(register.A, memoryManager.readMemory(register.getHL()), false);
+                register.A.setValue(cpu8BitOR(register.A, memoryManager.readMemory(register.getHL()), false));
                 return 8;
             case 0xF6:
-                register.A = cpu8BitOR(register.A, 0, true);
+                register.A.setValue(cpu8BitOR(register.A, 0, true));
                 return 8;
 
             /* Logical XOR */
             case 0xAF:
-                register.A = cpu8BitXOR(register.A, register.A, false);
+                register.A.setValue(cpu8BitXOR(register.A, register.A, false));
                 return 4;
             case 0xA8:
-                register.A = cpu8BitXOR(register.A, register.getBC(), false);
+                register.A.setValue(cpu8BitXOR(register.A, register.getBC(), false));
                 return 4;
             case 0xA9:
-                register.A = cpu8BitXOR(register.A, register.C, false);
+                register.A.setValue(cpu8BitXOR(register.A, register.C, false));
                 return 4;
             case 0xAA:
-                register.A = cpu8BitXOR(register.A, register.D, false);
+                register.A.setValue(cpu8BitXOR(register.A, register.D, false));
                 return 4;
             case 0xAB:
-                register.A = cpu8BitXOR(register.A, register.E, false);
+                register.A.setValue(cpu8BitXOR(register.A, register.E, false));
                 return 4;
             case 0xAC:
-                register.A = cpu8BitXOR(register.A, register.H, false);
+                register.A.setValue(cpu8BitXOR(register.A, register.H, false));
                 return 4;
             case 0xAD:
-                register.A = cpu8BitXOR(register.A, register.L, false);
+                register.A.setValue(cpu8BitXOR(register.A, register.L, false));
                 return 4;
             case 0xAE:
-                register.A = cpu8BitXOR(register.A, memoryManager.readMemory(register.getHL()), false);
+                register.A.setValue(cpu8BitXOR(register.A, memoryManager.readMemory(register.getHL()), false));
                 return 8;
             case 0xEE:
-                register.A = cpu8BitXOR(register.A, 0, true);
+                register.A.setValue(cpu8BitXOR(register.A, 0, true));
                 return 8;
 
             /* Compares */
@@ -636,25 +636,25 @@ public class CPU2 {
 
             /* Increment */
             case 0x3C:
-                register.A = cpu8BitInc(register.A);
+                register.A.setValue(cpu8BitInc(register.A));
                 return 4;
             case 0x04:
-                register.B = cpu8BitInc(register.B);
+                register.B.setValue(cpu8BitInc(register.B));
                 return 4;
             case 0x0C:
-                register.C = cpu8BitInc(register.C);
+                register.C.setValue(cpu8BitInc(register.C));
                 return 4;
             case 0x14:
-                register.D = cpu8BitInc(register.D);
+                register.D.setValue(cpu8BitInc(register.D));
                 return 4;
             case 0x1C:
-                register.E = cpu8BitInc(register.E);
+                register.E.setValue(cpu8BitInc(register.E));
                 return 4;
             case 0x24:
-                register.H = cpu8BitInc(register.H);
+                register.H.setValue(cpu8BitInc(register.H));
                 return 4;
             case 0x2C:
-                register.L = cpu8BitInc(register.L);
+                register.L.setValue(cpu8BitInc(register.L));
                 return 4;
             case 0x34:
                 cpuIncMemory(register.getHL());
@@ -2084,34 +2084,38 @@ public class CPU2 {
         return nn;
     }
 
-    private void cpuCompare(int A, int val, boolean useImmediate) {
+    private void cpuCompare(UInt A, UInt val, boolean useImmediate) {
+        cpuCompare(A, val.getValue(), useImmediate);
+    }
+
+    private void cpuCompare(UInt A, int val, boolean useImmediate) {
         int n = 0;
 
         if (useImmediate) {
-            n = memoryManager.readMemory(register.pc);
-            register.pc++;
+            n = memoryManager.readMemory(register.pc.getValue());
+            register.pc.inc();
         } else {
             n = val;
         }
 
-        register.setZ(A == n);
-        register.setC(A < n);
-        register.setH((n & 0x0F) > (A & 0x0F));
+        register.setZ(A.getValue() == n);
+        register.setC(A.getValue() < n);
+        register.setH((n & 0x0F) > (A.getValue() & 0x0F));
         register.setN(true);
     }
 
-    private int cpu8BitInc(int n) {
-        int initialN = n;
+    private int cpu8BitInc(UInt n) {
+        int initialN = n.getValue();
 //        n++;
 //        if(n == 256) {
 //            n = 0;
 //        }
         
         //System.out.println("N after: " + n);
-        register.setZ(n == 0);
+        register.setZ(n.getValue() == 0);
         register.setN(false);
         register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F);
-        return n;
+        return n.getValue();
     }
 
     private void cpuIncMemory(int address) {
@@ -2193,25 +2197,29 @@ public class CPU2 {
         return reg.getValue();
     }
 
-    private int cpu8BitOR(int reg, int value, boolean useImmediate) {
+    private int cpu8BitOR(UInt reg1, UInt reg2, boolean useImmediate) {
+        return cpu8BitOR(reg1, reg2.getValue(), useImmediate);
+    }
+
+    private int cpu8BitOR(UInt reg, int value, boolean useImmediate) {
         int n = 0;
 
         if (useImmediate) {
-            n = memoryManager.readMemory(register.pc);
-            register.pc++;
+            n = memoryManager.readMemory(register.pc.getValue());
+            register.pc.inc();
         } else {
             n = value;
         }
 
-        reg = reg | n;
+        reg.setValue(reg.getValue() | n);
 
         register.clearN();
         register.clearH();
         register.clearC();
 
-        register.setZ(reg == 0);
+        register.setZ(reg.getValue() == 0);
 
-        return reg;
+        return reg.getValue();
     }
 
     private int cpu8BitLoad() {
@@ -2397,23 +2405,27 @@ public class CPU2 {
         register.setH(((register.pc ^ n ^ result) & 0x10) != 0);
     }
 
-    private int cpu8BitXOR(int reg, int value, boolean useImmediate) {
+    private int cpu8BitXOR(UInt reg1, UInt reg2, boolean useImmediate) {
+        return cpu8BitXOR(reg1, reg2.getValue(), useImmediate);
+    }
+
+    private int cpu8BitXOR(UInt reg, int value, boolean useImmediate) {
 
         int n = 0;
 
         if (useImmediate) {
-            n = memoryManager.readMemory(register.pc);
-            register.pc++;
+            n = memoryManager.readMemory(register.pc.getValue());
+            register.pc.inc();
         } else {
             n = value;
         }
 
-        reg = reg ^ n;
+        reg.setValue(reg.getValue() ^ n);
 
         register.clearAllFlags();
 
-        register.setZ(reg == 0);
+        register.setZ(reg.getValue() == 0);
 
-        return reg;
+        return reg.getValue();
     }
 }
