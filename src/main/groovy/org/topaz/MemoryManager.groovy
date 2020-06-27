@@ -93,9 +93,9 @@ class MemoryManager{
          * convince method for when an entire word must be read. Such as when
          * the CPU needs to execute a call instruction.
          */
-        int word = readMemory(register.pc+1)
+        int word = readMemory(register.pc.getValue()+1)
         word = word << 8 // shift first byte into upper byte of word
-        word = word | readMemory(register.pc) //read the second word into the lower byte
+        word = word | readMemory(register.pc.getValue()) //read the second word into the lower byte
         
         return word
     }
@@ -162,10 +162,10 @@ class MemoryManager{
          */
         int hi = word >> 8
         int lo = word & 0xff
-        register.sp--
-        this.writeMemory(register.sp, hi)
-        register.sp--
-        this.writeMemory(register.sp, lo)
+        register.sp.dec()
+        this.writeMemory(register.sp.getValue(), hi)
+        register.sp.dec()
+        this.writeMemory(register.sp.getValue(), lo)
     }
     
     int pop() {
@@ -173,9 +173,9 @@ class MemoryManager{
          * The stack stores bytes, so a word needs to be split into two bytes
          * when popping.
          */
-        int word = this.readMemory(register.sp+1) << 8
-        word |= this.readMemory(register.sp)
-        register.sp = register.sp + 2
+        int word = this.readMemory(register.sp.getValue()+1) << 8
+        word |= this.readMemory(register.sp.getValue())
+        register.sp.add(2);// = register.sp + 2
         return word
     }
 

@@ -1713,30 +1713,30 @@ public class CPU2 {
     // STOLEN! :-);
     private void cpuDAA() {
         if (!register.isN()) {
-            if (register.isC() || register.A > 0x99) {
-                register.A = register.A + 0x60;
+            if (register.isC() || register.A.getValue() > 0x99) {
+                register.A.add(0x60); //= register.A + 0x60;
                 register.setC();
             }
 
-            if (register.isH() || ((register.A & 0x0F) > 0x09)) {
-                register.A = register.A + 0x6;
+            if (register.isH() || ((register.A.getValue() & 0x0F) > 0x09)) {
+                register.A.add(0x6);// = register.A + 0x6;
             } else {
                 if (register.isC()) {
-                    register.A = register.A - 0x60;
+                    register.A.sub(0x60);// = register.A - 0x60;
                 }
                 if (register.isH()) {
-                    register.A = register.A - 0x6;
+                    register.A.sub(0x6);// = register.A - 0x6;
                 }
             }
         }
 
-        register.setZ(register.A == 0);
+        register.setZ(register.A.getValue() == 0);
         register.clearH();
     }
 
     private void cpuRestart(int n) {
-        memoryManager.push(register.pc);
-        register.pc = n;
+        memoryManager.push(register.pc.getValue());
+        register.pc.setValue(n);
     }
 
     private void cpuCall(boolean useCondition, int flag, boolean condition) {
@@ -1744,65 +1744,65 @@ public class CPU2 {
         /*
          * Advance 2 positions ahead because two bytes were just read.
          */
-        register.pc = register.pc + 2;
+        register.pc.add(2);//;= register.pc + 2;
 
         if (!useCondition) {
-            memoryManager.push(register.pc);
-            register.pc = word;
+            memoryManager.push(register.pc.getValue());
+            register.pc.setValue(word);// = word;
             return;
         }
 
-        if (BitUtil.isSet(register.F, flag) == condition) {
-            memoryManager.push(register.pc);
-            register.pc = word;
+        if (BitUtil.isSet(register.F.getValue(), flag) == condition) {
+            memoryManager.push(register.pc.getValue());
+            register.pc.setValue(word);// = word;
         }
     }
 
     private void cpuReturn(boolean useCondition, int flag, boolean condition) {
         if (!useCondition) {
-            register.pc = memoryManager.pop();
+            register.pc.setValue(memoryManager.pop());
             return;
         }
 
-        if (BitUtil.isSet(register.F, flag) == condition) {
-            register.pc = memoryManager.pop();
+        if (BitUtil.isSet(register.F.getValue(), flag) == condition) {
+            register.pc.setValue(memoryManager.pop());
         }
     }
 
     private void cpuReturnFromInterrupt() {
-        register.pc = memoryManager.pop();
+        register.pc.setValue(memoryManager.pop());
         interruptMaster = true;
     }
 
     private void cpuJump(boolean useJumpCondition, int flag, boolean jumpCondition) {
         int nn = memoryManager.readWord();
-        register.pc = register.pc + 2;
+        register.pc.add(2);// = register.pc + 2;
 
         if (!useJumpCondition) {
-            register.pc = nn;
+            register.pc.setValue(nn);
             return;
         }
 
-        if (BitUtil.isSet(register.F, flag) == jumpCondition) {
-            register.pc = nn;
+        if (BitUtil.isSet(register.F.getValue(), flag) == jumpCondition) {
+            register.pc.setValue(nn);
         }
     }
 
     public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
-        byte n = (byte) memoryManager.readMemory(register.pc);
+        byte n = (byte) memoryManager.readMemory(register.pc.getValue());
 
         if (!useCondition) {
             /*
              * Jump unconditionally
              */
-            register.pc = register.pc + n;
-        } else if (BitUtil.isSet(register.F, flag) == condition) {
+            register.pc.add(n);// = register.pc + n;
+        } else if (BitUtil.isSet(register.F.getValue(), flag) == condition) {
             /*
              * Only jump if the condition is met
              */
-            register.pc = register.pc + n;
+            register.pc.add(n);// = register.pc + n;
         }
-        register.pc++;
+        register.pc.inc();
     }
 
     private void cpuTestBit(int reg, int bit) {
@@ -2080,7 +2080,7 @@ public class CPU2 {
 
     private int cpu16BitImmediateLoad() {
         int nn = memoryManager.readWord();
-        register.pc += 2;
+        register.pc.add(2);// += 2;
         return nn;
     }
 
@@ -2151,9 +2151,9 @@ public class CPU2 {
 
     private void cpu16BitLDHL() {
         /* If problems occur, double check the implementation of this method */
-        int n = memoryManager.readMemory(register.sp);
-        register.pc++;
-        int result = register.sp + n;
+        int n = memoryManager.readMemory(register.sp.getValue());
+        register.pc.inc();
+        int result = register.sp.getValue() + n;
 
         register.setHL(result & 0xFFFF);
 
@@ -2166,7 +2166,7 @@ public class CPU2 {
             register.clearC();
         }
 
-        if ((register.sp & 0xF) + (n & 0xF) > 0xF) {
+        if ((register.sp.getValue() & 0xF) + (n & 0xF) > 0xF) {
             register.setH();
         } else {
             register.clearH();
@@ -2246,8 +2246,8 @@ public class CPU2 {
     }
 
     private void cpuLoadImmediate8BitMemory(int destination) {
-        int data = memoryManager.readMemory(register.pc);
-        register.pc++;
+        int data = memoryManager.readMemory(register.pc.getValue());
+        register.pc.inc();
         memoryManager.writeMemory(destination, data);
     }
 
@@ -2382,9 +2382,9 @@ public class CPU2 {
     }
 
     private void cpu8BitSPAdd() {
-        int n = memoryManager.readMemory(register.pc);
-        int result = (register.pc + n) & 0xFFFF;
-        register.pc = result;
+        int n = memoryManager.readMemory(register.pc.getValue());
+        int result = (register.pc.getValue() + n) & 0xFFFF;
+        register.pc.setValue(result);
 
         register.clearZ();
         register.clearN();
@@ -2401,8 +2401,8 @@ public class CPU2 {
          * operator-clarification
          */
 
-        register.setC(((register.pc ^ n ^ result) & 0x100) != 0);
-        register.setH(((register.pc ^ n ^ result) & 0x10) != 0);
+        register.setC(((register.pc.getValue() ^ n ^ result) & 0x100) != 0);
+        register.setH(((register.pc.getValue() ^ n ^ result) & 0x10) != 0);
     }
 
     private int cpu8BitXOR(UInt reg1, UInt reg2, boolean useImmediate) {
