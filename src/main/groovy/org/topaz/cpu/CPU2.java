@@ -662,25 +662,25 @@ public class CPU2 {
 
             /* Decrement */
             case 0x3D:
-                register.A = cpu8BitDec(register.A);
+                register.A.setValue(cpu8BitDec(register.A));
                 return 4;
             case 0x05:
-                register.B = cpu8BitDec(register.B);
+                register.B.setValue(cpu8BitDec(register.B));
                 return 4;
             case 0x0D:
-                register.C = cpu8BitDec(register.C);
+                register.C.setValue(cpu8BitDec(register.C));
                 return 4;
             case 0x15:
-                register.D = cpu8BitDec(register.D);
+                register.D.setValue(cpu8BitDec(register.D));
                 return 4;
             case 0x1D:
-                register.E = cpu8BitDec(register.E);
+                register.E.setValue(cpu8BitDec(register.E));
                 return 4;
             case 0x25:
-                register.H = cpu8BitDec(register.H);
+                register.H.setValue(cpu8BitDec(register.H));
                 return 4;
             case 0x2D:
-                register.L = cpu8BitDec(register.L);
+                register.L.setValue(cpu8BitDec(register.L));
                 return 4;
             case 0x35:
                 cpuDecMemory(register.getHL());
@@ -697,7 +697,7 @@ public class CPU2 {
                 register.setHL( cpu16BitAdd(register.getHL(), register.getHL()));
                 return 8;
             case 0x39:
-                register.setHL( cpu16BitAdd(register.getHL(), register.sp));
+                register.setHL( cpu16BitAdd(register.getHL(), register.sp.getValue()));
                 return 8;
 
             /* Add n to stack pointer */
@@ -716,7 +716,7 @@ public class CPU2 {
                 register.setHL( cpu16BitInc(register.getHL()));
                 return 8;
             case 0x33:
-                register.sp = cpu16BitInc(register.sp);
+                register.sp.setValue(cpu16BitInc(register.sp.getValue()));
                 return 8;
 
             /* 16 bit DEC */
@@ -730,7 +730,7 @@ public class CPU2 {
                 register.setHL( cpu16BitDec(register.getHL()));
                 return 8;
             case 0x3B:
-                register.sp = cpu16BitDec(register.sp);
+                register.sp.setValue(cpu16BitDec(register.sp.getValue()));
                 return 8;
 
             /* DAA */
@@ -740,7 +740,7 @@ public class CPU2 {
 
             /* Miscellaneous */
             case 0x2F:
-                register.A = ~register.A;
+                register.A.setValue(~register.A.getValue());
                 register.setN();
                 register.setH();
                 return 4;
@@ -756,7 +756,7 @@ public class CPU2 {
                 return 4;
 
             case 0x10: //Stop
-                register.pc++;
+                register.pc.inc();
                 return 4;
 
             case 0xF3:
@@ -769,19 +769,19 @@ public class CPU2 {
 
             /* Rotates and shifts */
             case 0x07:
-                register.A = cpuRLC(register.A);
+                register.A.setValue(cpuRLC(register.A));
                 return 4;
 
             case 0x17:
-                register.A = cpuRL(register.A);
+                register.A.setValue(cpuRL(register.A));
                 return 4;
 
             case 0x0F:
-                register.A = cpuRRC(register.A);
+                register.A.setValue(cpuRRC(register.A));
                 return 4;
 
             case 0x1F:
-                register.A = cpuRR(register.A);
+                register.A.setValue(cpuRR(register.A));
                 return 4;
 
             /* Jumps */
@@ -801,7 +801,7 @@ public class CPU2 {
                 cpuJump(true, Register2.FLAG_C, true);
                 return 12;
             case 0xE9:
-                register.pc = register.getHL();
+                register.pc.setValue(register.getHL());
                 return 4;
             case 0x18:
                 cpuJumpImmediate(false, 0, false);
@@ -903,7 +903,7 @@ public class CPU2 {
                   System.out.println("Unrecognized opcode: " + hexCode);
                   System.exit(-1);
 //                def hexCode = java.lang.String.format("0x%2X", opcode);
-//                throw new Exception("Unrecognized opcode: " + hexCode);
+//                throw new Exception("Unrecognised opcode: " + hexCode);
         }
         return 0;
     }
@@ -913,54 +913,54 @@ public class CPU2 {
          * When the opcode 0xCB is encountered the next immediate byte needs to be
          * decoded and treated as an opcode.
          */
-        int opcode = memoryManager.readMemory(register.pc);
-        register.pc++;
+        int opcode = memoryManager.readMemory(register.pc.getValue());
+        register.pc.inc();
 
         switch (opcode) {
         /* Swaps */
         case 0x37:
-            register.A = cpuSwapNibbles(register.A);
+            register.A.setValue(cpuSwapNibbles(register.A));
             return 8;
         case 0x30:
-            register.B = cpuSwapNibbles(register.B);
+            register.B.setValue(cpuSwapNibbles(register.B));
             return 8;
         case 0x31:
-            register.C = cpuSwapNibbles(register.C);
+            register.C.setValue(cpuSwapNibbles(register.C));
             return 8;
         case 0x32:
-            register.D = cpuSwapNibbles(register.D);
+            register.D.setValue(cpuSwapNibbles(register.D));
             return 8;
         case 0x33:
-            register.E = cpuSwapNibbles(register.E);
+            register.E.setValue(cpuSwapNibbles(register.E));
             return 8;
         case 0x34:
-            register.H = cpuSwapNibbles(register.H);
+            register.H.setValue(cpuSwapNibbles(register.H));
             return 8;
         case 0x35:
-            register.L = cpuSwapNibbles(register.L);
+            register.L.setValue(cpuSwapNibbles(register.L));
             return 8;
 
         /* Rotate left through carry */
         case 0x07:
-            register.A = cpuRLC(register.A);
+            register.A.setValue(cpuRLC(register.A));
             return 8;
         case 0x00:
-            register.B = cpuRLC(register.B);
+            register.B.setValue(cpuRLC(register.B));
             return 8;
         case 0x01:
-            register.C = cpuRLC(register.C);
+            register.C.setValue(cpuRLC(register.C));
             return 8;
         case 0x02:
-            register.D = cpuRLC(register.D);
+            register.D.setValue(cpuRLC(register.D));
             return 8;
         case 0x03:
-            register.E = cpuRLC(register.E);
+            register.E.setValue(cpuRLC(register.E));
             return 8;
         case 0x04:
-            register.H = cpuRLC(register.H);
+            register.H.setValue(cpuRLC(register.H));
             return 8;
         case 0x05:
-            register.L = cpuRLC(register.L);
+            register.L.setValue(cpuRLC(register.L));
             return 8;
         case 0x06:
             cpuRLCMemory(register.getHL());
@@ -968,25 +968,25 @@ public class CPU2 {
 
         /* rotate left */
         case 0x17:
-            register.A = cpuRL(register.A);
+            register.A.setValue(cpuRL(register.A));
             return 8;
         case 0x10:
-            register.B = cpuRL(register.B);
+            register.B.setValue(cpuRL(register.B));
             return 8;
         case 0x11:
-            register.C = cpuRL(register.C);
+            register.C.setValue(cpuRL(register.C));
             return 8;
         case 0x12:
-            register.D = cpuRL(register.D);
+            register.D.setValue(cpuRL(register.D));
             return 8;
         case 0x13:
-            register.E = cpuRL(register.E);
+            register.E.setValue(cpuRL(register.E));
             return 8;
         case 0x14:
-            register.H = cpuRL(register.H);
+            register.H.setValue(cpuRL(register.H));
             return 8;
         case 0x15:
-            register.L = cpuRL(register.A);
+            register.L.setValue(cpuRL(register.A));
             return 8;
         case 0x16:
             cpuRLMemory(register.getHL());
@@ -994,25 +994,25 @@ public class CPU2 {
 
         /* Rotate right through carry */
         case 0x0F:
-            register.A = cpuRRC(register.A);
+            register.A.setValue(cpuRRC(register.A));
             return 8;
         case 0x08:
-            register.B = cpuRRC(register.B);
+            register.B.setValue(cpuRRC(register.B));
             return 8;
         case 0x09:
-            register.C = cpuRRC(register.C);
+            register.C.setValue(cpuRRC(register.C));
             return 8;
         case 0x0A:
-            register.D = cpuRRC(register.D);
+            register.D.setValue(cpuRRC(register.D));
             return 8;
         case 0x0B:
-            register.E = cpuRRC(register.E);
+            register.E.setValue(cpuRRC(register.E));
             return 8;
         case 0x0C:
-            register.H = cpuRRC(register.H);
+            register.H.setValue(cpuRRC(register.H));
             return 8;
         case 0x0D:
-            register.L = cpuRRC(register.L);
+            register.L.setValue(cpuRRC(register.L));
             return 8;
         case 0x0E:
             cpuRRCMemory(register.getHL());
@@ -1020,25 +1020,25 @@ public class CPU2 {
 
         /* rotate right */
         case 0x1F:
-            register.A = cpuRR(register.A);
+            register.A.setValue(cpuRR(register.A));
             return 8;
         case 0x18:
-            register.B = cpuRR(register.B);
+            register.B.setValue(cpuRR(register.B));
             return 8;
         case 0x19:
-            register.C = cpuRR(register.C);
+            register.C.setValue(cpuRR(register.C));
             return 8;
         case 0x1A:
-            register.D = cpuRR(register.D);
+            register.D.setValue(cpuRR(register.D));
             return 8;
         case 0x1B:
-            register.E = cpuRR(register.E);
+            register.E.setValue(cpuRR(register.E));
             return 8;
         case 0x1C:
-            register.H = cpuRR(register.H);
+            register.H.setValue(cpuRR(register.H));
             return 8;
         case 0x1D:
-            register.L = cpuRR(register.L);
+            register.L.setValue(cpuRR(register.L));
             return 8;
         case 0x1E:
             cpuRRMemory(register.getHL());
@@ -1046,75 +1046,75 @@ public class CPU2 {
 
         /* shift left */
         case 0x27:
-            register.A = cpuSLA(register.A);
+            register.A.setValue(cpuSLA(register.A));
             return 8;
         case 0x20:
-            register.B = cpuSLA(register.B);
+            register.B.setValue(cpuSLA(register.B));
             return 8;
         case 0x21:
-            register.C = cpuSLA(register.C);
+            register.C.setValue(cpuSLA(register.C));
             return 8;
         case 0x22:
-            register.D = cpuSLA(register.D);
+            register.D.setValue(cpuSLA(register.D));
             return 8;
         case 0x23:
-            register.E = cpuSLA(register.E);
+            register.E.setValue(cpuSLA(register.E));
             return 8;
         case 0x24:
-            register.H = cpuSLA(register.H);
+            register.H.setValue(cpuSLA(register.H));
             return 8;
         case 0x25:
-            register.L = cpuSLA(register.L);
+            register.L.setValue(cpuSLA(register.L));
             return 8;
         case 0x26:
-            cpuSLAMemory(register.H);
+            cpuSLAMemory(register.H.getValue());
             return 16;
 
         /* shift right into carry */
         case 0x2F:
-            register.A = cpuSRA(register.A);
+            register.A.setValue(cpuSRA(register.A.getValue()));
             return 8;
         case 0x28:
-            register.B = cpuSRA(register.B);
+            register.B.setValue(cpuSRA(register.B.getValue()));
             return 8;
         case 0x29:
-            register.C = cpuSRA(register.C);
+            register.C.setValue(cpuSRA(register.C.getValue()));
             return 8;
         case 0x2A:
-            register.D = cpuSRA(register.D);
+            register.D.setValue(cpuSRA(register.D.getValue()));
             return 8;
         case 0x2B:
-            register.E = cpuSRA(register.E);
+            register.E.setValue(cpuSRA(register.E.getValue()));
             return 8;
         case 0x2C:
-            register.H = cpuSRA(register.H);
+            register.H.setValue(cpuSRA(register.H.getValue()));
             return 8;
         case 0x2D:
-            register.L = cpuSRA(register.L);
+            register.L.setValue(cpuSRA(register.L.getValue()));
             return 8;
         case 0x2E:
             cpuSRAMemory(register.getHL());
             return 16;
         case 0x3F:
-            register.A = cpuSRL(register.A);
+            register.A.setValue(cpuSRL(register.A.getValue()));
             return 8;
         case 0x38:
-            register.B = cpuSRL(register.B);
+            register.B.setValue(cpuSRL(register.B.getValue()));
             return 8;
         case 0x39:
-            register.C = cpuSRL(register.C);
+            register.C.setValue(cpuSRL(register.C.getValue()));
             return 8;
         case 0x3A:
-            register.D = cpuSRL(register.D);
+            register.D.setValue(cpuSRL(register.D.getValue()));
             return 8;
         case 0x3B:
-            register.E = cpuSRL(register.E);
+            register.E.setValue(cpuSRL(register.E.getValue()));
             return 8;
         case 0x3C:
-            register.H = cpuSRL(register.H);
+            register.H.setValue(cpuSRL(register.H.getValue()));
             return 8;
         case 0x3D:
-            register.L = cpuSRL(register.L);
+            register.L.setValue(cpuSRL(register.L.getValue()));
             return 8;
         case 0x3E:
             cpuSRLMemory(register.getHL());
@@ -1125,387 +1125,387 @@ public class CPU2 {
             cpuTestBit(register.getBC(), 0);
             return 8;
         case 0x41:
-            cpuTestBit(register.C, 0);
+            cpuTestBit(register.C.getValue(), 0);
             return 8;
         case 0x42:
-            cpuTestBit(register.D, 0);
+            cpuTestBit(register.D.getValue(), 0);
             return 8;
         case 0x43:
-            cpuTestBit(register.E, 0);
+            cpuTestBit(register.E.getValue(), 0);
             return 8;
         case 0x44:
-            cpuTestBit(register.H, 0);
+            cpuTestBit(register.H.getValue(), 0);
             return 8;
         case 0x45:
-            cpuTestBit(register.L, 0);
+            cpuTestBit(register.L.getValue(), 0);
             return 8;
         case 0x46:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 0);
             return 16;
         case 0x47:
-            cpuTestBit(register.A, 0);
+            cpuTestBit(register.A.getValue(), 0);
             return 8;
         case 0x48:
             cpuTestBit(register.getBC(), 1);
             return 8;
         case 0x49:
-            cpuTestBit(register.C, 1);
+            cpuTestBit(register.C.getValue(), 1);
             return 8;
         case 0x4A:
-            cpuTestBit(register.D, 1);
+            cpuTestBit(register.D.getValue(), 1);
             return 8;
         case 0x4B:
-            cpuTestBit(register.E, 1);
+            cpuTestBit(register.E.getValue(), 1);
             return 8;
         case 0x4C:
-            cpuTestBit(register.H, 1);
+            cpuTestBit(register.H.getValue(), 1);
             return 8;
         case 0x4D:
-            cpuTestBit(register.L, 1);
+            cpuTestBit(register.L.getValue(), 1);
             return 8;
         case 0x4E:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 1);
             return 16;
         case 0x4F:
-            cpuTestBit(register.A, 1);
+            cpuTestBit(register.A.getValue(), 1);
             return 8;
         case 0x50:
             cpuTestBit(register.getBC(), 2);
             return 8;
         case 0x51:
-            cpuTestBit(register.C, 2);
+            cpuTestBit(register.C.getValue(), 2);
             return 8;
         case 0x52:
-            cpuTestBit(register.D, 2);
+            cpuTestBit(register.D.getValue(), 2);
             return 8;
         case 0x53:
-            cpuTestBit(register.E, 2);
+            cpuTestBit(register.E.getValue(), 2);
             return 8;
         case 0x54:
-            cpuTestBit(register.H, 2);
+            cpuTestBit(register.H.getValue(), 2);
             return 8;
         case 0x55:
-            cpuTestBit(register.L, 2);
+            cpuTestBit(register.L.getValue(), 2);
             return 8;
         case 0x56:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 2);
             return 16;
         case 0x57:
-            cpuTestBit(register.A, 2);
+            cpuTestBit(register.A.getValue(), 2);
             return 8;
         case 0x58:
             cpuTestBit(register.getBC(), 3);
             return 8;
         case 0x59:
-            cpuTestBit(register.C, 3);
+            cpuTestBit(register.C.getValue(), 3);
             return 8;
         case 0x5A:
-            cpuTestBit(register.D, 3);
+            cpuTestBit(register.D.getValue(), 3);
             return 8;
         case 0x5B:
-            cpuTestBit(register.E, 3);
+            cpuTestBit(register.E.getValue(), 3);
             return 8;
         case 0x5C:
-            cpuTestBit(register.H, 3);
+            cpuTestBit(register.H.getValue(), 3);
             return 8;
         case 0x5D:
-            cpuTestBit(register.L, 3);
+            cpuTestBit(register.L.getValue(), 3);
             return 8;
         case 0x5E:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 3);
             return 16;
         case 0x5F:
-            cpuTestBit(register.A, 3);
+            cpuTestBit(register.A.getValue(), 3);
             return 8;
         case 0x60:
             cpuTestBit(register.getBC(), 4);
             return 8;
         case 0x61:
-            cpuTestBit(register.C, 4);
+            cpuTestBit(register.C.getValue(), 4);
             return 8;
         case 0x62:
-            cpuTestBit(register.D, 4);
+            cpuTestBit(register.D.getValue(), 4);
             return 8;
         case 0x63:
-            cpuTestBit(register.E, 4);
+            cpuTestBit(register.E.getValue(), 4);
             return 8;
         case 0x64:
-            cpuTestBit(register.H, 4);
+            cpuTestBit(register.H.getValue(), 4);
             return 8;
         case 0x65:
-            cpuTestBit(register.L, 4);
+            cpuTestBit(register.L.getValue(), 4);
             return 8;
         case 0x66:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 4);
             return 16;
         case 0x67:
-            cpuTestBit(register.A, 4);
+            cpuTestBit(register.A.getValue(), 4);
             return 8;
         case 0x68:
             cpuTestBit(register.getBC(), 5);
             return 8;
         case 0x69:
-            cpuTestBit(register.C, 5);
+            cpuTestBit(register.C.getValue(), 5);
             return 8;
         case 0x6A:
-            cpuTestBit(register.D, 5);
+            cpuTestBit(register.D.getValue(), 5);
             return 8;
         case 0x6B:
-            cpuTestBit(register.E, 5);
+            cpuTestBit(register.E.getValue(), 5);
             return 8;
         case 0x6C:
-            cpuTestBit(register.H, 5);
+            cpuTestBit(register.H.getValue(), 5);
             return 8;
         case 0x6D:
-            cpuTestBit(register.L, 5);
+            cpuTestBit(register.L.getValue(), 5);
             return 8;
         case 0x6E:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 5);
             return 16;
         case 0x6F:
-            cpuTestBit(register.A, 5);
+            cpuTestBit(register.A.getValue(), 5);
             return 8;
         case 0x70:
             cpuTestBit(register.getBC(), 6);
             return 8;
         case 0x71:
-            cpuTestBit(register.C, 6);
+            cpuTestBit(register.C.getValue(), 6);
             return 8;
         case 0x72:
-            cpuTestBit(register.D, 6);
+            cpuTestBit(register.D.getValue(), 6);
             return 8;
         case 0x73:
-            cpuTestBit(register.E, 6);
+            cpuTestBit(register.E.getValue(), 6);
             return 8;
         case 0x74:
-            cpuTestBit(register.H, 6);
+            cpuTestBit(register.H.getValue(), 6);
             return 8;
         case 0x75:
-            cpuTestBit(register.L, 6);
+            cpuTestBit(register.L.getValue(), 6);
             return 8;
         case 0x76:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 6);
             return 16;
         case 0x77:
-            cpuTestBit(register.A, 6);
+            cpuTestBit(register.A.getValue(), 6);
             return 8;
         case 0x78:
             cpuTestBit(register.getBC(), 7);
             return 8;
         case 0x79:
-            cpuTestBit(register.C, 7);
+            cpuTestBit(register.C.getValue(), 7);
             return 8;
         case 0x7A:
-            cpuTestBit(register.D, 7);
+            cpuTestBit(register.D.getValue(), 7);
             return 8;
         case 0x7B:
-            cpuTestBit(register.E, 7);
+            cpuTestBit(register.E.getValue(), 7);
             return 8;
         case 0x7C:
-            cpuTestBit(register.H, 7);
+            cpuTestBit(register.H.getValue(), 7);
             return 8;
         case 0x7D:
-            cpuTestBit(register.L, 7);
+            cpuTestBit(register.L.getValue(), 7);
             return 8;
         case 0x7E:
             cpuTestBit(memoryManager.readMemory(register.getHL()), 7);
             return 16;
         case 0x7F:
-            cpuTestBit(register.A, 7);
+            cpuTestBit(register.A.getValue(), 7);
             return 8;
 
         /* set bit */
         case 0xC0:
-            register.B = cpuSetBit(register.getBC(), 0);
+            register.B.setValue(cpuSetBit(register.getBC(), 0));
             return 8;
         case 0xC1:
-            register.C = cpuSetBit(register.C, 0);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 0));
             return 8;
         case 0xC2:
-            register.D = cpuSetBit(register.D, 0);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 0));
             return 8;
         case 0xC3:
-            register.E = cpuSetBit(register.E, 0);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 0));
             return 8;
         case 0xC4:
-            register.H = cpuSetBit(register.H, 0);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 0));
             return 8;
         case 0xC5:
-            register.L = cpuSetBit(register.L, 0);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 0));
             return 8;
         case 0xC6:
             cpuSetBitMemory(register.getHL(), 0);
             return 16;
         case 0xC7:
-            register.A = cpuSetBit(register.A, 0);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 0));
             return 8;
         case 0xC8:
-            register.B = cpuSetBit(register.getBC(), 1);
+            register.B.setValue(cpuSetBit(register.getBC(), 1));
             return 8;
         case 0xC9:
-            register.C = cpuSetBit(register.C, 1);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 1));
             return 8;
         case 0xCA:
-            register.D = cpuSetBit(register.D, 1);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 1));
             return 8;
         case 0xCB:
-            register.E = cpuSetBit(register.E, 1);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 1));
             return 8;
         case 0xCC:
-            register.H = cpuSetBit(register.H, 1);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 1));
             return 8;
         case 0xCD:
-            register.L = cpuSetBit(register.L, 1);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 1));
             return 8;
         case 0xCE:
             cpuSetBitMemory(register.getHL(), 1);
             return 16;
         case 0xCF:
-            register.A = cpuSetBit(register.A, 1);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 1));
             return 8;
         case 0xD0:
-            register.B = cpuSetBit(register.getBC(), 2);
+            register.B.setValue(cpuSetBit(register.getBC(), 2));
             return 8;
         case 0xD1:
-            register.C = cpuSetBit(register.C, 2);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 2));
             return 8;
         case 0xD2:
-            register.D = cpuSetBit(register.D, 2);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 2));
             return 8;
         case 0xD3:
-            register.E = cpuSetBit(register.E, 2);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 2));
             return 8;
         case 0xD4:
-            register.H = cpuSetBit(register.H, 2);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 2));
             return 8;
         case 0xD5:
-            register.L = cpuSetBit(register.L, 2);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 2));
             return 8;
         case 0xD6:
             cpuSetBitMemory(register.getHL(), 2);
             return 16;
         case 0xD7:
-            register.A = cpuSetBit(register.A, 2);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 2));
             return 8;
         case 0xD8:
-            register.B = cpuSetBit(register.getBC(), 3);
+            register.B.setValue(cpuSetBit(register.getBC(), 3));
             return 8;
         case 0xD9:
-            register.C = cpuSetBit(register.C, 3);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 3));
             return 8;
         case 0xDA:
-            register.D = cpuSetBit(register.D, 3);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 3));
             return 8;
         case 0xDB:
-            register.E = cpuSetBit(register.E, 3);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 3));
             return 8;
         case 0xDC:
-            register.H = cpuSetBit(register.H, 3);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 3));
             return 8;
         case 0xDD:
-            register.L = cpuSetBit(register.L, 3);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 3));
             return 8;
         case 0xDE:
             cpuSetBitMemory(register.getHL(), 3);
             return 16;
         case 0xDF:
-            register.A = cpuSetBit(register.A, 3);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 3));
             return 8;
         case 0xE0:
-            register.B = cpuSetBit(register.getBC(), 4);
+            register.B.setValue(cpuSetBit(register.getBC(), 4));
             return 8;
         case 0xE1:
-            register.C = cpuSetBit(register.C, 4);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 4));
             return 8;
         case 0xE2:
-            register.D = cpuSetBit(register.D, 4);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 4));
             return 8;
         case 0xE3:
-            register.E = cpuSetBit(register.E, 4);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 4));
             return 8;
         case 0xE4:
-            register.H = cpuSetBit(register.H, 4);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 4));
             return 8;
         case 0xE5:
-            register.L = cpuSetBit(register.L, 4);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 4));
             return 8;
         case 0xE6:
             cpuSetBitMemory(register.getHL(), 4);
             return 16;
         case 0xE7:
-            register.A = cpuSetBit(register.A, 4);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 4));
             return 8;
         case 0xE8:
-            register.B = cpuSetBit(register.getBC(), 5);
+            register.B.setValue(cpuSetBit(register.getBC(), 5));
             return 8;
         case 0xE9:
-            register.C = cpuSetBit(register.C, 5);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 5));
             return 8;
         case 0xEA:
-            register.D = cpuSetBit(register.D, 5);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 5));
             return 8;
         case 0xEB:
-            register.E = cpuSetBit(register.E, 5);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 5));
             return 8;
         case 0xEC:
-            register.H = cpuSetBit(register.H, 5);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 5));
             return 8;
         case 0xED:
-            register.L = cpuSetBit(register.L, 5);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 5));
             return 8;
         case 0xEE:
             cpuSetBitMemory(register.getHL(), 5);
             return 16;
         case 0xEF:
-            register.A = cpuSetBit(register.A, 5);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 5));
             return 8;
         case 0xF0:
-            register.B = cpuSetBit(register.getBC(), 6);
+            register.B.setValue(cpuSetBit(register.getBC(), 6));
             return 8;
         case 0xF1:
-            register.C = cpuSetBit(register.getBC(), 6);
+            register.C.setValue(cpuSetBit(register.getBC(), 6));
             return 8;
         case 0xF2:
-            register.D = cpuSetBit(register.D, 6);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 6));
             return 8;
         case 0xF3:
-            register.E = cpuSetBit(register.E, 6);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 6));
             return 8;
         case 0xF4:
-            register.H = cpuSetBit(register.H, 6);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 6));
             return 8;
         case 0xF5:
-            register.L = cpuSetBit(register.L, 6);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 6));
             return 8;
         case 0xF6:
             cpuSetBitMemory(register.getHL(), 6);
             return 16;
         case 0xF7:
-            register.A = cpuSetBit(register.A, 6);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 6));
             return 8;
         case 0xF8:
-            register.B = cpuSetBit(register.getBC(), 7);
+            register.B.setValue(cpuSetBit(register.getBC(), 7));
             return 8;
         case 0xF9:
-            register.C = cpuSetBit(register.C, 7);
+            register.C.setValue(cpuSetBit(register.C.getValue(), 7));
             return 8;
         case 0xFA:
-            register.D = cpuSetBit(register.D, 7);
+            register.D.setValue(cpuSetBit(register.D.getValue(), 7));
             return 8;
         case 0xFB:
-            register.E = cpuSetBit(register.E, 7);
+            register.E.setValue(cpuSetBit(register.E.getValue(), 7));
             return 8;
         case 0xFC:
-            register.H = cpuSetBit(register.H, 7);
+            register.H.setValue(cpuSetBit(register.H.getValue(), 7));
             return 8;
         case 0xFD:
-            register.L = cpuSetBit(register.L, 7);
+            register.L.setValue(cpuSetBit(register.L.getValue(), 7));
             return 8;
         case 0xFE:
             cpuSetBitMemory(register.getHL(), 7);
             return 16;
         case 0xFF:
-            register.A = cpuSetBit(register.A, 7);
+            register.A.setValue(cpuSetBit(register.A.getValue(), 7));
             return 8;
 
         /* reset bit */
@@ -1904,13 +1904,13 @@ public class CPU2 {
         memoryManager.writeMemory(address, reg);
     }
 
-    private int cpuSLA(int reg) {
-        register.setC(BitUtil.isSet(reg, 7));
-        reg = (reg << 1) & 0xFF;
+    private int cpuSLA(UInt reg) {
+        register.setC(BitUtil.isSet(reg.getValue(), 7));
+        reg.setValue((reg.getValue() << 1) & 0xFF);
         register.clearN();
         register.clearH();
-        register.setZ(reg == 0);
-        return reg;
+        register.setZ(reg.getValue() == 0);
+        return reg.getValue();
     }
 
     private void cpuSLAMemory(int address) {
@@ -1924,15 +1924,15 @@ public class CPU2 {
         memoryManager.writeMemory(address, reg);
     }
 
-    private int cpuRLC(int reg) {
-        int n = reg & 0xFF;
-        register.A = (reg << 1 | reg >> 7) & 0xFF;
-        register.setZ(reg == 0);
+    private int cpuRLC(UInt reg) {
+        int n = reg.getValue() & 0xFF;
+        register.A.setValue((reg.getValue() << 1 | reg.getValue() >> 7) & 0xFF);
+        register.setZ(reg.getValue() == 0);
         register.clearN();
         register.clearH();
         register.setC(BitUtil.isSet(n, 7));
 
-        return reg;
+        return reg.getValue();
     }
 
     private void cpuRLCMemory(int address) {
@@ -1954,23 +1954,23 @@ public class CPU2 {
         memoryManager.writeMemory(address, reg);
     }
 
-    private int cpuRL(int reg) {
+    private int cpuRL(UInt reg) {
         boolean carrySet = register.isC();
-        boolean isMSBSet = BitUtil.isSet(reg, 7);
+        boolean isMSBSet = BitUtil.isSet(reg.getValue(), 7);
 
-        reg = (reg << 1) & 0xFF;
+        reg.setValue((reg.getValue() << 1) & 0xFF);
 
         register.clearH();
         register.clearN();
         register.setC(isMSBSet);
 
         if (carrySet) {
-            reg = BitUtil.setBit(reg, 0);
+            reg.setValue(BitUtil.setBit(reg.getValue(), 0));
         }
 
-        register.setZ(reg == 0);
+        register.setZ(reg.getValue() == 0);
 
-        return reg;
+        return reg.getValue();
     }
 
     private void cpuRLMemory(int address) {
@@ -1993,23 +1993,23 @@ public class CPU2 {
         memoryManager.writeMemory(address, reg);
     }
 
-    private int cpuRRC(int reg) {
-        boolean isLSBSet = BitUtil.isSet(reg, 0);
+    private int cpuRRC(UInt reg) {
+        boolean isLSBSet = BitUtil.isSet(reg.getValue(), 0);
 
         register.clearAllFlags();
 
-        reg = (reg >> 1) & 0xFF;
+        reg.setValue((reg.getValue() >> 1) & 0xFF);
 
         if (isLSBSet) {
             register.setC();
-            reg = BitUtil.setBit(reg, 7);
+            reg.setValue(BitUtil.setBit(reg.getValue(), 7));
         }
 
-        if (reg == 0) {
+        if (reg.getValue() == 0) {
             register.setZ();
         }
 
-        return reg;
+        return reg.getValue();
     }
 
     private void cpuRRCMemory(int address) {
@@ -2031,23 +2031,23 @@ public class CPU2 {
         memoryManager.writeMemory(address, reg);
     }
 
-    private int cpuRR(int reg) {
+    private int cpuRR(UInt reg) {
         boolean carrySet = register.isC();
-        boolean isLSBSet = BitUtil.isSet(reg, 0);
+        boolean isLSBSet = BitUtil.isSet(reg.getValue(), 0);
 
-        reg = (reg >> 1) & 0xFF;
+        reg.setValue((reg.getValue() >> 1) & 0xFF);
 
         register.clearH();
         register.clearN();
         register.setC(isLSBSet);
 
         if (carrySet) {
-            reg = BitUtil.setBit(reg, 7);
+            reg.setValue(BitUtil.setBit(reg.getValue(), 7));
         }
 
-        register.setZ(reg == 0);
+        register.setZ(reg.getValue() == 0);
 
-        return reg;
+        return reg.getValue();
     }
 
     private void cpuRRMemory(int address) {
@@ -2070,12 +2070,12 @@ public class CPU2 {
         memoryManager.writeMemory(address, reg);
     }
 
-    private int cpuSwapNibbles(int n) {
-        n = (((n & 0xF0) >> 4) | ((n & 0x0F) << 4));
+    private int cpuSwapNibbles(UInt n) {
+        n.setValue((((n.getValue() & 0xF0) >> 4) | ((n.getValue() & 0x0F) << 4)));
 
         register.clearAllFlags();
-        register.setZ(n == 0);
-        return n;
+        register.setZ(n.getValue() == 0);
+        return n.getValue();
     }
 
     private int cpu16BitImmediateLoad() {
@@ -2129,13 +2129,13 @@ public class CPU2 {
         register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F);
     }
 
-    private int cpu8BitDec(int n) {
-        int initialN = n;
-        n--;
-        register.setZ(n == 0);
+    private int cpu8BitDec(UInt n) {
+        int initialN = n.getValue();
+        n.dec();
+        register.setZ(n.getValue() == 0);
         register.setN(true);
         register.setH((initialN & 0x0F) == 0);
-        return n;
+        return n.getValue();
     }
 
     private void cpuDecMemory(int address) {
