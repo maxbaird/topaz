@@ -53,4 +53,9 @@ public class UInt{
     public void dec() {
         this.value = (this.value - 1) & mask;
     }
+    
+    @Override
+    public String toString() {
+       return String.format("%s", this.value); 
+    }
 }

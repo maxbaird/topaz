@@ -32,9 +32,9 @@ public class CPU2 {
         int opcode = memoryManager.readMemory(register.pc.getValue());
 
         String hexCode = java.lang.String.format("0x%02X", opcode);
-        //boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
-        boolean display = (n >= 1 && n <= 500) ? true : false;
-        display = false;
+        boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
+        //boolean display = (n >= 1 && n <= 500) ? true : false;
+        //display = false;
         // true : false
 
         register.pc.inc();
