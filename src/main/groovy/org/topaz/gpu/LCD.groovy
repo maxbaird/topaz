@@ -123,7 +123,6 @@ public class LCD{
             status = BitUtil.setBit(status, 0) /* Set bit 0 to 1 */
             status = BitUtil.clearBit(status, 1)
             memoryManager.writeMemory(LCD_STATUS, status)
-            println 'Writing LCD status1'
             return
         }
 
@@ -229,7 +228,6 @@ public class LCD{
              */
             status = BitUtil.clearBit(status, COINCIDENCE_FLAG_BIT)
         }
-        println 'Writing LCD status 2'
         memoryManager.writeMemory(LCD_STATUS, status)
 
     }

@@ -13,7 +13,7 @@ public class UInt{
         if(width == EIGHT_BITS){
             mask = 0xFF;
         }else if(width == SIXTEEN_BITS){
-            mask = 0xFFF;
+            mask = 0xFFFF;
         }else{
             throw new IllegalStateException("Unsupported bit width " + width + " specified.");
         }
@@ -37,12 +37,12 @@ public class UInt{
     }
     
     public void add(int value){
-        verify(value);
+        //verify(value);
         this.value = (this.value + value) & mask;
     }
     
     public void sub(int value){
-        verify(value);
+        //verify(value);
         this.value = (this.value - value) & mask;
     }
     
