@@ -120,7 +120,7 @@ public class LCD{
              * Also set the LCD mode to 1
              */
             status = (status & 252) & 0xFF /* Set bits 1 and 2 to 0 */
-            status = BitUtil.setBit(status, 0) /* Set bit 0 to 1 */
+            status = BitUtil.clearBit(status, 0) /* Set bit 0 to 1 */
             status = BitUtil.clearBit(status, 1)
             memoryManager.writeMemory(LCD_STATUS, status)
             return

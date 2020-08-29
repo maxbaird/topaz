@@ -2106,6 +2106,7 @@ public class CPU2 {
 
     private int cpu8BitInc(UInt n) {
         int initialN = n.getValue();
+        n.inc();
 //        n++;
 //        if(n == 256) {
 //            n = 0;
