@@ -50,7 +50,7 @@ public class CPU2 {
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
-            //dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
         return cycles;
     }
@@ -828,7 +828,7 @@ public class CPU2 {
             /* Calls */
             case 0xCD:
                 cpuCall(false, 0, false);
-                return 24;
+                return register.isZ() ? 24 : 12;
             case 0xC4:
                 cpuCall(true, Register2.FLAG_Z, false);
                 return 12;
