@@ -331,6 +331,12 @@ public class CPU2 {
                 register.setHL(cpu16BitInc(register.getHL()));
                 return 8;
 
+             /* Put A into memory, inc/dec reg */
+            case 0x32:
+            	cpuLoadRegisterToMemory(register.getHL(), register.A);
+            	register.setHL(cpu16BitDec(register.getHL()));
+            	return 8;
+            	
             /* Load from A into memory increment/decrement register */
             case 0x22:
                 cpuLoadRegisterToMemory(register.getHL(), register.A);
