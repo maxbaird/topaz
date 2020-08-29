@@ -820,7 +820,7 @@ public class CPU2 {
                 return register.isZ() ? 12 : 8;
             case 0x30:
                 cpuJumpImmediate(true, Register2.FLAG_C, false);
-                return 8;
+                return register.isC() ? 8 : 12;
             case 0x38:
                 cpuJumpImmediate(true, Register2.FLAG_C, true);
                 return 8;
@@ -828,10 +828,10 @@ public class CPU2 {
             /* Calls */
             case 0xCD:
                 cpuCall(false, 0, false);
-                return register.isZ() ? 24 : 12;
+                return 24;
             case 0xC4:
                 cpuCall(true, Register2.FLAG_Z, false);
-                return 12;
+                return register.isZ() ? 12 : 24;
             case 0xCC:
                 cpuCall(true, Register2.FLAG_Z, true);
                 return 12;
