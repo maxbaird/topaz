@@ -110,18 +110,18 @@ class InterruptHandler{
         /*
          * The current execution address is pushed onto the stack
          */
-        memoryManager.push(cpu.register.pc)
+        memoryManager.push(cpu.register.pc.getValue())
 
         switch(interruptId) {
             /*
              * Based on the interruptId, the appropriate instruction service
              * routine is assigned to the program counter.
              */
-            case V_BLANK_INTERRUPT : cpu.register.pc = ISR.V_BLANK; break
-            case LCD_INTERRUPT : cpu.register.pc = ISR.LCD; break
-            case TIMER_INTERRUPT : cpu.register.pc = ISR.TIMER; break
-            case SERIAL_INTERRUPT : cpu.register.pc = ISR.SERIAL; break
-            case JOYPAD_INTERRUPT : cpu.register.pc = ISR.JOYPAD; break
+            case V_BLANK_INTERRUPT : cpu.register.pc.setValue(ISR.V_BLANK); break
+            case LCD_INTERRUPT : cpu.register.pc.setValue(ISR.LCD); break
+            case TIMER_INTERRUPT : cpu.register.pc.setValue(ISR.TIMER); break
+            case SERIAL_INTERRUPT : cpu.register.pc.setValue(ISR.SERIAL); break
+            case JOYPAD_INTERRUPT : cpu.register.pc.setValue(ISR.JOYPAD); break
             default:
                 throw new Exception("Unknown Interrupt: " + interruptId)
                 System.exit(-1)
