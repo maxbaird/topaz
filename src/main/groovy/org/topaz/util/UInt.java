@@ -21,14 +21,14 @@ public class UInt{
         this.value = 0 & mask;
     }
     
-    private void verify(int value){
-        if(value < 0 || value > mask){
-            throw new IllegalStateException("Value " + value + " not in range.");
-        }
-    }
+//    private void verify(int value){
+//        if(value < 0 || value > mask){
+//            throw new IllegalStateException("Value " + value + " not in range.");
+//        }
+//    }
     
     public void setValue(int value){
-        verify(value);
+        //verify(value);
         this.value = value & mask;
     }
     

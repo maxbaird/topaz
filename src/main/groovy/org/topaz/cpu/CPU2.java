@@ -50,7 +50,7 @@ public class CPU2 {
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
-            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            //dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
         return cycles;
     }
