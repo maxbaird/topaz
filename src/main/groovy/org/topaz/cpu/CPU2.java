@@ -22,12 +22,6 @@ public class CPU2 {
     }
 
     public int executeNextOpcode(int n) {
-        
-        if(register.getHL() == 104448) {
-           System.out.println("Register HL will cause an out of bounds: " + n);
-           //System.exit(-1);
-        }
-        
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc.getValue());
 
@@ -60,6 +54,7 @@ public class CPU2 {
         switch(opcode){
             /* No-op */
             case 0x00:
+                System.out.println("Returning from no-op");
                 return 4;
 
             /* 8-Bit Loads */
@@ -854,7 +849,7 @@ public class CPU2 {
                 return register.isZ() ? 20 : 8;
             case 0xD0:
                 cpuReturn(true, Register2.FLAG_C, false);
-                return 8;
+                return register.isC() ? 8 : 20;
             case 0xD8:
                 cpuReturn(true, Register2.FLAG_C, true);
                 return 8;
@@ -2349,23 +2344,23 @@ public class CPU2 {
      */
     private int cpu8BitSub(UInt reg, int value, boolean useImmediate, boolean subCarry) {
         int initialValue = reg.getValue();
-        int runningDifference = 0;
+        UInt runningDifference = new UInt(UInt.EIGHT_BITS);
 
         if (useImmediate) {
             int n = memoryManager.readMemory(register.pc.getValue());
             register.pc.inc();
-            runningDifference = n;
+            runningDifference.setValue(n);
         } else {
-            runningDifference = value;
+            runningDifference.setValue(value);
         }
 
         if (subCarry) {
             if (register.isC()) {
-                runningDifference++;
+                runningDifference.inc();
             }
         }
 
-        reg.sub(runningDifference);
+        reg.sub(runningDifference.getValue());
 
         /* now set flags */
         register.clearAllFlags();
@@ -2374,12 +2369,12 @@ public class CPU2 {
 
         register.setN();
 
-        if (initialValue < runningDifference) {
+        if (initialValue < runningDifference.getValue()) {
             register.setC();
         }
 
         int halfCarry = initialValue & 0xF;
-        halfCarry = halfCarry - (runningDifference & 0xF);
+        halfCarry = halfCarry - (runningDifference.getValue() & 0xF);
 
         if (halfCarry < 0) {
             register.setH();

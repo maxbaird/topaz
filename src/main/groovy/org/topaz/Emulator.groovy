@@ -83,7 +83,6 @@ class Emulator{
                 println n
             }
             if(n == Topaz.executionLimit) {
-            //if(n == 330000) {
                 println 'exiting at : ' + n
                 //println 'Press enter to continue...'
                 //System.in.newReader().readLine()
