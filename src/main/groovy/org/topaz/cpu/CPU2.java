@@ -46,7 +46,7 @@ public class CPU2 {
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
-            //dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
         return cycles;
     }
@@ -796,6 +796,7 @@ public class CPU2 {
 
             case 0x1F:
                 register.A.setValue(cpuRR(register.A));
+                register.clearZ();
                 return 4;
 
             /* Jumps */
@@ -1732,20 +1733,24 @@ public class CPU2 {
                 register.setC();
             }
 
-            if (register.isH() || ((register.A.getValue() & 0x0F) > 0x09)) {
-                register.A.add(0x6);// = register.A + 0x6;
-            } else {
-                if (register.isC()) {
-                    register.A.sub(0x60);// = register.A - 0x60;
-                }
-                if (register.isH()) {
-                    register.A.sub(0x6);// = register.A - 0x6;
-                }
-            }
+            if (register.isH() || ((register.A.getValue() & 0x0F) > 0x9)) {
+                register.A.add(0x06);// = register.A + 0x6;
+                register.clearH();
+            } 
+        }
+        
+        else if (register.isC() && register.isH()) {
+                    register.A.add(0x9A);// = register.A - 0x60;
+                    register.clearH();
+        } else if (register.isC()) {
+                    register.A.add(0xA0);// = register.A - 0x6;
+        }else if (register.isH()) {
+        	register.A.add(0xFA);
+        	register.clearH();
         }
 
         register.setZ(register.A.getValue() == 0);
-        register.clearH();
+        //register.clearH();
     }
 
     private void cpuRestart(int n) {
