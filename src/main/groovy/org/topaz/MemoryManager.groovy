@@ -6,6 +6,7 @@ import org.topaz.gpu.LCD
 import org.topaz.DMAHandler
 import org.topaz.Joypad
 import groovy.transform.*
+import org.topaz.debug.Debug
 
 @CompileStatic
 class MemoryManager{

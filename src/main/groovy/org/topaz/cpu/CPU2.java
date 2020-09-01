@@ -5,6 +5,7 @@ import org.topaz.Topaz;
 import org.topaz.util.BitUtil;
 import org.topaz.util.UInt;
 import org.topaz.debug.StateDumper;
+import org.topaz.debug.Debug;
 
 public class CPU2 {
     Register2 register;
@@ -27,6 +28,7 @@ public class CPU2 {
 
         String hexCode = java.lang.String.format("0x%02X", opcode);
         boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
+        Debug.instructionCounter = n;
         //boolean display = (n >= 1 && n <= 500) ? true : false;
         //display = false;
         // true : false
@@ -44,7 +46,7 @@ public class CPU2 {
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
-            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            //dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
         return cycles;
     }
@@ -394,7 +396,18 @@ public class CPU2 {
 
             /* pop */
             case 0xF1:
-                register.setAF(memoryManager.pop());
+            	/*
+            	 * When setting AF it is important to zero out the lower for
+            	 * bits of the F register because it is *always* zero. The upper
+            	 * four bits are are written to when any of the flags need
+            	 * setting. So here, the lower four bits are zeroed out and the
+            	 * flags are set according to the bits of the upper 4.
+            	 */
+                register.setAF(memoryManager.pop() & 0xFFF0);
+                register.setZ(BitUtil.isSet(register.getF(), 7));
+                register.setN(BitUtil.isSet(register.getF(), 6));
+                register.setH(BitUtil.isSet(register.getF(), 5));
+                register.setC(BitUtil.isSet(register.getF(), 4));
                 return 12;
             case 0xC1:
                 register.setBC(memoryManager.pop());
