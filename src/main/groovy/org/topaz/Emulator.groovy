@@ -86,7 +86,7 @@ class Emulator{
                 //println 'exiting at : ' + n
                 //println 'Press enter to continue...'
                 //System.in.newReader().readLine()
-                System.exit(-1)
+                //System.exit(-1)
             }
             int cycles = 0
             cycles = this.executeNextOpCode(n)

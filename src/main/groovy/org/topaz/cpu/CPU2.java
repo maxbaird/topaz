@@ -59,7 +59,7 @@ public class CPU2 {
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
-            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            //dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
         return cycles;
     }
@@ -878,7 +878,7 @@ public class CPU2 {
                 return register.isC() ? 8 : 20;
             case 0xD8:
                 cpuReturn(true, Register2.FLAG_C, true);
-                return 8;
+                return register.isC() ? 20 : 8;
 
             /* Return from interrupt */
             case 0xD9:
