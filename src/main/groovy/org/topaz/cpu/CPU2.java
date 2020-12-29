@@ -25,10 +25,22 @@ public class CPU2 {
     public int executeNextOpcode(int n) {
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc.getValue());
+        
+//       if(opcode == 0x30) {
+//    	   System.out.println("n = " + n);
+//        	System.out.println("register.pc: " + register.pc.getValue());
+//        	System.exit(-1);
+//        }
 
         String hexCode = java.lang.String.format("0x%02X", opcode);
         boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
         Debug.instructionCounter = n;
+
+//        if(n == 1268960) {
+//        	System.out.println("reg.pc = " + register.pc.getValue());
+//        	Debug.print(String.format("Opcode: 0x%02X\n", opcode), 1268960, true);
+//        }
+
         //boolean display = (n >= 1 && n <= 500) ? true : false;
         //display = false;
         // true : false
@@ -44,6 +56,7 @@ public class CPU2 {
 //            System.exit(1);
 //        }
 
+
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
             dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
@@ -56,7 +69,6 @@ public class CPU2 {
         switch(opcode){
             /* No-op */
             case 0x00:
-                System.out.println("Returning from no-op");
                 return 4;
 
             /* 8-Bit Loads */
@@ -624,7 +636,7 @@ public class CPU2 {
                 cpuCompare(register.A, register.A, false);
                 return 4;
             case 0xB8:
-                cpuCompare(register.A, register.getBC(), false);
+                cpuCompare(register.A, register.B, false);
                 return 4;
             case 0xB9:
                 cpuCompare(register.A, register.C, false);
@@ -1807,6 +1819,29 @@ public class CPU2 {
         }
     }
 
+//            case 0x30:
+//                cpuJumpImmediate(true, Register2.FLAG_C, false);
+//                return register.isC() ? 8 : 12;
+//    public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
+//        if (!useCondition) {
+//        int address = memoryManager.readMemory(register.pc.getValue()) + register.pc.getValue();
+//        register.pc.inc();
+//            /*
+//             * Jump unconditionally
+//             */
+//            register.pc.setValue(address);// = register.pc + n;
+//        } else if (BitUtil.isSet(register.F.getValue(), flag) == condition) {
+//        byte n = (byte) memoryManager.readMemory(register.pc.getValue());
+//        register.pc.inc();
+//            /*
+//             * Only jump if the condition is met
+//             */
+//            register.pc.setValue(register.pc.getValue() + n);// = register.pc + n;
+//        	//Debug.print("Value assigned: " + ((int)register.pc.getValue() + (int)n), 1268960, true);
+//        }
+//        //register.pc.inc();
+//    }
+    
     public void cpuJumpImmediate(boolean useCondition, int flag, boolean condition) {
         byte n = (byte) memoryManager.readMemory(register.pc.getValue());
 
