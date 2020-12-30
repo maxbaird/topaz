@@ -9,7 +9,8 @@ public class Debug{
 			println msg
 
 			if(terminate) {
-				System.exit(-1)
+				System.err.println("Exiting from Debug print")
+				System.exit(0)
 			}
 		}
 	}

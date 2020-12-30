@@ -59,7 +59,7 @@ public class CPU2 {
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
-            //dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
         return cycles;
     }
@@ -2206,26 +2206,45 @@ public class CPU2 {
 
     private void cpu16BitLDHL() {
         /* If problems occur, double check the implementation of this method */
-        int n = memoryManager.readMemory(register.sp.getValue());
+    	//Problems occurred!!!
+//        int n = memoryManager.readMemory(register.sp.getValue());
+        int val1 = register.sp.getValue();
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        int val2 = (byte)memoryManager.readMemory(register.pc.getValue());
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         register.pc.inc();
-        int result = register.sp.getValue() + n;
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        int result = val1 + val2;
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        //Debug.print(String.format("val2 = %d", val2), 174951, false);
 
         register.setHL(result & 0xFFFF);
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        //.Debug.print(String.format("result = %d", result & 0xFFFF), 174951, true);
 
         register.clearZ();
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         register.clearN();
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        
+        int temp = val1 ^ val2 ^ result;
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        register.setH((temp & 0x10) == 0x10);
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
+        register.setC((temp & 0x100) == 0x100);
+        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
 
-        if (result > 0xFFFF) {
-            register.setC();
-        } else {
-            register.clearC();
-        }
-
-        if ((register.sp.getValue() & 0xF) + (n & 0xF) > 0xF) {
-            register.setH();
-        } else {
-            register.clearH();
-        }
+//        if (result > 0xFFFF) {
+//            register.setC();
+//        } else {
+//            register.clearC();
+//        }
+//
+//        if ((register.sp.getValue() & 0xF) + (val1 & 0xF) > 0xF) {
+//            register.setH();
+//        } else {
+//            register.clearH();
+//        }
     }
 
     private int cpu8BitAND(UInt reg1, UInt reg2, boolean useImmediate) {
