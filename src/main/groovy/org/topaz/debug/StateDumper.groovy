@@ -2,10 +2,12 @@ package org.topaz.debug
 
 import org.topaz.cpu.Register2
 import org.topaz.MemoryManager
+import org.topaz.cpu.CPU2
 
 class StateDumper{
     Register2 register
     MemoryManager memoryManager
+	CPU2 cpu
     
     StringBuilder sb
     
@@ -15,6 +17,15 @@ class StateDumper{
         
         sb = new StringBuilder(memoryManager.rom.length * 3)
     }
+	
+	private def buildInterruptState() {
+		def str = 'PendingInterruptEnabled: ' + cpu.pendingInterruptEnabled +
+			   '\nInterruptMaster: ' + cpu.interruptMaster +
+			   '\nHalt: ' + cpu.isHalted +
+			   '\n===========\n'
+		
+		return str
+	}
     
     def dump(def iteration, def opcode, def extendedOpcode, def cycles, def fileName){
         println 'Dumping state: ' + fileName
@@ -26,6 +37,7 @@ class StateDumper{
         sb.append('===========\n')
         sb.append(register.toString())
         sb.append('===========\n')
+		sb.append(this.buildInterruptState())
         
         memoryManager.rom.eachWithIndex{it, idx->
             sb.append(String.format("0x%02X: %d\n", idx, it))

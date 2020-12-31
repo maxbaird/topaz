@@ -26,41 +26,24 @@ public class CPU2 {
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc.getValue());
         
-//       if(opcode == 0x30) {
-//    	   System.out.println("n = " + n);
-//        	System.out.println("register.pc: " + register.pc.getValue());
-//        	System.exit(-1);
-//        }
-
+        Debug.print("Register.pc: " + register.pc.getValue(), 174983, false);
+        Debug.print("Register.pc: " + register.pc.getValue(), 174984, true);
+        
         String hexCode = java.lang.String.format("0x%02X", opcode);
         boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
-        Debug.instructionCounter = n;
-
-//        if(n == 1268960) {
-//        	System.out.println("reg.pc = " + register.pc.getValue());
-//        	Debug.print(String.format("Opcode: 0x%02X\n", opcode), 1268960, true);
-//        }
-
-        //boolean display = (n >= 1 && n <= 500) ? true : false;
-        //display = false;
-        // true : false
 
         register.pc.inc();
+        Debug.print("Register.pc: " + register.pc.getValue(), 174983, false);
         int extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc.getValue()) : 0x0;
         // : 0x0
 
         cycles = executeOpcode(opcode);
-//        try {
-//        }catch(Exception e) {
-//            println e.message
-//            System.exit(1);
-//        }
-
 
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
             dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
+        Debug.print("Register.pc: " + register.pc.getValue(), 174983, false);
         return cycles;
     }
 
@@ -2209,30 +2192,20 @@ public class CPU2 {
     	//Problems occurred!!!
 //        int n = memoryManager.readMemory(register.sp.getValue());
         int val1 = register.sp.getValue();
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         int val2 = (byte)memoryManager.readMemory(register.pc.getValue());
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         register.pc.inc();
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         int result = val1 + val2;
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         //Debug.print(String.format("val2 = %d", val2), 174951, false);
 
         register.setHL(result & 0xFFFF);
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         //.Debug.print(String.format("result = %d", result & 0xFFFF), 174951, true);
 
         register.clearZ();
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         register.clearN();
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         
         int temp = val1 ^ val2 ^ result;
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         register.setH((temp & 0x10) == 0x10);
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
         register.setC((temp & 0x100) == 0x100);
-        Debug.print(String.format("val1 = %d", register.getF()), 174951, false);
 
 //        if (result > 0xFFFF) {
 //            register.setC();

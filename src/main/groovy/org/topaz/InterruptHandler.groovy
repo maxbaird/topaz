@@ -2,6 +2,7 @@ package org.topaz
 
 import org.topaz.util.BitUtil
 import org.topaz.cpu.CPU2
+import org.topaz.debug.Debug
 
 class InterruptHandler{
     public static final int V_BLANK_INTERRUPT = 0
@@ -126,5 +127,6 @@ class InterruptHandler{
                 throw new Exception("Unknown Interrupt: " + interruptId)
                 System.exit(-1)
         }
+		Debug.print("final register.pc: " + cpu.register.pc, 174983, false)
     }
 }

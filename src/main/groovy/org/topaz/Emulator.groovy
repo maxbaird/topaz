@@ -11,6 +11,7 @@ import org.topaz.Joypad
 import org.topaz.ui.Display
 import org.topaz.debug.StateDumper
 import org.topaz.Topaz
+import org.topaz.debug.Debug
 import groovy.transform.*
 
 @CompileStatic
@@ -35,6 +36,7 @@ class Emulator{
         this.memoryManager = new MemoryManager(this.cartridge, this.register, this.joypad)
         this.dumper = new StateDumper(this.memoryManager, this.register)
         this.cpu = new CPU2(this.memoryManager, this.register, this.dumper)
+		this.dumper.cpu = this.cpu
         this.interruptHandler = new InterruptHandler(memoryManager:this.memoryManager, cpu:this.cpu)
         this.timer = new Timer(memoryManager: this.memoryManager, interruptHandler: this.interruptHandler)
         joypad.interruptHandler = interruptHandler
@@ -79,6 +81,7 @@ class Emulator{
 
         while(cyclesThisUpdate < MAX_CYCLES) {
             n++
+			Debug.instructionCounter = n
             if ((n%100000) == 0) {
                 println n
             }
@@ -86,7 +89,7 @@ class Emulator{
                 //println 'exiting at : ' + n
                 //println 'Press enter to continue...'
                 //System.in.newReader().readLine()
-                System.exit(0)
+                //System.exit(0)
             }
             int cycles = 0
             cycles = this.executeNextOpCode(n)
@@ -142,6 +145,7 @@ class Emulator{
          *  If the EI (enable interrupt) instruction was executed the interrupt
          *  master is set as enabled for the next instruction cycle.
          */
+   	    Debug.print("Got here1", 174983, false);
         if (cpu.pendingInterruptEnabled) {
             cpu.pendingInterruptEnabled = false
             cpu.interruptMaster = true
@@ -152,9 +156,13 @@ class Emulator{
          * If the CPU is neither interrupted or halted, there is no need to
          * proceed with handling interrupts.
          */
+   	    Debug.print("Got here2", 174983, false);
+   	    Debug.print("cpu.interruptMaster: " + cpu.interruptMaster, 174983, false);
+   	    Debug.print("cpu.isHalted: " + cpu.isHalted, 174983, false);
         if(!cpu.interruptMaster && !cpu.isHalted) {
             return 0
         }
+   	    Debug.print("Got here3", 174983, false);
 
         if(cpu.interruptMaster || cpu.isHalted) {
             interruptHandler.handleInterrupts()

@@ -6,7 +6,7 @@ public class Debug{
 
 	public static print(String msg, int instructionNo, boolean terminate) {
 		if(instructionNo == this.instructionCounter) {
-			println msg
+			println '[' + instructionNo + ']: ' + msg
 
 			if(terminate) {
 				System.err.println("Exiting from Debug print")
