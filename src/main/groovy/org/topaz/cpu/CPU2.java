@@ -26,9 +26,6 @@ public class CPU2 {
         int cycles = 0;
         int opcode = memoryManager.readMemory(register.pc.getValue());
         
-        Debug.print("Register.pc: " + register.pc.getValue(), 174983, false);
-        Debug.print("Register.pc: " + register.pc.getValue(), 174984, true);
-        
         String hexCode = java.lang.String.format("0x%02X", opcode);
         boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
 
@@ -769,7 +766,7 @@ public class CPU2 {
                 return 4;
 
             case 0xF3:
-                this.interruptMaster = true;
+                this.interruptMaster = false;
                 return 4;
 
             case 0xFB:
