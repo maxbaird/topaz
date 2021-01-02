@@ -38,7 +38,7 @@ class Topaz{
 	}
 
 	public Topaz(def path){
-        String rom = "../cpu_instrs/individual/02-interrupts.gb"
+        String rom = "../cpu_instrs/individual/03-op_sp_hl.gb"
         //String rom = "/home/maxx/Documents/Games/terminator2.gb"
 
 		def f = (path != null) ? new File(path) : new File(rom)

@@ -30,7 +30,6 @@ public class CPU2 {
         boolean display = (n >= Topaz.executionStart && n <= Topaz.executionEnd) ? true : false;
 
         register.pc.inc();
-        Debug.print("Register.pc: " + register.pc.getValue(), 174983, false);
         int extendedOpcode = (opcode == 0xCB) ? memoryManager.readMemory(register.pc.getValue()) : 0x0;
         // : 0x0
 
@@ -40,7 +39,6 @@ public class CPU2 {
             String exOpcode = String.format("0x%02X", extendedOpcode);
             dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
         }
-        Debug.print("Register.pc: " + register.pc.getValue(), 174983, false);
         return cycles;
     }
 
@@ -558,7 +556,7 @@ public class CPU2 {
                 register.A.setValue(cpu8BitOR(register.A, register.A, false));
                 return 4;
             case 0xB0:
-                register.A.setValue(cpu8BitOR(register.A, register.getBC(), false));
+                register.A.setValue(cpu8BitOR(register.A, register.B, false));
                 return 4;
             case 0xB1:
                 register.A.setValue(cpu8BitOR(register.A, register.C, false));
