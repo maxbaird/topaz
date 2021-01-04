@@ -38,7 +38,6 @@ public class CPU2 {
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
             dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
-            Debug.print("result:", 637995, true);
         }
         return cycles;
     }
@@ -2436,7 +2435,6 @@ public class CPU2 {
 
         register.pc.inc();
         register.sp.setValue(result);
-        Debug.print("result: " + result, 637995, false);
 
         register.clearZ();
         register.clearN();
