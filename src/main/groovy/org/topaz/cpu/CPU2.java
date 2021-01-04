@@ -38,6 +38,7 @@ public class CPU2 {
         if(display) {
             String exOpcode = String.format("0x%02X", extendedOpcode);
             dumper.dump(n, hexCode, exOpcode, cycles, "/tmp/" + n + ".topaz");
+            Debug.print("result:", 637995, true);
         }
         return cycles;
     }
@@ -2424,13 +2425,22 @@ public class CPU2 {
     }
 
     private void cpu8BitSPAdd() {
-        int n = memoryManager.readMemory(register.pc.getValue());
-        int result = (register.pc.getValue() + n) & 0xFFFF;
-        register.pc.setValue(result);
+        int n1 = register.sp.getValue();
+        int n2 = memoryManager.readMemory(register.pc.getValue());
+        int result = n1 + n2; //& 0xFFFF;
+
+//    	int origin1 = n;//register.sp.getValue(); 
+//    	int origin2 = memoryManager.readMemory(register.pc.getValue());
+//        Debug.print("origin1: " + origin1, 637995, false);
+//        Debug.print("origin2: " + origin2, 637995, false);
+
+        register.pc.inc();
+        register.sp.setValue(result);
+        Debug.print("result: " + result, 637995, false);
 
         register.clearZ();
         register.clearN();
-
+        
         /*
          * To understand the logic behind setting the carry and half carry flag, see the
          * following stackoverflow questions.
@@ -2442,9 +2452,9 @@ public class CPU2 {
          * https://stackoverflow.com/questions/9070937/adding-two-numbers-without-
          * operator-clarification
          */
-
-        register.setC(((register.pc.getValue() ^ n ^ result) & 0x100) != 0);
-        register.setH(((register.pc.getValue() ^ n ^ result) & 0x10) != 0);
+        int k = n1 ^ (n2 & 0xFFFF) ^ result;
+        register.setC(((k) & 0x100) != 0);
+        register.setH(((k) & 0x10) != 0);
     }
 
     private int cpu8BitXOR(UInt reg1, UInt reg2, boolean useImmediate) {
