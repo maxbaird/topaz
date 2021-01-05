@@ -2425,16 +2425,17 @@ public class CPU2 {
 
     private void cpu8BitSPAdd() {
         int n1 = register.sp.getValue();
-        int n2 = memoryManager.readMemory(register.pc.getValue());
+        int n2 = (byte)memoryManager.readMemory(register.pc.getValue());
         int result = n1 + n2; //& 0xFFFF;
 
 //    	int origin1 = n;//register.sp.getValue(); 
 //    	int origin2 = memoryManager.readMemory(register.pc.getValue());
-//        Debug.print("origin1: " + origin1, 637995, false);
-//        Debug.print("origin2: " + origin2, 637995, false);
+//        Debug.print("origin1: " + n1, 747736, false);
+//        Debug.print("origin2: " + n2, 747736, false);
 
         register.pc.inc();
         register.sp.setValue(result);
+//        Debug.print("register.sp: " + register.sp.getValue() , 747736, true);
 
         register.clearZ();
         register.clearN();
