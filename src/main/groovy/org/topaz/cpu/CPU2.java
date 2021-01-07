@@ -521,6 +521,9 @@ public class CPU2 {
             case 0x9E:
                 register.A.setValue(cpu8BitSub(register.A, memoryManager.readMemory(register.getHL()), false, true));
                 return 8;
+            case 0xDE:
+            	register.A.setValue(cpu8BitSub(register.A, new UInt(UInt.EIGHT_BITS),true,true));
+            	return 8;
 
             /* Logical AND */
             case 0xA7:
@@ -2316,11 +2319,15 @@ public class CPU2 {
     private int cpu8BitAdd(UInt reg1, int value, boolean addImmediate, boolean addCarry) {
         int initialValue = reg1.getValue();
         int runningSum = 0;
+        int carry = 0;
+        int pc = 0;
 
         if (addImmediate) {
-            int n = memoryManager.readMemory(register.pc.getValue());
+            pc = memoryManager.readMemory(register.pc.getValue());
             register.pc.inc();
-            runningSum = n;
+//            Debug.print("origin1: " + initialValue, 952832, false);
+//            Debug.print("origin2: " + n, 952832, true);
+            runningSum = pc;
         } else {
             runningSum = value;
         }
@@ -2328,6 +2335,7 @@ public class CPU2 {
         if (addCarry) {
             if (register.isC()) {
                 runningSum++;
+                carry = 1;
             }
         }
 
@@ -2339,15 +2347,8 @@ public class CPU2 {
         register.setZ(reg1.getValue() == 0);
 
         int halfCarry = initialValue & 0xF;
-        halfCarry = halfCarry + (runningSum & 0xF);
+        halfCarry = halfCarry + (pc & 0xF) + (byte)carry;
 
-        // if(halfCarry > 0xF) {
-        // register.setH();
-        // }
-        //
-        // if((initialValue + runningSum) > 0xFF) {
-        // register.setC();
-        // }
         register.setH(halfCarry > 0xF);
         register.setC((initialValue + runningSum) > 0xFF);
 
