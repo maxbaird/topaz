@@ -2385,14 +2385,12 @@ public class CPU2 {
      */
     private int cpu8BitSub(UInt reg, int value, boolean useImmediate, boolean subCarry) {
         int initialValue = reg.getValue();
-        int carry = 0;
-        int pc = 0;
         UInt runningDifference = new UInt(UInt.EIGHT_BITS);
 
         if (useImmediate) {
-            pc = memoryManager.readMemory(register.pc.getValue());
+            int n = memoryManager.readMemory(register.pc.getValue());
             register.pc.inc();
-            runningDifference.setValue(pc);
+            runningDifference.setValue(n);
         } else {
             runningDifference.setValue(value);
         }
@@ -2400,7 +2398,6 @@ public class CPU2 {
         if (subCarry) {
             if (register.isC()) {
                 runningDifference.inc();
-                carry = 1;
             }
         }
 
@@ -2417,11 +2414,12 @@ public class CPU2 {
             register.setC();
         }
 
-        int halfCarry = initialValue & 0x0F;
-        halfCarry = halfCarry - (pc & 0xF)-carry;
-        //Debug.print("halfCarry: " + halfCarry, 1087094, true);
+        int halfCarry = initialValue & 0xF;
+        halfCarry = halfCarry - (runningDifference.getValue() & 0xF);
 
-        register.setH(halfCarry < 0);
+        if (halfCarry < 0) {
+            register.setH();
+        }
 
         return reg.getValue();
     }
