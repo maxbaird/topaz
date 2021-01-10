@@ -523,7 +523,6 @@ public class CPU2 {
                 return 8;
             case 0xDE:
             	OPDE();
-            	//register.A.setValue(cpu8BitSub(register.A, new UInt(UInt.EIGHT_BITS),true,true));
             	return 8;
 
             /* Logical AND */
