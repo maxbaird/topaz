@@ -443,7 +443,7 @@ public class CPU2 {
                 register.A.setValue(cpu8BitAdd(register.A, register.A, false, true));
                 return 4;
             case 0x88:
-                register.A.setValue(cpu8BitAdd(register.A, register.getBC(), false, true));
+                register.A.setValue(cpu8BitAdd(register.A, register.B, false, true));
                 return 4;
             case 0x89:
                 register.A.setValue(cpu8BitAdd(register.A, register.C, false, true));
