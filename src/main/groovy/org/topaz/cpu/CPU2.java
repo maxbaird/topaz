@@ -2341,7 +2341,7 @@ public class CPU2 {
         register.setZ(reg1.getValue() == 0);
 
         int halfCarry = initialValue & 0xF;
-        halfCarry = halfCarry + (pc & 0xF) + (byte)carry;
+        halfCarry = halfCarry + (runningSum & 0xF) + (byte)carry;
 
         register.setH(halfCarry > 0xF);
         register.setC((initialValue + runningSum) > 0xFF);
