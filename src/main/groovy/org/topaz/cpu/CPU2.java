@@ -414,7 +414,7 @@ public class CPU2 {
                 register.A.setValue(cpu8BitAdd(register.A, register.A, false, false));
                 return 4;
             case 0x80:
-                register.A.setValue(cpu8BitAdd(register.A, register.getBC(), false, false));
+                register.A.setValue(cpu8BitAdd(register.A, register.B, false, false));
                 return 4;
             case 0x81:
                 register.A.setValue(cpu8BitAdd(register.A, register.C, false, false));
@@ -897,21 +897,17 @@ public class CPU2 {
                     * cycles taken by the extended opcode
                     */
                     return 4 + executeExtendedOpcode();
-//                try {
-//                   /* 0xCB itself takes 4 cycles to execute so add this to
-//                    * cycles taken by the extended opcode
-//                    */
-//                    return 4 + executeExtendedOpcode();
-//                }catch(Exception e) {
-//                    throw e
-//                }
+                    
+            case 0x3F:
+            	register.clearN();
+            	register.clearH();
+            	register.setC(!register.isC());
+            	return 4;
 
             default:
                   String hexCode = java.lang.String.format("0x%2X", opcode);
                   System.out.println("Unrecognized opcode: " + hexCode);
                   System.exit(-1);
-//                def hexCode = java.lang.String.format("0x%2X", opcode);
-//                throw new Exception("Unrecognised opcode: " + hexCode);
         }
         return 0;
     }
@@ -2325,8 +2321,6 @@ public class CPU2 {
         if (addImmediate) {
             pc = memoryManager.readMemory(register.pc.getValue());
             register.pc.inc();
-//            Debug.print("origin1: " + initialValue, 952832, false);
-//            Debug.print("origin2: " + n, 952832, true);
             runningSum = pc;
         } else {
             runningSum = value;
