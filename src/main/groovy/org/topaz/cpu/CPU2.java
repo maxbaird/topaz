@@ -522,7 +522,8 @@ public class CPU2 {
                 register.A.setValue(cpu8BitSub(register.A, memoryManager.readMemory(register.getHL()), false, true));
                 return 8;
             case 0xDE:
-            	register.A.setValue(cpu8BitSub(register.A, new UInt(UInt.EIGHT_BITS),true,true));
+            	OPDE();
+            	//register.A.setValue(cpu8BitSub(register.A, new UInt(UInt.EIGHT_BITS),true,true));
             	return 8;
 
             /* Logical AND */
@@ -2374,6 +2375,26 @@ public class CPU2 {
 
         return reg;
     }
+    
+    private void OPDE() {
+    	int carry = 0;
+    	if(register.isC()) {
+    		carry = 1;
+    	}
+
+    	int val2 = memoryManager.readMemory(register.pc.getValue());
+    	register.pc.inc();
+    	int origin = register.A.getValue();
+    	int dirtySum =register.A.getValue() - val2 - carry;
+    	int total = (byte)dirtySum;
+    	register.A.setValue(total);
+
+    	register.setZ(total == 0);
+    	register.setN();
+    	register.setH(((origin&0x0F) -(val2&0xF) -carry) < 0);
+    	register.setC(dirtySum < 0);
+    }
+
 
     private int cpu8BitSub(UInt reg1, UInt reg2, boolean useImmediate, boolean subCarry) {
        return cpu8BitSub(reg1, reg2.getValue(), useImmediate, subCarry); 
