@@ -2341,7 +2341,12 @@ public class CPU2 {
         register.setZ(reg1.getValue() == 0);
 
         int halfCarry = initialValue & 0xF;
-        halfCarry = halfCarry + (runningSum & 0xF) + (byte)carry;
+        halfCarry = halfCarry + (value & 0xF) + (byte)carry;
+        
+//        Debug.print("origin1: " + (initialValue&0xF), 1005509, false);
+//        Debug.print("origin2: " + (value&0xF), 1005509, false);
+//        Debug.print("carry: " + (byte)carry, 1005509, false);
+//        Debug.print("halfCarry: " + halfCarry, 1005509, true);
 
         register.setH(halfCarry > 0xF);
         register.setC((initialValue + runningSum) > 0xFF);
