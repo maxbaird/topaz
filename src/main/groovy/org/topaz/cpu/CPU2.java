@@ -472,7 +472,7 @@ public class CPU2 {
                 register.A.setValue(cpu8BitSub(register.A, register.A, false, false));
                 return 4;
             case 0x90:
-                register.A.setValue(cpu8BitSub(register.A, register.getBC(), false, false));
+                register.A.setValue(cpu8BitSub(register.A, register.B, false, false));
                 return 4;
             case 0x91:
                 register.A.setValue(cpu8BitSub(register.A, register.C, false, false));
