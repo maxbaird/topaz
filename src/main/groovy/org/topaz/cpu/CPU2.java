@@ -529,7 +529,7 @@ public class CPU2 {
 			register.A.setValue(cpu8BitAND(register.A, register.A, false));
 			return 4;
 		case 0xA0:
-			register.A.setValue(cpu8BitAND(register.A, register.getBC(), false));
+			register.A.setValue(cpu8BitAND(register.A, register.B, false));
 			return 4;
 		case 0xA1:
 			register.A.setValue(cpu8BitAND(register.A, register.C, false));
@@ -2437,10 +2437,6 @@ public class CPU2 {
 		} else {
 			register.setC((initialValue - value - carry) < 0);
 		}
-//        Debug.print("initialValue: " + initialValue, 1449955, false);
-//        Debug.print("value: " + value, 1449955, false);
-//        Debug.print("carry: " + carry, 1449955, false);
-//        Debug.print("res: " + (initialValue - value - carry), 1449955, true);
 
 		int halfCarry = (initialValue & 0xF) - (value & 0xF);
 
