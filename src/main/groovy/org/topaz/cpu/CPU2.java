@@ -2405,6 +2405,7 @@ public class CPU2 {
     private int cpu8BitSub(UInt reg, int value, boolean useImmediate, boolean subCarry) {
         int initialValue = reg.getValue();
         UInt runningDifference = new UInt(UInt.EIGHT_BITS);
+        int carry = 0;
 
         if (useImmediate) {
             int n = memoryManager.readMemory(register.pc.getValue());
@@ -2417,6 +2418,7 @@ public class CPU2 {
         if (subCarry) {
             if (register.isC()) {
                 runningDifference.inc();
+                carry = 1;
             }
         }
 
@@ -2434,7 +2436,7 @@ public class CPU2 {
         }
 
         int halfCarry = initialValue & 0xF;
-        halfCarry = halfCarry - (runningDifference.getValue() & 0xF);
+        halfCarry = halfCarry - (value & 0xF)-carry;
 
         if (halfCarry < 0) {
             register.setH();
