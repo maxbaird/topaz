@@ -587,7 +587,7 @@ public class CPU2 {
 			register.A.setValue(cpu8BitXOR(register.A, register.A, false));
 			return 4;
 		case 0xA8:
-			register.A.setValue(cpu8BitXOR(register.A, register.getBC(), false));
+			register.A.setValue(cpu8BitXOR(register.A, register.B, false));
 			return 4;
 		case 0xA9:
 			register.A.setValue(cpu8BitXOR(register.A, register.C, false));
