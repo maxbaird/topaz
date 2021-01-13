@@ -775,7 +775,12 @@ public class CPU2 {
 
 		/* Rotates and shifts */
 		case 0x07:
+			int val = register.A.getValue();
 			register.A.setValue(cpuRLC(register.A));
+			register.clearZ();
+			register.clearN();
+			register.clearH();
+			register.setC(val > 0x7F);
 			return 4;
 
 		case 0x17:
