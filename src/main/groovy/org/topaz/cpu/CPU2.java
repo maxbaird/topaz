@@ -790,6 +790,7 @@ public class CPU2 {
 
 		case 0x0F:
 			register.A.setValue(cpuRRC(register.A));
+			register.clearZ();
 			return 4;
 
 		case 0x1F:
