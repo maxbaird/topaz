@@ -1964,7 +1964,8 @@ public class CPU2 {
 
 	private int cpuRLC(UInt reg) {
 		int n = reg.getValue() & 0xFF;
-		register.A.setValue((reg.getValue() << 1 | reg.getValue() >> 7) & 0xFF);
+		//register.A.setValue((reg.getValue() << 1 | reg.getValue() >> 7) & 0xFF);
+		reg.setValue((reg.getValue() << 1 | reg.getValue() >> 7) & 0xFF);
 		register.setZ(reg.getValue() == 0);
 		register.clearN();
 		register.clearH();
