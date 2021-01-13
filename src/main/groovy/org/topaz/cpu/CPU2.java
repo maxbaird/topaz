@@ -785,6 +785,7 @@ public class CPU2 {
 
 		case 0x17:
 			register.A.setValue(cpuRL(register.A));
+			register.clearZ();
 			return 4;
 
 		case 0x0F:
