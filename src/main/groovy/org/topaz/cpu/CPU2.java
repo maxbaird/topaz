@@ -997,7 +997,7 @@ public class CPU2 {
 			register.H.setValue(cpuRL(register.H));
 			return 8;
 		case 0x15:
-			register.L.setValue(cpuRL(register.A));
+			register.L.setValue(cpuRL(register.L));
 			return 8;
 		case 0x16:
 			cpuRLMemory(register.getHL());
@@ -1994,22 +1994,39 @@ public class CPU2 {
 	}
 
 	private int cpuRL(UInt reg) {
-		boolean carrySet = register.isC();
-		boolean isMSBSet = BitUtil.isSet(reg.getValue(), 7);
-
-		reg.setValue((reg.getValue() << 1) & 0xFF);
-
-		register.clearH();
-		register.clearN();
-		register.setC(isMSBSet);
-
-		if (carrySet) {
-			reg.setValue(BitUtil.setBit(reg.getValue(), 0));
+		int val = reg.getValue();
+		byte oldCarry = 0;
+		
+		if(register.isC()) {
+			oldCarry = 1;
 		}
-
-		register.setZ(reg.getValue() == 0);
-
+		
+		int newCarry = val >> 7;
+		int rot = (val<<1)&0xFF | oldCarry;
+		reg.setValue(rot);
+		
+		register.setZ(rot == 0);
+		register.clearN();
+		register.clearH();
+		register.setC(newCarry == 1);
+		
 		return reg.getValue();
+//		boolean carrySet = register.isC();
+//		boolean isMSBSet = BitUtil.isSet(reg.getValue(), 7);
+//
+//		reg.setValue((reg.getValue() << 1) & 0xFF);
+//
+//		register.clearH();
+//		register.clearN();
+//		register.setC(isMSBSet);
+//
+//		if (carrySet) {
+//			reg.setValue(BitUtil.setBit(reg.getValue(), 0));
+//		}
+//
+//		register.setZ(reg.getValue() == 0);
+//
+//		return reg.getValue();
 	}
 
 	private void cpuRLMemory(int address) {
