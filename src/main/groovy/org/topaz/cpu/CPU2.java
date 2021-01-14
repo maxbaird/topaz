@@ -2351,6 +2351,9 @@ public class CPU2 {
 			runningSum = value;
 		}
 
+		int halfCarry = initialValue & 0xF;
+		halfCarry = halfCarry + (runningSum & 0xF);
+
 		if (addCarry) {
 			if (register.isC()) {
 				runningSum++;
@@ -2364,9 +2367,6 @@ public class CPU2 {
 		register.clearAllFlags();
 
 		register.setZ(reg1.getValue() == 0);
-
-		int halfCarry = initialValue & 0xF;
-		halfCarry = halfCarry + (pc & 0xF);
 		
 		if(addCarry) {
 			halfCarry = halfCarry + (byte)carry;
