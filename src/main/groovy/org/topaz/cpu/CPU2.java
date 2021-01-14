@@ -2366,12 +2366,11 @@ public class CPU2 {
 		register.setZ(reg1.getValue() == 0);
 
 		int halfCarry = initialValue & 0xF;
-		halfCarry = halfCarry + (value & 0xF) + (byte) carry;
-
-//        Debug.print("origin1: " + (initialValue&0xF), 1005509, false);
-//        Debug.print("origin2: " + (value&0xF), 1005509, false);
-//        Debug.print("carry: " + (byte)carry, 1005509, false);
-//        Debug.print("halfCarry: " + halfCarry, 1005509, true);
+		halfCarry = halfCarry + (pc & 0xF);
+		
+		if(addCarry) {
+			halfCarry = halfCarry + (byte)carry;
+		}
 
 		register.setH(halfCarry > 0xF);
 		register.setC((initialValue + runningSum) > 0xFF);
@@ -2430,6 +2429,7 @@ public class CPU2 {
 		int initialValue = reg.getValue();
 		UInt runningDifference = new UInt(UInt.EIGHT_BITS);
 		int carry = 0;
+		int initialValue2 = 0;
 
 		if (useImmediate) {
 			int n = memoryManager.readMemory(register.pc.getValue());
@@ -2438,6 +2438,11 @@ public class CPU2 {
 		} else {
 			runningDifference.setValue(value);
 		}
+		
+		initialValue2 = runningDifference.getValue();
+		
+//		Debug.print("origin: " + initialValue, 100004, false);
+//		Debug.print("val: " + runningDifference.getValue(), 100004, true);
 
 		if (subCarry) {
 			if (register.isC()) {
@@ -2460,10 +2465,10 @@ public class CPU2 {
 				register.setC();
 			}
 		} else {
-			register.setC((initialValue - value - carry) < 0);
+			register.setC((initialValue - initialValue2 - carry) < 0);
 		}
 
-		int halfCarry = (initialValue & 0xF) - (value & 0xF);
+		int halfCarry = (initialValue & 0xF) - (initialValue2 & 0xF);
 
 		if (subCarry) {
 			halfCarry = halfCarry - carry;
