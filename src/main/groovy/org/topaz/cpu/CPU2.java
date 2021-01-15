@@ -1133,7 +1133,7 @@ public class CPU2 {
 
 		/* Test Bit */
 		case 0x40:
-			cpuTestBit(register.getBC(), 0);
+			cpuTestBit(register.B.getValue(), 0);
 			return 8;
 		case 0x41:
 			cpuTestBit(register.C.getValue(), 0);
@@ -1851,7 +1851,7 @@ public class CPU2 {
 		 * : Set to 1
 		 */
 
-		register.setZ(BitUtil.isSet(reg, bit));
+		register.setZ(BitUtil.isSet(reg, bit) == false);
 
 		register.clearN();
 		register.setH();
