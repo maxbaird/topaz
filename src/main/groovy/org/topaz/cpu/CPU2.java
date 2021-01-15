@@ -1157,7 +1157,7 @@ public class CPU2 {
 			cpuTestBit(register.A.getValue(), 0);
 			return 8;
 		case 0x48:
-			cpuTestBit(register.getBC(), 1);
+			cpuTestBit(register.B.getValue(), 1);
 			return 8;
 		case 0x49:
 			cpuTestBit(register.C.getValue(), 1);
