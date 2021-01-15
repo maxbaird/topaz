@@ -1229,7 +1229,7 @@ public class CPU2 {
 			cpuTestBit(register.A.getValue(), 3);
 			return 8;
 		case 0x60:
-			cpuTestBit(register.getBC(), 4);
+			cpuTestBit(register.B.getValue(), 4);
 			return 8;
 		case 0x61:
 			cpuTestBit(register.C.getValue(), 4);
@@ -1253,7 +1253,7 @@ public class CPU2 {
 			cpuTestBit(register.A.getValue(), 4);
 			return 8;
 		case 0x68:
-			cpuTestBit(register.getBC(), 5);
+			cpuTestBit(register.B.getValue(), 5);
 			return 8;
 		case 0x69:
 			cpuTestBit(register.C.getValue(), 5);
@@ -1277,7 +1277,7 @@ public class CPU2 {
 			cpuTestBit(register.A.getValue(), 5);
 			return 8;
 		case 0x70:
-			cpuTestBit(register.getBC(), 6);
+			cpuTestBit(register.B.getValue(), 6);
 			return 8;
 		case 0x71:
 			cpuTestBit(register.C.getValue(), 6);
@@ -1301,7 +1301,7 @@ public class CPU2 {
 			cpuTestBit(register.A.getValue(), 6);
 			return 8;
 		case 0x78:
-			cpuTestBit(register.getBC(), 7);
+			cpuTestBit(register.B.getValue(), 7);
 			return 8;
 		case 0x79:
 			cpuTestBit(register.C.getValue(), 7);
@@ -1327,7 +1327,7 @@ public class CPU2 {
 
 		/* set bit */
 		case 0xC0:
-			register.B.setValue(cpuSetBit(register.getBC(), 0));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 0));
 			return 8;
 		case 0xC1:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 0));
@@ -1351,7 +1351,7 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 0));
 			return 8;
 		case 0xC8:
-			register.B.setValue(cpuSetBit(register.getBC(), 1));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 1));
 			return 8;
 		case 0xC9:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 1));
@@ -1375,7 +1375,7 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 1));
 			return 8;
 		case 0xD0:
-			register.B.setValue(cpuSetBit(register.getBC(), 2));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 2));
 			return 8;
 		case 0xD1:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 2));
@@ -1399,7 +1399,7 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 2));
 			return 8;
 		case 0xD8:
-			register.B.setValue(cpuSetBit(register.getBC(), 3));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 3));
 			return 8;
 		case 0xD9:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 3));
@@ -1423,7 +1423,7 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 3));
 			return 8;
 		case 0xE0:
-			register.B.setValue(cpuSetBit(register.getBC(), 4));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 4));
 			return 8;
 		case 0xE1:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 4));
@@ -1447,7 +1447,7 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 4));
 			return 8;
 		case 0xE8:
-			register.B.setValue(cpuSetBit(register.getBC(), 5));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 5));
 			return 8;
 		case 0xE9:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 5));
@@ -1471,10 +1471,10 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 5));
 			return 8;
 		case 0xF0:
-			register.B.setValue(cpuSetBit(register.getBC(), 6));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 6));
 			return 8;
 		case 0xF1:
-			register.C.setValue(cpuSetBit(register.getBC(), 6));
+			register.C.setValue(cpuSetBit(register.C.getValue(), 6));
 			return 8;
 		case 0xF2:
 			register.D.setValue(cpuSetBit(register.D.getValue(), 6));
@@ -1495,7 +1495,7 @@ public class CPU2 {
 			register.A.setValue(cpuSetBit(register.A.getValue(), 6));
 			return 8;
 		case 0xF8:
-			register.B.setValue(cpuSetBit(register.getBC(), 7));
+			register.B.setValue(cpuSetBit(register.B.getValue(), 7));
 			return 8;
 		case 0xF9:
 			register.C.setValue(cpuSetBit(register.C.getValue(), 7));
@@ -1521,7 +1521,7 @@ public class CPU2 {
 
 		/* reset bit */
 		case 0x80:
-			register.B.setValue(cpuResetBit(register.getBC(), 0));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 0));
 			return 8;
 		case 0x81:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 0));
@@ -1545,7 +1545,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 0));
 			return 8;
 		case 0x88:
-			register.B.setValue(cpuResetBit(register.getBC(), 1));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 1));
 			return 8;
 		case 0x89:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 1));
@@ -1569,7 +1569,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 1));
 			return 8;
 		case 0x90:
-			register.B.setValue(cpuResetBit(register.getBC(), 2));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 2));
 			return 8;
 		case 0x91:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 2));
@@ -1593,7 +1593,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 2));
 			return 8;
 		case 0x98:
-			register.B.setValue(cpuResetBit(register.getBC(), 3));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 3));
 			return 8;
 		case 0x99:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 3));
@@ -1617,7 +1617,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 3));
 			return 8;
 		case 0xA0:
-			register.B.setValue(cpuResetBit(register.getBC(), 4));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 4));
 			return 8;
 		case 0xA1:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 4));
@@ -1641,7 +1641,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 4));
 			return 8;
 		case 0xA8:
-			register.B.setValue(cpuResetBit(register.getBC(), 5));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 5));
 			return 8;
 		case 0xA9:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 5));
@@ -1665,7 +1665,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 5));
 			return 8;
 		case 0xB0:
-			register.B.setValue(cpuResetBit(register.getBC(), 6));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 6));
 			return 8;
 		case 0xB1:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 6));
@@ -1689,7 +1689,7 @@ public class CPU2 {
 			register.A.setValue(cpuResetBit(register.A.getValue(), 6));
 			return 8;
 		case 0xB8:
-			register.B.setValue(cpuResetBit(register.getBC(), 7));
+			register.B.setValue(cpuResetBit(register.B.getValue(), 7));
 			return 8;
 		case 0xB9:
 			register.C.setValue(cpuResetBit(register.C.getValue(), 7));
