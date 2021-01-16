@@ -1958,14 +1958,14 @@ public class CPU2 {
 	}
 
 	private void cpuSLAMemory(int address) {
-		int reg = memoryManager.readMemory(address);
-		reg = (reg << 1) & 0xFF;
+		int val = memoryManager.readMemory(address);
+		int res = (val << 1) & 0xFF;
 		register.clearN();
 		register.clearH();
-		register.setC(BitUtil.isSet(reg, 7));
-		register.setZ(reg == 0);
+		register.setC(BitUtil.isSet(val, 7));
+		register.setZ(res == 0);
 
-		memoryManager.writeMemory(address, reg);
+		memoryManager.writeMemory(address, res);
 	}
 
 	private int cpuRLC(UInt reg) {
