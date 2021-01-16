@@ -950,6 +950,11 @@ public class CPU2 {
 		case 0x35:
 			register.L.setValue(cpuSwapNibbles(register.L));
 			return 8;
+		case 0x36:
+			UInt val = new UInt(UInt.SIXTEEN_BITS);
+			val.setValue(register.getHL());
+			register.L.setValue(cpuSwapNibbles(val));
+			return 16;
 
 		/* Rotate left through carry */
 		case 0x07:
@@ -1715,6 +1720,7 @@ public class CPU2 {
 		default:
 			String hexCode = java.lang.String.format("0x%2X", opcode);
 			System.out.println("Unrecognized extended opcode: " + hexCode);
+			System.exit(-1);
 //                def hexCode = java.lang.String.format("0x%2X", opcode);
 //                throw new Exception("Unrecognized extended opcode: " + hexCode);
 		}
@@ -2196,12 +2202,14 @@ public class CPU2 {
 	}
 
 	private void cpuDecMemory(int address) {
-		int n = memoryManager.readMemory(address);
-		int initialN = n;
-		n--;
-		memoryManager.writeMemory(address, n);
+		UInt n = new UInt(UInt.EIGHT_BITS);
+		n.setValue(memoryManager.readMemory(address));
+		int initialN = n.getValue();
+		n.dec();
 
-		register.setZ(n == 0);
+		memoryManager.writeMemory(address, n.getValue());
+
+		register.setZ(n.getValue() == 0);
 		register.setN(true);
 		register.setH((initialN & 0x0F) == 0);
 	}
