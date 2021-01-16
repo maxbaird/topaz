@@ -951,9 +951,10 @@ public class CPU2 {
 			register.L.setValue(cpuSwapNibbles(register.L));
 			return 8;
 		case 0x36:
-			UInt val = new UInt(UInt.SIXTEEN_BITS);
-			val.setValue(register.getHL());
-			register.setHL(cpuSwapNibbles(val));
+//			UInt val = new UInt(UInt.SIXTEEN_BITS);
+//			val.setValue(register.getHL());
+//			register.setHL(cpuSwapNibbles(val));
+			cpuSwapNibblesMemory(register.getHL());
 			return 16;
 
 		/* Rotate left through carry */
@@ -2141,6 +2142,16 @@ public class CPU2 {
 		register.clearAllFlags();
 		register.setZ(n.getValue() == 0);
 		return n.getValue();
+	}
+	
+	private void cpuSwapNibblesMemory(int address) {
+		int val = memoryManager.readMemory(address);
+		int res = ((val & 0xF0) >> 4) | ((val & 0x0F) << 4);
+		memoryManager.writeMemory(address, res);
+		register.setZ(res == 0);
+		register.clearN();
+		register.clearH();
+		register.clearC();
 	}
 
 	private int cpu16BitImmediateLoad() {
