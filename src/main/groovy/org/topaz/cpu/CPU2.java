@@ -1083,7 +1083,7 @@ public class CPU2 {
 			register.L.setValue(cpuSLA(register.L));
 			return 8;
 		case 0x26:
-			cpuSLAMemory(register.H.getValue());
+			cpuSLAMemory(register.getHL());
 			return 16;
 
 		/* shift right into carry */
