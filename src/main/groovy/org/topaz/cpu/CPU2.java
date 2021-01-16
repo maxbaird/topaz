@@ -953,7 +953,7 @@ public class CPU2 {
 		case 0x36:
 			UInt val = new UInt(UInt.SIXTEEN_BITS);
 			val.setValue(register.getHL());
-			register.L.setValue(cpuSwapNibbles(val));
+			register.setHL(cpuSwapNibbles(val));
 			return 16;
 
 		/* Rotate left through carry */
