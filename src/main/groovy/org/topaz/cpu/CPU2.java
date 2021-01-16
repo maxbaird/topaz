@@ -1984,19 +1984,20 @@ public class CPU2 {
 		int reg = memoryManager.readMemory(address);
 
 		boolean isMSBSet = BitUtil.isSet(reg, 7);
+		int carry = isMSBSet ? 1 : 0;
 
-		reg = (reg << 1) & 0xFF;
-
-		register.clearN();
-		register.clearH();
-
-		if (isMSBSet) {
-			register.setC();
-			reg = BitUtil.setBit(reg, 0);
-		}
+		reg = (reg << 1) & 0xFF | carry;
+		memoryManager.writeMemory(address, reg);
 
 		register.setZ(reg == 0);
-		memoryManager.writeMemory(address, reg);
+		register.clearN();
+		register.clearH();
+		register.setC(carry == 1);
+
+//		if (isMSBSet) {
+//			reg = BitUtil.setBit(reg, 0);
+//		}
+
 	}
 
 	private int cpuRL(UInt reg) {
