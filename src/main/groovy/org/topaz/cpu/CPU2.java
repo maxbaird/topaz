@@ -2182,12 +2182,13 @@ public class CPU2 {
 	}
 
 	private void cpuIncMemory(int address) {
-		int n = memoryManager.readMemory(address);
-		int initialN = n;
-		n++;
-		memoryManager.writeMemory(address, n);
+		UInt n = new UInt(UInt.EIGHT_BITS);
+		n.setValue(memoryManager.readMemory(address));
+		int initialN = n.getValue();
+		n.inc();
+		memoryManager.writeMemory(address, n.getValue());
 
-		register.setZ(n == 0);
+		register.setZ(n.getValue() == 0);
 		register.setN(false);
 		register.setH(((initialN & 0x0F) + (1 & 0x0F)) > 0x0F);
 	}
